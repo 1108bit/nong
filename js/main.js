@@ -1,43 +1,43 @@
 function getMainName() {
   const params = new URLSearchParams(location.search);
-  return params.get("mainName") || "레기온원";
+  return params.get("mainName") || "";
 }
 
 function initMainPage() {
   const mainName = getMainName();
 
-  // 본캐명 표시
-  document.getElementById("accountMainName").textContent = mainName;
+  if (!mainName) {
+    location.href = "./index.html";
+    return;
+  }
 
-  // (임시 데이터 - 나중에 DB 연결 예정)
-  document.getElementById("characterCount").textContent = "3";
-  document.getElementById("weeklyRunCount").textContent = "1 / 2";
+  document.getElementById("accountMainName").textContent = mainName;
+  document.getElementById("characterCount").textContent = "-";
+  document.getElementById("weeklyRunCount").textContent = "0 / 2";
 }
 
-// 로그아웃
+function moveNotReady(pageName) {
+  alert(pageName + " 기능은 다음 단계에서 연결 예정");
+}
+
 document.getElementById("logoutButton").addEventListener("click", () => {
   location.href = "./index.html";
 });
 
-// 캐릭터 추가
 document.getElementById("addCharacterButton").addEventListener("click", () => {
-  alert("캐릭터 추가 페이지는 다음 단계에서 연결 예정");
+  moveNotReady("캐릭터 추가");
 });
 
-// 시간 등록 이동
 document.getElementById("goAvailabilityButton").addEventListener("click", () => {
-  alert("시간 등록 페이지는 다음 단계에서 연결 예정");
+  moveNotReady("시간 등록");
 });
 
-// 파티 보기 이동
 document.getElementById("goPartyButton").addEventListener("click", () => {
-  alert("파티 보기 페이지는 다음 단계에서 연결 예정");
+  moveNotReady("파티 보기");
 });
 
-// 내 기록 보기 이동
 document.getElementById("goHistoryButton").addEventListener("click", () => {
-  alert("내 기록 보기 페이지는 다음 단계에서 연결 예정");
+  moveNotReady("내 기록 보기");
 });
 
-// 초기 실행
 initMainPage();
