@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>NSB Guild</title>
+  <title>NSB Legion</title>
   <style>
     * {
       box-sizing: border-box;
@@ -68,7 +68,7 @@
       min-height: 640px;
       background:
         linear-gradient(180deg, rgba(15, 23, 42, 0.72), rgba(15, 23, 42, 0.92)),
-url("./images/logo_main1.png") center/cover no-repeat;
+        url("./images/logo_main1.png") center/cover no-repeat;
       position: relative;
       overflow: hidden;
     }
@@ -367,31 +367,31 @@ url("./images/logo_main1.png") center/cover no-repeat;
 <body>
   <main class="page">
     <section class="shell">
-      <article class="panel left-panel">
+      <article class="panel left-panel" id="leftPanel">
         <div class="left-inner">
-          <div class="eyebrow">NSB 레이드 매니저</div>
+          <div class="eyebrow" id="eyebrowText">NSB 레기온</div>
 
           <div class="logo-wrap">
-            <img src="./images/logo_main1.png" alt="메인 로고1">
+            <img id="logoImagePc" src="./images/logo_main1.png" alt="레기온 로고">
           </div>
 
-          <h1 class="title" id="siteTitle">NSB 길드 페이지</h1>
+          <h1 class="title" id="siteTitle">NSB 레기온 페이지</h1>
           <p class="desc" id="noticeText">
-            요일별, 시간별 가능 캐릭터를 모아서 파티를 편성하고 주차별 참여 현황까지 관리할 수 있는 길드 전용 페이지입니다.
+            요일별, 시간별 가능 캐릭터를 모아서 파티를 편성하고 주차별 참여 현황까지 관리할 수 있는 레기온 전용 페이지입니다.
           </p>
 
           <div class="feature-list">
             <div class="feature-item">
               <div class="feature-dot"></div>
-              <div class="feature-text">본캐명 기준으로 로그인 후 내 캐릭터 정보를 확인</div>
+              <div class="feature-text" id="featureText1">본캐명 기준으로 로그인 후 내 캐릭터 정보를 확인</div>
             </div>
             <div class="feature-item">
               <div class="feature-dot"></div>
-              <div class="feature-text">요일·시간 기준으로 가능한 캐릭터 취합</div>
+              <div class="feature-text" id="featureText2">요일·시간 기준으로 가능한 캐릭터 취합</div>
             </div>
             <div class="feature-item">
               <div class="feature-dot"></div>
-              <div class="feature-text">관리자가 파티를 직접 편성하고 참여 이력 관리</div>
+              <div class="feature-text" id="featureText3">관리자가 파티를 직접 편성하고 참여 이력 관리</div>
             </div>
           </div>
         </div>
@@ -400,24 +400,18 @@ url("./images/logo_main1.png") center/cover no-repeat;
       <article class="panel right-panel">
         <div class="mobile-logo">
           <div class="logo-wrap">
-            <img
-              id="logoImageMobile"
-              src="https://drive.google.com/uc?export=view&id=1hkPAg6h-o8VFxuEbWPhf8UydAsAlpBSn"
-              alt="길드 로고"
-            />
+            <img id="logoImageMobile" src="./images/logo_main1.png" alt="레기온 로고" />
           </div>
         </div>
 
         <div class="form-head">
           <h2 class="form-title" id="loginTitle">로그인</h2>
-          <p class="form-sub" id="loginDesc">
-            본캐명을 입력해서 길드 페이지에 입장해주세요.
-          </p>
+          <p class="form-sub" id="loginDesc">본캐명을 입력해서 레기온 페이지에 입장해주세요.</p>
         </div>
 
         <div class="form-card">
-          <h3 class="card-title">길드원 입장</h3>
-          <label class="label" for="mainName">본캐명</label>
+          <h3 class="card-title" id="memberEnterTitle">레기온원 입장</h3>
+          <label class="label" for="mainName" id="mainNameLabel">본캐명</label>
           <input
             class="input"
             type="text"
@@ -433,7 +427,7 @@ url("./images/logo_main1.png") center/cover no-repeat;
 
         <div class="form-card">
           <h3 class="card-title" id="adminEnterTitle">관리자 입장</h3>
-          <label class="label" for="adminCode">관리자 코드</label>
+          <label class="label" for="adminCode" id="adminCodeLabel">관리자 코드</label>
           <input
             class="input"
             type="password"
@@ -445,8 +439,8 @@ url("./images/logo_main1.png") center/cover no-repeat;
           <div class="result" id="adminResult"></div>
         </div>
 
-        <div class="footer-note">
-          로그인 후 길드원 화면으로 이동하고, 관리자 코드를 입력하면 관리자 전용 화면으로 이동하게 붙일 예정이야.
+        <div class="footer-note" id="footerNote">
+          로그인 후 레기온 메인 화면으로 이동하고, 관리자 코드를 입력하면 관리자 전용 화면으로 이동하게 붙일 예정입니다.
         </div>
       </article>
     </section>
@@ -460,6 +454,7 @@ url("./images/logo_main1.png") center/cover no-repeat;
       Object.entries(params).forEach(([key, value]) => {
         url.searchParams.set(key, value);
       });
+
       const res = await fetch(url.toString());
       return await res.json();
     }
@@ -470,6 +465,18 @@ url("./images/logo_main1.png") center/cover no-repeat;
       el.classList.toggle("error", isError);
     }
 
+    function setText(id, value, fallback = "") {
+      const el = document.getElementById(id);
+      if (!el) return;
+      el.textContent = value || fallback;
+    }
+
+    function setPlaceholder(id, value, fallback = "") {
+      const el = document.getElementById(id);
+      if (!el) return;
+      el.placeholder = value || fallback;
+    }
+
     async function initPage() {
       try {
         const data = await callApi({ action: "init" });
@@ -478,26 +485,45 @@ url("./images/logo_main1.png") center/cover no-repeat;
         const text = data.text || {};
         const image = data.image || {};
 
-        document.getElementById("siteTitle").textContent = text.site_title || "NSB 길드 페이지";
-        document.getElementById("noticeText").textContent =
-          text.notice_text || "길드 전용 페이지에 오신 걸 환영합니다.";
-        document.getElementById("loginTitle").textContent = text.login_title || "로그인";
-        document.getElementById("loginDesc").textContent =
-          text.login_desc || "본캐명을 입력해서 길드 페이지에 입장해주세요.";
-        document.getElementById("mainName").placeholder =
-          text.login_placeholder || "본캐명을 입력해주세요";
-        document.getElementById("loginButton").textContent =
-          text.login_button || "입장하기";
-        document.getElementById("adminEnterTitle").textContent =
-          text.admin_enter_title || "관리자 입장";
-        document.getElementById("adminCode").placeholder =
-          text.admin_code_placeholder || "관리자 코드를 입력해주세요";
-        document.getElementById("adminButton").textContent =
-          text.admin_button || "관리자 페이지 입장";
+        setText("eyebrowText", text.eyebrow_text, "NSB 레기온");
+        setText("siteTitle", text.site_title, "NSB 레기온 페이지");
+        setText("noticeText", text.notice_text, "레기온 전용 페이지에 오신 걸 환영합니다.");
+        setText("featureText1", text.feature_text_1, "본캐명 기준으로 로그인 후 내 캐릭터 정보를 확인");
+        setText("featureText2", text.feature_text_2, "요일·시간 기준으로 가능한 캐릭터 취합");
+        setText("featureText3", text.feature_text_3, "관리자가 파티를 직접 편성하고 참여 이력 관리");
 
-        if (image.IMG_LOGO && image.IMG_LOGO.url) {
-          document.getElementById("logoImagePc").src = image.IMG_LOGO.url;
-          document.getElementById("logoImageMobile").src = image.IMG_LOGO.url;
+        setText("loginTitle", text.login_title, "로그인");
+        setText("loginDesc", text.login_desc, "본캐명을 입력해서 레기온 페이지에 입장해주세요.");
+        setText("memberEnterTitle", text.member_enter_title, "레기온원 입장");
+        setText("mainNameLabel", text.main_name_label, "본캐명");
+        setPlaceholder("mainName", text.login_placeholder, "본캐명을 입력해주세요");
+        setText("loginButton", text.login_button, "입장하기");
+
+        setText("adminEnterTitle", text.admin_enter_title, "관리자 입장");
+        setText("adminCodeLabel", text.admin_code_label, "관리자 코드");
+        setPlaceholder("adminCode", text.admin_code_placeholder, "관리자 코드를 입력해주세요");
+        setText("adminButton", text.admin_button, "관리자 페이지 입장");
+
+        setText("footerNote", text.footer_note, "로그인 후 레기온 메인 화면으로 이동하고, 관리자 코드를 입력하면 관리자 전용 화면으로 이동하게 붙일 예정입니다.");
+
+        const logoUrl =
+          (image.IMG_LOGO && image.IMG_LOGO.url) ||
+          (image.logo_main && image.logo_main.url) ||
+          "";
+
+        const bgUrl =
+          (image.BG_LOGIN && image.BG_LOGIN.url) ||
+          (image.login_bg && image.login_bg.url) ||
+          "";
+
+        if (logoUrl) {
+          document.getElementById("logoImagePc").src = logoUrl;
+          document.getElementById("logoImageMobile").src = logoUrl;
+        }
+
+        if (bgUrl) {
+          document.getElementById("leftPanel").style.background =
+            `linear-gradient(180deg, rgba(15, 23, 42, 0.72), rgba(15, 23, 42, 0.92)), url("${bgUrl}") center/cover no-repeat`;
         }
       } catch (e) {
         console.log(e);
@@ -521,7 +547,13 @@ url("./images/logo_main1.png") center/cover no-repeat;
         }
 
         setMessage("loginResult", data.message || "로그인되었습니다.");
-        alert("로그인 성공. 다음 단계에서 길드원 메인 화면으로 연결하면 돼.");
+
+        if (data.redirectUrl) {
+          location.href = data.redirectUrl;
+          return;
+        }
+
+        alert("로그인 성공");
       } catch (e) {
         setMessage("loginResult", "로그인 중 오류가 발생했습니다.", true);
       }
@@ -544,7 +576,13 @@ url("./images/logo_main1.png") center/cover no-repeat;
         }
 
         setMessage("adminResult", data.message || "관리자 인증 완료");
-        alert("관리자 인증 성공. 다음 단계에서 관리자 화면으로 연결하면 돼.");
+
+        if (data.redirectUrl) {
+          location.href = data.redirectUrl;
+          return;
+        }
+
+        alert("관리자 인증 성공");
       } catch (e) {
         setMessage("adminResult", "관리자 인증 중 오류가 발생했습니다.", true);
       }
