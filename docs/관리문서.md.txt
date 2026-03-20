@@ -1,0 +1,50 @@
+# NSB Legion 관리문서
+
+## 1. 파일 역할
+- index.html : 화면 구조
+- css/style.css : 화면 디자인
+- js/app.js : 기능, API 호출
+- images/logo_main1.png : 기본 로고 이미지
+
+## 2. 주요 화면 요소
+- eyebrowText : 좌측 상단 작은 문구
+- siteTitle : 메인 제목
+- noticeText : 안내 문구
+- featureText1~3 : 기능 설명 문구
+- loginTitle : 로그인 제목
+- loginDesc : 로그인 설명
+- mainName : 본캐명 입력칸
+- loginButton : 입장 버튼
+- loginResult : 로그인 결과 문구
+- adminCode : 관리자 코드 입력칸
+- adminButton : 관리자 버튼
+- adminResult : 관리자 결과 문구
+- footerNote : 하단 안내 문구
+
+## 3. Apps Script action
+- init : TEXT / IMAGE 불러오기
+- login : 본캐명 로그인
+- adminLogin : 관리자 로그인
+
+## 4. TEXT key
+- eyebrow_text
+- site_title
+- notice_text
+- feature_text_1
+- feature_text_2
+- feature_text_3
+- login_title
+- login_desc
+- member_enter_title
+- main_name_label
+- login_placeholder
+- login_button
+- admin_enter_title
+- admin_code_label
+- admin_code_placeholder
+- admin_button
+- footer_note
+
+## 5. IMAGE key
+- IMG_LOGO
+- BG_LOGIN
