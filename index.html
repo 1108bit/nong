@@ -10,156 +10,237 @@
     body {
       margin: 0;
       font-family: "Noto Sans KR", sans-serif;
-      background: #0f172a;
+      background: linear-gradient(135deg, #0f172a, #111827);
       color: #f8fafc;
     }
 
     .wrap {
-      max-width: 1100px;
+      max-width: 1200px;
       margin: 0 auto;
       padding: 24px;
     }
 
-    .card {
-      background: #111827;
-      border: 1px solid rgba(255,255,255,0.08);
-      border-radius: 16px;
-      padding: 20px;
-      margin-bottom: 20px;
+    .hidden { display: none; }
+
+    .hero {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
     }
 
-    h1, h2, h3 {
+    .hero-grid {
+      width: 100%;
+      max-width: 1100px;
+      display: grid;
+      grid-template-columns: 1.1fr 0.9fr;
+      gap: 24px;
+    }
+
+    .panel {
+      background: rgba(17, 24, 39, 0.92);
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 20px;
+      padding: 24px;
+      box-shadow: 0 20px 40px rgba(0,0,0,0.25);
+    }
+
+    .panel h1, .panel h2, .panel h3 {
       margin-top: 0;
+    }
+
+    .logo-box {
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .logo-box img {
+      max-width: 220px;
+      width: 100%;
+      height: auto;
+      margin-bottom: 20px;
+      border-radius: 20px;
+      background: rgba(255,255,255,0.04);
+      padding: 12px;
+    }
+
+    .sub {
+      color: #cbd5e1;
+      font-size: 14px;
+      line-height: 1.6;
     }
 
     input, select, button {
       width: 100%;
-      padding: 12px;
-      border-radius: 10px;
+      padding: 14px;
+      border-radius: 12px;
       border: 1px solid rgba(255,255,255,0.1);
       background: #1f2937;
       color: #fff;
       margin-top: 8px;
       margin-bottom: 12px;
+      font-size: 15px;
     }
 
     button {
       cursor: pointer;
-      background: #2563eb;
+      background: linear-gradient(135deg, #2563eb, #1d4ed8);
       border: none;
       font-weight: 700;
     }
 
-    .grid {
+    button.secondary {
+      background: linear-gradient(135deg, #374151, #1f2937);
+    }
+
+    .main-grid {
       display: grid;
       grid-template-columns: 1fr 1fr;
       gap: 20px;
     }
 
     .member {
-      padding: 12px;
-      border-radius: 12px;
+      padding: 14px;
+      border-radius: 14px;
       background: #1f2937;
       margin-bottom: 10px;
+      border: 1px solid rgba(255,255,255,0.05);
     }
 
-    .sub {
-      color: #cbd5e1;
-      font-size: 14px;
-    }
-
-    .hidden {
-      display: none;
+    .section-title {
+      margin-bottom: 14px;
+      padding-bottom: 10px;
+      border-bottom: 1px solid rgba(255,255,255,0.08);
     }
 
     @media (max-width: 900px) {
-      .grid {
+      .hero-grid, .main-grid {
         grid-template-columns: 1fr;
       }
     }
   </style>
 </head>
 <body>
-  <div class="wrap">
-    <div class="card">
-      <h1 id="siteTitle">길드 페이지</h1>
-      <div class="sub" id="noticeText">불러오는 중...</div>
-    </div>
+  <section id="loginScreen" class="hero">
+    <div class="hero-grid">
+      <div class="panel logo-box">
+        <img id="logoImage" src="" alt="길드 로고" />
+        <h1 id="siteTitle">NSB Guild</h1>
+        <div class="sub" id="noticeText">길드 페이지 로딩 중...</div>
+      </div>
 
-    <div class="grid">
-      <div class="card">
+      <div class="panel">
         <h2 id="loginTitle">로그인</h2>
         <input type="text" id="mainName" placeholder="본캐명 입력" />
         <button id="loginButton">입장하기</button>
         <div id="loginResult" class="sub"></div>
+
+        <hr style="border:none;border-top:1px solid rgba(255,255,255,0.08);margin:20px 0;">
+
+        <h3 id="adminEnterTitle">관리자 입장</h3>
+        <input type="password" id="adminCode" placeholder="관리자 코드를 입력해주세요" />
+        <button id="adminButton" class="secondary">관리자 페이지 입장</button>
+        <div id="adminResult" class="sub"></div>
+      </div>
+    </div>
+  </section>
+
+  <section id="userScreen" class="hidden">
+    <div class="wrap">
+      <div class="panel">
+        <h1 class="section-title">길드 메인</h1>
+        <div id="accountInfo"></div>
       </div>
 
-      <div class="card">
-        <h2>시간 선택</h2>
-        <select id="slotSelect">
-          <option value="">시간 선택</option>
-        </select>
-        <button id="loadMembersButton">가능 캐릭 보기</button>
+      <div class="main-grid">
+        <div class="panel">
+          <h2 class="section-title">내 캐릭터</h2>
+          <div id="charList"></div>
+        </div>
+
+        <div class="panel">
+          <h2 class="section-title">시간 선택</h2>
+          <select id="slotSelect">
+            <option value="">시간 선택</option>
+          </select>
+          <button id="loadMembersButton">가능 캐릭 보기</button>
+          <div id="slotMemberList"></div>
+        </div>
       </div>
     </div>
+  </section>
 
-    <div class="card hidden" id="accountBox">
-      <h2>계정 정보</h2>
-      <div id="accountInfo"></div>
-    </div>
+  <section id="adminScreen" class="hidden">
+    <div class="wrap">
+      <div class="panel">
+        <h1 class="section-title">관리자 관리 페이지</h1>
+        <div class="sub">여기에 관리자용 캐릭터 관리, 파티 배정, 주차별 현황 기능을 붙이면 됨</div>
+      </div>
 
-    <div class="card hidden" id="charBox">
-      <h2>내 캐릭터</h2>
-      <div id="charList"></div>
-    </div>
+      <div class="main-grid">
+        <div class="panel">
+          <h2 class="section-title">관리자 메뉴</h2>
+          <div class="member">캐릭터 관리</div>
+          <div class="member">시간대별 가능 인원 조회</div>
+          <div class="member">파티 편성</div>
+          <div class="member">클리어 현황 관리</div>
+        </div>
 
-    <div class="card hidden" id="slotMemberBox">
-      <h2>선택 시간 가능 캐릭</h2>
-      <div id="slotMemberList"></div>
+        <div class="panel">
+          <h2 class="section-title">안내</h2>
+          <div class="sub">지금은 관리자 입장 분기만 먼저 넣은 상태</div>
+        </div>
+      </div>
     </div>
-  </div>
+  </section>
 
   <script>
-    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwOlszRW-sCVG7WH8hlWcwULUqg44KNg2u3ASgp16itsVEZpfRtNoFGnkiB0-uqBIqnFA/exec";
+    const SCRIPT_URL = "여기에_앱스크립트_URL";
 
     async function callApi(params = {}) {
       const url = new URL(SCRIPT_URL);
       Object.entries(params).forEach(([key, value]) => {
         url.searchParams.set(key, value);
       });
-
       const res = await fetch(url.toString());
       return await res.json();
     }
 
     async function initPage() {
-      try {
-        const data = await callApi({ action: "init" });
-
-        if (!data.ok) {
-          alert(data.message || "초기화 실패");
-          return;
-        }
-
-        const text = data.text || {};
-        const timeSlots = data.timeSlots || [];
-
-        document.getElementById("siteTitle").innerText = text.site_title || "NSB Guild";
-        document.getElementById("noticeText").innerText = text.notice_text || "";
-        document.getElementById("loginTitle").innerText = text.login_title || "로그인";
-        document.getElementById("mainName").placeholder = text.login_placeholder || "본캐명 입력";
-        document.getElementById("loginButton").innerText = text.login_button || "입장하기";
-
-        const slotSelect = document.getElementById("slotSelect");
-        timeSlots.forEach(slot => {
-          const option = document.createElement("option");
-          option.value = slot.slot_id;
-          option.textContent = `${slot.요일} ${slot.시간}`;
-          slotSelect.appendChild(option);
-        });
-      } catch (error) {
-        alert("초기화 오류: " + error.message);
+      const data = await callApi({ action: "init" });
+      if (!data.ok) {
+        alert(data.message || "초기화 실패");
+        return;
       }
+
+      const text = data.text || {};
+      const image = data.image || {};
+      const timeSlots = data.timeSlots || [];
+
+      document.getElementById("siteTitle").innerText = text.site_title || "NSB Guild";
+      document.getElementById("noticeText").innerText = text.notice_text || "";
+      document.getElementById("loginTitle").innerText = text.login_title || "로그인";
+      document.getElementById("mainName").placeholder = text.login_placeholder || "본캐명 입력";
+      document.getElementById("loginButton").innerText = text.login_button || "입장하기";
+      document.getElementById("adminEnterTitle").innerText = text.admin_enter_title || "관리자 입장";
+      document.getElementById("adminCode").placeholder = text.admin_code_placeholder || "관리자 코드를 입력해주세요";
+      document.getElementById("adminButton").innerText = text.admin_button || "관리자 페이지 입장";
+
+      if (image.IMG_LOGO && image.IMG_LOGO.url) {
+        document.getElementById("logoImage").src = image.IMG_LOGO.url;
+      }
+
+      const slotSelect = document.getElementById("slotSelect");
+      timeSlots.forEach(slot => {
+        const option = document.createElement("option");
+        option.value = slot.slot_id;
+        option.textContent = `${slot.요일} ${slot.시간}`;
+        slotSelect.appendChild(option);
+      });
     }
 
     async function login() {
@@ -171,39 +252,25 @@
         return;
       }
 
-      try {
-        const data = await callApi({
-          action: "login",
-          mainName
-        });
+      const data = await callApi({ action: "login", mainName });
+      loginResult.innerText = data.message || "";
 
-        loginResult.innerText = data.message || "";
+      if (!data.ok) return;
 
-        if (!data.ok) return;
+      document.getElementById("loginScreen").classList.add("hidden");
+      document.getElementById("userScreen").classList.remove("hidden");
 
-        const accountBox = document.getElementById("accountBox");
-        const charBox = document.getElementById("charBox");
-        const accountInfo = document.getElementById("accountInfo");
-        const charList = document.getElementById("charList");
+      document.getElementById("accountInfo").innerHTML = `
+        <div class="member">
+          <div><strong>본캐명:</strong> ${data.account?.본캐명 || ""}</div>
+          <div><strong>상태:</strong> ${data.account?.상태 || ""}</div>
+          <div><strong>권한:</strong> ${data.account?.role || ""}</div>
+        </div>
+      `;
 
-        accountBox.classList.remove("hidden");
-        charBox.classList.remove("hidden");
-
-        accountInfo.innerHTML = `
-          <div class="member">
-            <div><strong>본캐명:</strong> ${data.account?.본캐명 || ""}</div>
-            <div><strong>상태:</strong> ${data.account?.상태 || ""}</div>
-            <div><strong>권한:</strong> ${data.account?.role || ""}</div>
-          </div>
-        `;
-
-        const characters = data.characters || [];
-        if (!characters.length) {
-          charList.innerHTML = `<div class="sub">등록된 캐릭터가 없습니다.</div>`;
-          return;
-        }
-
-        charList.innerHTML = characters.map(char => `
+      const characters = data.characters || [];
+      document.getElementById("charList").innerHTML = characters.length
+        ? characters.map(char => `
           <div class="member">
             <div><strong>${char.캐릭명 || ""}</strong></div>
             <div class="sub">구분: ${char.본부캐구분 || ""}</div>
@@ -212,10 +279,26 @@
             <div class="sub">전투력값: ${char.전투력값 || ""}</div>
             <div class="sub">메모: ${char.메모 || ""}</div>
           </div>
-        `).join("");
-      } catch (error) {
-        loginResult.innerText = "로그인 오류: " + error.message;
+        `).join("")
+        : `<div class="sub">등록된 캐릭터가 없습니다.</div>`;
+    }
+
+    async function adminLogin() {
+      const adminCode = document.getElementById("adminCode").value.trim();
+      const adminResult = document.getElementById("adminResult");
+
+      if (!adminCode) {
+        adminResult.innerText = "관리자 코드를 입력해주세요.";
+        return;
       }
+
+      const data = await callApi({ action: "adminLogin", adminCode });
+      adminResult.innerText = data.message || "";
+
+      if (!data.ok) return;
+
+      document.getElementById("loginScreen").classList.add("hidden");
+      document.getElementById("adminScreen").classList.remove("hidden");
     }
 
     async function loadMembersBySlot() {
@@ -225,28 +308,15 @@
         return;
       }
 
-      try {
-        const data = await callApi({
-          action: "getAvailability",
-          slotId
-        });
+      const data = await callApi({ action: "getAvailability", slotId });
+      if (!data.ok) {
+        alert(data.message || "불러오기 실패");
+        return;
+      }
 
-        if (!data.ok) {
-          alert(data.message || "불러오기 실패");
-          return;
-        }
-
-        const box = document.getElementById("slotMemberBox");
-        const list = document.getElementById("slotMemberList");
-        box.classList.remove("hidden");
-
-        const members = data.members || [];
-        if (!members.length) {
-          list.innerHTML = `<div class="sub">가능한 캐릭터가 없습니다.</div>`;
-          return;
-        }
-
-        list.innerHTML = members.map(member => `
+      const members = data.members || [];
+      document.getElementById("slotMemberList").innerHTML = members.length
+        ? members.map(member => `
           <div class="member">
             <div><strong>${member.캐릭명 || ""}</strong> (${member.본부캐구분 || ""})</div>
             <div class="sub">계정: ${member.본캐명 || ""}</div>
@@ -255,13 +325,12 @@
             <div class="sub">전투력값: ${member.전투력값 || ""}</div>
             <div class="sub">메모: ${member.메모 || ""}</div>
           </div>
-        `).join("");
-      } catch (error) {
-        alert("불러오기 오류: " + error.message);
-      }
+        `).join("")
+        : `<div class="sub">가능한 캐릭터가 없습니다.</div>`;
     }
 
     document.getElementById("loginButton").addEventListener("click", login);
+    document.getElementById("adminButton").addEventListener("click", adminLogin);
     document.getElementById("loadMembersButton").addEventListener("click", loadMembersBySlot);
 
     initPage();
