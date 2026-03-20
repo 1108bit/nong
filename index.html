@@ -1,562 +1,270 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-  <base target="_top">
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-  <title>NO STEP BACK</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>NSB Guild</title>
   <style>
-    :root{
-      --bg1:#07131b;
-      --bg2:#0d1f2b;
-      --bg3:#123241;
-      --card:rgba(10, 20, 28, 0.88);
-      --card-line:rgba(109, 191, 170, 0.18);
-      --text:#e8f3f2;
-      --sub:#9eb7b4;
-      --line:rgba(158,183,180,0.16);
-      --input-bg:rgba(255,255,255,0.04);
-      --primary:#1f6f5f;
-      --primary2:#2f8f7b;
-      --primary3:#7bc4a3;
-      --danger:#ff7b7b;
-      --success:#74d7a7;
-      --shadow:0 24px 50px rgba(0,0,0,.38);
-      --radius:24px;
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      font-family: "Noto Sans KR", sans-serif;
+      background: #0f172a;
+      color: #f8fafc;
     }
 
-    *{
-      box-sizing:border-box;
-      -webkit-tap-highlight-color:transparent;
+    .wrap {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 24px;
     }
 
-    html, body{
-      margin:0;
-      padding:0;
-      width:100%;
-      min-height:100%;
-      font-family:-apple-system,BlinkMacSystemFont,"Apple SD Gothic Neo","Noto Sans KR","Malgun Gothic",sans-serif;
-      color:var(--text);
-      background:
-        radial-gradient(circle at 15% 15%, rgba(72,176,150,0.18), transparent 26%),
-        radial-gradient(circle at 85% 12%, rgba(132,208,255,0.12), transparent 24%),
-        radial-gradient(circle at 50% 100%, rgba(69,130,112,0.22), transparent 30%),
-        linear-gradient(160deg, var(--bg1) 0%, var(--bg2) 48%, var(--bg3) 100%);
+    .card {
+      background: #111827;
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 16px;
+      padding: 20px;
+      margin-bottom: 20px;
     }
 
-    body{
-      min-height:100vh;
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      padding:24px 16px;
+    h1, h2, h3 {
+      margin-top: 0;
     }
 
-    .app{
-      width:100%;
-      max-width:440px;
+    input, select, button {
+      width: 100%;
+      padding: 12px;
+      border-radius: 10px;
+      border: 1px solid rgba(255,255,255,0.1);
+      background: #1f2937;
+      color: #fff;
+      margin-top: 8px;
+      margin-bottom: 12px;
     }
 
-    .card{
-      position:relative;
-      overflow:hidden;
-      background:var(--card);
-      border:1px solid var(--card-line);
-      border-radius:var(--radius);
-      box-shadow:var(--shadow);
-      padding:30px 24px 22px;
-      backdrop-filter:blur(14px);
+    button {
+      cursor: pointer;
+      background: #2563eb;
+      border: none;
+      font-weight: 700;
     }
 
-    .card::before{
-      content:"";
-      position:absolute;
-      inset:0;
-      background:
-        linear-gradient(180deg, rgba(255,255,255,0.05), transparent 30%),
-        radial-gradient(circle at top, rgba(123,196,163,0.08), transparent 40%);
-      pointer-events:none;
+    .grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
     }
 
-    .logo-wrap{
-      position:relative;
-      text-align:center;
-      margin-bottom:12px;
-      z-index:1;
+    .member {
+      padding: 12px;
+      border-radius: 12px;
+      background: #1f2937;
+      margin-bottom: 10px;
     }
 
-    .logo-img{
-      width:140px;
-      max-width:100%;
-      height:auto;
-      display:block;
-      margin:0 auto;
-      filter:drop-shadow(0 12px 22px rgba(0,0,0,0.28));
+    .sub {
+      color: #cbd5e1;
+      font-size: 14px;
     }
 
-    .title{
-      position:relative;
-      z-index:1;
-      margin:0;
-      text-align:center;
-      font-size:28px;
-      line-height:1.15;
-      font-weight:800;
-      letter-spacing:-0.6px;
-      color:#f4fbfa;
-      text-shadow:0 0 18px rgba(123,196,163,0.14);
+    .hidden {
+      display: none;
     }
 
-    .desc{
-      position:relative;
-      z-index:1;
-      margin:12px 0 24px;
-      text-align:center;
-      font-size:14px;
-      line-height:1.6;
-      color:var(--sub);
-      word-break:keep-all;
-    }
-
-    .field{
-      position:relative;
-      z-index:1;
-      margin-bottom:14px;
-    }
-
-    .label{
-      display:block;
-      margin-bottom:8px;
-      font-size:13px;
-      font-weight:700;
-      color:#d8ece8;
-    }
-
-    .input{
-      width:100%;
-      height:56px;
-      border:1px solid var(--line);
-      border-radius:16px;
-      padding:0 16px;
-      font-size:16px;
-      outline:none;
-      transition:.18s ease;
-      background:var(--input-bg);
-      color:var(--text);
-    }
-
-    .input:focus{
-      border-color:rgba(123,196,163,0.5);
-      box-shadow:0 0 0 4px rgba(123,196,163,0.10);
-    }
-
-    .input::placeholder{
-      color:#7e9895;
-    }
-
-    .option-row{
-      position:relative;
-      z-index:1;
-      display:flex;
-      gap:12px;
-      margin:8px 0 18px;
-      flex-wrap:wrap;
-    }
-
-    .check{
-      flex:1;
-      min-width:130px;
-      display:flex;
-      align-items:center;
-      gap:8px;
-      background:rgba(255,255,255,0.03);
-      border:1px solid var(--line);
-      border-radius:14px;
-      padding:12px 14px;
-      font-size:14px;
-      color:#d7ebe7;
-      user-select:none;
-    }
-
-    .check input{
-      width:18px;
-      height:18px;
-      margin:0;
-      accent-color:#4aa78b;
-      flex-shrink:0;
-    }
-
-    .btn{
-      position:relative;
-      z-index:1;
-      width:100%;
-      height:56px;
-      border:0;
-      border-radius:16px;
-      font-size:16px;
-      font-weight:800;
-      cursor:pointer;
-      transition:.18s ease;
-    }
-
-    .btn:disabled{
-      opacity:.68;
-      cursor:default;
-    }
-
-    .btn-primary{
-      background:linear-gradient(135deg, var(--primary), var(--primary2));
-      color:#f7fffd;
-      box-shadow:0 12px 24px rgba(22,82,69,.28);
-    }
-
-    .btn-sub{
-      background:rgba(255,255,255,0.04);
-      color:#d9ece9;
-      border:1px solid var(--line);
-    }
-
-    .msg{
-      position:relative;
-      z-index:1;
-      min-height:20px;
-      margin-top:14px;
-      text-align:center;
-      font-size:13px;
-      font-weight:700;
-      color:var(--danger);
-      word-break:keep-all;
-    }
-
-    .helper{
-      position:relative;
-      z-index:1;
-      margin-top:18px;
-      padding:14px 16px;
-      background:rgba(255,255,255,0.03);
-      border:1px solid var(--line);
-      border-radius:16px;
-      font-size:13px;
-      color:var(--sub);
-      line-height:1.6;
-    }
-
-    .welcome{
-      display:none;
-      text-align:center;
-      padding-top:8px;
-      position:relative;
-      z-index:1;
-    }
-
-    .welcome-badge{
-      width:72px;
-      height:72px;
-      border-radius:24px;
-      margin:0 auto 16px;
-      background:linear-gradient(135deg, #2c8b73, #6bc59c);
-      color:#fff;
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      font-size:30px;
-      font-weight:900;
-      box-shadow:0 16px 28px rgba(77,181,141,.24);
-    }
-
-    .welcome h2{
-      margin:0 0 8px;
-      font-size:24px;
-      line-height:1.3;
-      letter-spacing:-0.4px;
-      color:#f2fbf9;
-    }
-
-    .welcome p{
-      margin:0 0 22px;
-      color:var(--sub);
-      font-size:14px;
-      line-height:1.6;
-    }
-
-    .footer-note{
-      margin-top:16px;
-      text-align:center;
-      font-size:12px;
-      color:rgba(232,243,242,.72);
-      letter-spacing:0.1px;
-    }
-
-    @media (max-width: 420px){
-      body{
-        padding:14px;
-      }
-
-      .card{
-        padding:24px 18px 18px;
-        border-radius:22px;
-      }
-
-      .title{
-        font-size:24px;
-      }
-
-      .btn,
-      .input{
-        height:52px;
-      }
-
-      .logo-img{
-        width:120px;
+    @media (max-width: 900px) {
+      .grid {
+        grid-template-columns: 1fr;
       }
     }
   </style>
 </head>
 <body>
-  <div class="app">
+  <div class="wrap">
     <div class="card">
-      <div id="loginBox">
-        <div class="logo-wrap">
-          <img id="logoImg" class="logo-img" src="" alt="로고">
-        </div>
+      <h1 id="siteTitle">길드 페이지</h1>
+      <div class="sub" id="noticeText">불러오는 중...</div>
+    </div>
 
-        <h1 class="title" id="pageTitle">접속</h1>
-
-        <p class="desc" id="pageDesc">
-          본캐명만 입력해주세요.<br>
-          처음 접속한 캐릭터명은 자동 등록됩니다.
-        </p>
-
-        <div class="field">
-          <label class="label" id="inputLabel" for="userId">본캐명</label>
-          <input class="input" id="userId" type="text" placeholder="본캐명 입력" autocomplete="username">
-        </div>
-
-        <div class="option-row">
-          <label class="check">
-            <input type="checkbox" id="rememberMe">
-            정보 저장
-          </label>
-          <label class="check">
-            <input type="checkbox" id="autoLogin">
-            자동 로그인
-          </label>
-        </div>
-
-        <button class="btn btn-primary" id="loginBtn" onclick="login()">입장하기</button>
-
-        <div class="msg" id="msg"></div>
-
-        <div class="helper" id="helperText">
-          본캐명만으로 접속합니다.<br>
-          차단이 필요하면 DB 시트에서 사용여부를 N으로 바꾸면 됩니다.
-        </div>
+    <div class="grid">
+      <div class="card">
+        <h2 id="loginTitle">로그인</h2>
+        <input type="text" id="mainName" placeholder="본캐명 입력" />
+        <button id="loginButton">입장하기</button>
+        <div id="loginResult" class="sub"></div>
       </div>
 
-      <div id="welcomeBox" class="welcome">
-        <div class="welcome-badge">✓</div>
-        <h2 id="welcomeText">환영합니다</h2>
-        <p id="welcomeSub">로그인이 완료되었습니다.</p>
-        <button class="btn btn-primary" id="continueBtn" onclick="goMain()">계속하기</button>
-        <button class="btn btn-sub" id="logoutBtn" style="margin-top:10px;" onclick="logout()">로그아웃</button>
+      <div class="card">
+        <h2>시간 선택</h2>
+        <select id="slotSelect">
+          <option value="">시간 선택</option>
+        </select>
+        <button id="loadMembersButton">가능 캐릭 보기</button>
       </div>
     </div>
 
-    <div class="footer-note" id="footerNote">모바일에서도 바로 사용할 수 있어요</div>
+    <div class="card hidden" id="accountBox">
+      <h2>계정 정보</h2>
+      <div id="accountInfo"></div>
+    </div>
+
+    <div class="card hidden" id="charBox">
+      <h2>내 캐릭터</h2>
+      <div id="charList"></div>
+    </div>
+
+    <div class="card hidden" id="slotMemberBox">
+      <h2>선택 시간 가능 캐릭</h2>
+      <div id="slotMemberList"></div>
+    </div>
   </div>
 
   <script>
-    let uiText = {};
-    let uiImage = {};
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwOlszRW-sCVG7WH8hlWcwULUqg44KNg2u3ASgp16itsVEZpfRtNoFGnkiB0-uqBIqnFA/exec";
 
-    window.addEventListener('load', function () {
-      loadUI();
-      loadSavedInfo();
-      tryAutoLogin();
-
-      document.getElementById('userId').addEventListener('keydown', function(e) {
-        if (e.key === 'Enter') login();
+    async function callApi(params = {}) {
+      const url = new URL(SCRIPT_URL);
+      Object.entries(params).forEach(([key, value]) => {
+        url.searchParams.set(key, value);
       });
-    });
 
-    function loadUI() {
-      google.script.run
-        .withSuccessHandler(function(config) {
-          uiText = (config && config.text) || {};
-          uiImage = (config && config.image) || {};
-
-          setText('pageTitle', uiText.TXT_LOGIN_TITLE, '접속');
-          setHtml('pageDesc', uiText.TXT_LOGIN_DESC, '본캐명만 입력해주세요.<br>처음 접속한 캐릭터명은 자동 등록됩니다.');
-          setText('inputLabel', uiText.TXT_INPUT_LABEL, '본캐명');
-          document.getElementById('userId').placeholder = uiText.TXT_INPUT_PLACEHOLDER || '본캐명 입력';
-          setButtonText('loginBtn', uiText.TXT_LOGIN_BUTTON, '입장하기');
-          setHtml('helperText', uiText.TXT_HELPER, '본캐명만으로 접속합니다.<br>차단이 필요하면 DB 시트에서 사용여부를 N으로 바꾸면 됩니다.');
-          setText('continueBtn', uiText.TXT_CONTINUE_BUTTON, '계속하기');
-          setText('logoutBtn', uiText.TXT_LOGOUT_BUTTON, '로그아웃');
-          setText('footerNote', uiText.TXT_FOOTER_NOTE, '모바일에서도 바로 사용할 수 있어요');
-
-          const logo = document.getElementById('logoImg');
-          if (uiImage.IMG_LOGO) {
-            logo.src = uiImage.IMG_LOGO;
-            logo.style.display = 'block';
-          } else {
-            logo.style.display = 'none';
-          }
-        })
-        .withFailureHandler(function(err) {
-          console.error(err);
-        })
-        .getUiConfig();
+      const res = await fetch(url.toString());
+      return await res.json();
     }
 
-    function setText(id, value, fallback) {
-      document.getElementById(id).textContent = value || fallback || '';
-    }
+    async function initPage() {
+      try {
+        const data = await callApi({ action: "init" });
 
-    function setHtml(id, value, fallback) {
-      document.getElementById(id).innerHTML = value || fallback || '';
-    }
+        if (!data.ok) {
+          alert(data.message || "초기화 실패");
+          return;
+        }
 
-    function setButtonText(id, value, fallback) {
-      document.getElementById(id).textContent = value || fallback || '';
-    }
+        const text = data.text || {};
+        const timeSlots = data.timeSlots || [];
 
-    function loadSavedInfo() {
-      const savedId = localStorage.getItem('savedId') || '';
-      const rememberMe = localStorage.getItem('rememberMe') === 'Y';
-      const autoLogin = localStorage.getItem('autoLogin') === 'Y';
+        document.getElementById("siteTitle").innerText = text.site_title || "NSB Guild";
+        document.getElementById("noticeText").innerText = text.notice_text || "";
+        document.getElementById("loginTitle").innerText = text.login_title || "로그인";
+        document.getElementById("mainName").placeholder = text.login_placeholder || "본캐명 입력";
+        document.getElementById("loginButton").innerText = text.login_button || "입장하기";
 
-      if (rememberMe || autoLogin) {
-        document.getElementById('userId').value = savedId;
-      }
-
-      document.getElementById('rememberMe').checked = rememberMe;
-      document.getElementById('autoLogin').checked = autoLogin;
-
-      document.getElementById('rememberMe').addEventListener('change', syncCheckboxes);
-      document.getElementById('autoLogin').addEventListener('change', syncCheckboxes);
-    }
-
-    function syncCheckboxes() {
-      const remember = document.getElementById('rememberMe');
-      const auto = document.getElementById('autoLogin');
-
-      if (auto.checked) {
-        remember.checked = true;
+        const slotSelect = document.getElementById("slotSelect");
+        timeSlots.forEach(slot => {
+          const option = document.createElement("option");
+          option.value = slot.slot_id;
+          option.textContent = `${slot.요일} ${slot.시간}`;
+          slotSelect.appendChild(option);
+        });
+      } catch (error) {
+        alert("초기화 오류: " + error.message);
       }
     }
 
-    function tryAutoLogin() {
-      const autoLogin = localStorage.getItem('autoLogin') === 'Y';
-      const savedId = localStorage.getItem('savedId') || '';
+    async function login() {
+      const mainName = document.getElementById("mainName").value.trim();
+      const loginResult = document.getElementById("loginResult");
 
-      if (autoLogin && savedId) {
-        doLogin(savedId, true);
+      if (!mainName) {
+        loginResult.innerText = "본캐명을 입력해주세요.";
+        return;
+      }
+
+      try {
+        const data = await callApi({
+          action: "login",
+          mainName
+        });
+
+        loginResult.innerText = data.message || "";
+
+        if (!data.ok) return;
+
+        const accountBox = document.getElementById("accountBox");
+        const charBox = document.getElementById("charBox");
+        const accountInfo = document.getElementById("accountInfo");
+        const charList = document.getElementById("charList");
+
+        accountBox.classList.remove("hidden");
+        charBox.classList.remove("hidden");
+
+        accountInfo.innerHTML = `
+          <div class="member">
+            <div><strong>본캐명:</strong> ${data.account?.본캐명 || ""}</div>
+            <div><strong>상태:</strong> ${data.account?.상태 || ""}</div>
+            <div><strong>권한:</strong> ${data.account?.role || ""}</div>
+          </div>
+        `;
+
+        const characters = data.characters || [];
+        if (!characters.length) {
+          charList.innerHTML = `<div class="sub">등록된 캐릭터가 없습니다.</div>`;
+          return;
+        }
+
+        charList.innerHTML = characters.map(char => `
+          <div class="member">
+            <div><strong>${char.캐릭명 || ""}</strong></div>
+            <div class="sub">구분: ${char.본부캐구분 || ""}</div>
+            <div class="sub">클래스: ${char.클래스 || ""}</div>
+            <div class="sub">전투력구간: ${char.전투력구간 || ""}</div>
+            <div class="sub">전투력값: ${char.전투력값 || ""}</div>
+            <div class="sub">메모: ${char.메모 || ""}</div>
+          </div>
+        `).join("");
+      } catch (error) {
+        loginResult.innerText = "로그인 오류: " + error.message;
       }
     }
 
-    function setLoading(isLoading) {
-      const btn = document.getElementById('loginBtn');
-      btn.disabled = isLoading;
-      btn.textContent = isLoading
-        ? (uiText.TXT_LOADING || '처리 중...')
-        : (uiText.TXT_LOGIN_BUTTON || '입장하기');
-    }
-
-    function showMsg(text, isSuccess) {
-      const msg = document.getElementById('msg');
-      msg.textContent = text || '';
-      msg.style.color = isSuccess ? '#74d7a7' : '#ff7b7b';
-    }
-
-    function validateInput(id) {
-      if (!id) {
-        showMsg(uiText.TXT_ERROR_EMPTY || '캐릭터명을 입력해주세요.');
-        return false;
-      }
-      return true;
-    }
-
-    function login() {
-      const id = document.getElementById('userId').value.trim();
-      if (!validateInput(id)) return;
-      doLogin(id, false);
-    }
-
-    function doLogin(id, isAuto) {
-      setLoading(true);
-      if (!isAuto) showMsg('');
-
-      google.script.run
-        .withSuccessHandler(function(res) {
-          setLoading(false);
-
-          if (!res || !res.success) {
-            if (!isAuto) {
-              showMsg((res && res.message) || uiText.TXT_ERROR_FAIL || '접속에 실패했습니다.');
-            }
-            return;
-          }
-
-          saveLoginInfo(id);
-          showWelcome(id, res.mode);
-        })
-        .withFailureHandler(function(err) {
-          setLoading(false);
-          showMsg(uiText.TXT_ERROR_SYSTEM || '오류가 발생했습니다.');
-          console.error(err);
-        })
-        .loginUser(id);
-    }
-
-    function saveLoginInfo(id) {
-      const rememberMe = document.getElementById('rememberMe').checked;
-      const autoLogin = document.getElementById('autoLogin').checked;
-
-      if (rememberMe || autoLogin) {
-        localStorage.setItem('savedId', id);
-      } else {
-        localStorage.removeItem('savedId');
+    async function loadMembersBySlot() {
+      const slotId = document.getElementById("slotSelect").value;
+      if (!slotId) {
+        alert("시간을 선택해주세요.");
+        return;
       }
 
-      localStorage.setItem('rememberMe', rememberMe ? 'Y' : 'N');
-      localStorage.setItem('autoLogin', autoLogin ? 'Y' : 'N');
-      localStorage.setItem('loginSession', 'Y');
-      localStorage.setItem('loginUser', id);
-    }
+      try {
+        const data = await callApi({
+          action: "getAvailability",
+          slotId
+        });
 
-    function showWelcome(name, mode) {
-      document.getElementById('loginBox').style.display = 'none';
-      document.getElementById('welcomeBox').style.display = 'block';
+        if (!data.ok) {
+          alert(data.message || "불러오기 실패");
+          return;
+        }
 
-      const title = document.getElementById('welcomeText');
-      const sub = document.getElementById('welcomeSub');
+        const box = document.getElementById("slotMemberBox");
+        const list = document.getElementById("slotMemberList");
+        box.classList.remove("hidden");
 
-      if (mode === 'signup') {
-        title.textContent = (uiText.TXT_WELCOME_SIGNUP_TITLE || '{name}님 등록 완료').replace('{name}', name);
-        sub.textContent = uiText.TXT_WELCOME_SIGNUP_SUB || '처음 접속한 계정이 생성되었습니다.';
-      } else {
-        title.textContent = (uiText.TXT_WELCOME_LOGIN_TITLE || '{name}님 환영합니다').replace('{name}', name);
-        sub.textContent = uiText.TXT_WELCOME_LOGIN_SUB || '접속이 완료되었습니다.';
+        const members = data.members || [];
+        if (!members.length) {
+          list.innerHTML = `<div class="sub">가능한 캐릭터가 없습니다.</div>`;
+          return;
+        }
+
+        list.innerHTML = members.map(member => `
+          <div class="member">
+            <div><strong>${member.캐릭명 || ""}</strong> (${member.본부캐구분 || ""})</div>
+            <div class="sub">계정: ${member.본캐명 || ""}</div>
+            <div class="sub">클래스: ${member.클래스 || ""}</div>
+            <div class="sub">전투력구간: ${member.전투력구간 || ""}</div>
+            <div class="sub">전투력값: ${member.전투력값 || ""}</div>
+            <div class="sub">메모: ${member.메모 || ""}</div>
+          </div>
+        `).join("");
+      } catch (error) {
+        alert("불러오기 오류: " + error.message);
       }
     }
 
-    function goMain() {
-      alert('다음 단계에서 메인 화면 연결하면 됩니다.');
-    }
+    document.getElementById("loginButton").addEventListener("click", login);
+    document.getElementById("loadMembersButton").addEventListener("click", loadMembersBySlot);
 
-    function logout() {
-      localStorage.removeItem('loginSession');
-      localStorage.removeItem('loginUser');
-
-      if (!document.getElementById('rememberMe').checked && !document.getElementById('autoLogin').checked) {
-        localStorage.removeItem('savedId');
-      }
-
-      document.getElementById('loginBox').style.display = 'block';
-      document.getElementById('welcomeBox').style.display = 'none';
-      showMsg('');
-    }
+    initPage();
   </script>
 </body>
 </html>
