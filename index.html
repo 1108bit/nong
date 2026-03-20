@@ -3,91 +3,40 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>NSB Legion</title>
+  <title>노스텝백</title>
   <link rel="stylesheet" href="./css/style.css" />
 </head>
 <body>
-  <main class="page">
-    <section class="shell">
-      <article class="panel left-panel" id="leftPanel">
-<div class="left-inner left-hero">
-  <a href="./index.html" class="logo-link logo-center" aria-label="홈으로 이동">
-    <div class="logo-wrap">
-      <img id="logoImagePc" src="./images/logo_main1.png" alt="레기온 로고">
-    </div>
-  </a>
+  <main class="app-page">
+    <div class="bg-logo" aria-hidden="true"></div>
+    <div class="bg-overlay" aria-hidden="true"></div>
 
-  <div class="eyebrow" id="eyebrowText">AION2 : 마족 [젠카카] 서버</div>
+    <section class="login-shell">
+      <div class="login-brand">
+        <div class="brand-badge" id="eyebrowText">AION2</div>
+        <h1 class="brand-title" id="siteTitle">NoStepBack</h1>
+        <p class="brand-sub" id="noticeText">레기온 일정 관리</p>
+      </div>
 
-  <h1 class="title" id="siteTitle">노스텝백 : NSB</h1>
-  <p class="desc" id="noticeText">
-    요일별, 시간별 가능 캐릭터를 모아서 파티를 편성하고 주차별 참여 현황까지 관리할 수 있는 레기온 전용 페이지입니다.
-  </p>
-
-          <div class="feature-list">
-            <div class="feature-item">
-              <div class="feature-dot"></div>
-              <div class="feature-text" id="featureText1">본캐명 기준으로 로그인 후 내 캐릭터 정보를 확인</div>
-            </div>
-            <div class="feature-item">
-              <div class="feature-dot"></div>
-              <div class="feature-text" id="featureText2">요일·시간 기준으로 가능한 캐릭터 취합</div>
-            </div>
-            <div class="feature-item">
-              <div class="feature-dot"></div>
-              <div class="feature-text" id="featureText3">관리자가 파티를 직접 편성하고 참여 이력 관리</div>
-            </div>
-          </div>
-        </div>
-      </article>
-
-      <article class="panel right-panel">
-        <div class="mobile-logo">
-          <a href="./index.html" class="logo-link" aria-label="홈으로 이동">
-            <div class="logo-wrap">
-              <img id="logoImageMobile" src="./images/logo_main1.png" alt="레기온 로고" />
-            </div>
-          </a>
+      <article class="login-card">
+        <div class="login-head">
+          <h2 class="login-title" id="loginTitle">입장하기</h2>
+          <p class="login-desc" id="loginDesc">본캐명을 입력해주세요.</p>
         </div>
 
-        <div class="form-head">
-          <h2 class="form-title" id="loginTitle">로그인</h2>
-          <p class="form-sub" id="loginDesc">본캐명을 입력해서 레기온 페이지에 입장해주세요.</p>
-        </div>
-
-        <div class="form-card">
-          <h3 class="card-title" id="memberEnterTitle">레기온원 입장</h3>
-          <label class="label" for="mainName" id="mainNameLabel">본캐명</label>
+        <div class="form-group">
+          <label class="input-label" for="mainName" id="mainNameLabel">본캐명</label>
           <input
-            class="input"
+            class="main-input"
             type="text"
             id="mainName"
             placeholder="본캐명을 입력해주세요"
             autocomplete="off"
           />
-          <button class="btn btn-primary" id="loginButton">입장하기</button>
-          <div class="result" id="loginResult"></div>
         </div>
 
-        <div class="divider"></div>
-
-        <div class="form-card">
-          <h3 class="card-title" id="adminEnterTitle">관리자 입장</h3>
-          <label class="label" for="adminCode" id="adminCodeLabel">관리자 코드</label>
-          <input
-            class="input"
-            type="password"
-            id="adminCode"
-            placeholder="관리자 코드를 입력해주세요"
-            autocomplete="off"
-          />
-          <button class="btn btn-secondary" id="adminButton">관리자 페이지 입장</button>
-          <div class="result" id="adminResult"></div>
-        </div>
-
-        <div class="footer-note" id="footerNote">
-          로그인 후 레기온 메인 화면으로 이동하고, 관리자 코드를 입력하면 관리자 전용 화면으로 이동하게 붙일 예정입니다.
-        </div>
+        <button class="main-button" id="loginButton">입장하기</button>
+        <div class="result" id="loginResult"></div>
       </article>
     </section>
   </main>
@@ -95,3 +44,7 @@
   <script src="./js/app.js"></script>
 </body>
 </html>
+
+<p class="copyright-text">
+  © 농. All Rights Reserved.
+</p>
