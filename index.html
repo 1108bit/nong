@@ -5,201 +5,459 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>NSB Guild</title>
   <style>
-    * { box-sizing: border-box; }
+    * {
+      box-sizing: border-box;
+    }
+
+    :root {
+      --bg1: #0b1020;
+      --bg2: #151d35;
+      --card: rgba(15, 23, 42, 0.88);
+      --card-soft: rgba(30, 41, 59, 0.78);
+      --line: rgba(255, 255, 255, 0.08);
+      --text: #f8fafc;
+      --sub: #cbd5e1;
+      --point: #60a5fa;
+      --point2: #38bdf8;
+      --btn-dark: #1e293b;
+      --danger: #f87171;
+      --shadow: 0 20px 50px rgba(0, 0, 0, 0.35);
+    }
 
     body {
       margin: 0;
-      font-family: "Noto Sans KR", sans-serif;
-      background: linear-gradient(135deg, #0f172a, #111827);
-      color: #f8fafc;
+      min-height: 100vh;
+      font-family: "Noto Sans KR", "Apple SD Gothic Neo", "Malgun Gothic", sans-serif;
+      color: var(--text);
+      background:
+        linear-gradient(135deg, rgba(9, 14, 28, 0.92), rgba(21, 29, 53, 0.88)),
+        radial-gradient(circle at top left, rgba(96, 165, 250, 0.18), transparent 28%),
+        radial-gradient(circle at bottom right, rgba(56, 189, 248, 0.14), transparent 24%),
+        linear-gradient(135deg, var(--bg1), var(--bg2));
     }
 
-    .wrap {
-      max-width: 1200px;
-      margin: 0 auto;
-      padding: 24px;
-    }
-
-    .hidden { display: none; }
-
-    .hero {
+    .page {
       min-height: 100vh;
       display: flex;
       align-items: center;
       justify-content: center;
-      padding: 24px;
+      padding: 20px;
     }
 
-    .hero-grid {
+    .shell {
       width: 100%;
-      max-width: 1100px;
+      max-width: 1120px;
       display: grid;
-      grid-template-columns: 1.1fr 0.9fr;
-      gap: 24px;
+      grid-template-columns: 1.08fr 0.92fr;
+      gap: 20px;
     }
 
     .panel {
-      background: rgba(17, 24, 39, 0.92);
-      border: 1px solid rgba(255,255,255,0.08);
-      border-radius: 20px;
-      padding: 24px;
-      box-shadow: 0 20px 40px rgba(0,0,0,0.25);
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: 24px;
+      padding: 28px;
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(12px);
     }
 
-    .panel h1, .panel h2, .panel h3 {
-      margin-top: 0;
-    }
-
-    .logo-box {
-      text-align: center;
+    .left-panel {
       display: flex;
       flex-direction: column;
-      justify-content: center;
+      justify-content: space-between;
+      min-height: 640px;
+      background:
+        linear-gradient(180deg, rgba(15, 23, 42, 0.72), rgba(15, 23, 42, 0.92)),
+        url("https://drive.google.com/uc?export=view&id=1hkPAg6h-o8VFxuEbWPhf8UydAsAlpBSn") center/cover no-repeat;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .left-panel::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(180deg, rgba(8, 15, 30, 0.15), rgba(8, 15, 30, 0.6));
+      pointer-events: none;
+    }
+
+    .left-inner {
+      position: relative;
+      z-index: 1;
+    }
+
+    .logo-wrap {
+      display: inline-flex;
       align-items: center;
+      justify-content: center;
+      width: 108px;
+      height: 108px;
+      border-radius: 24px;
+      background: rgba(255, 255, 255, 0.07);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(6px);
+      margin-bottom: 22px;
+      overflow: hidden;
     }
 
-    .logo-box img {
-      max-width: 220px;
-      width: 100%;
-      height: auto;
-      margin-bottom: 20px;
-      border-radius: 20px;
-      background: rgba(255,255,255,0.04);
-      padding: 12px;
+    .logo-wrap img {
+      width: 84px;
+      height: 84px;
+      object-fit: contain;
+      display: block;
     }
 
-    .sub {
-      color: #cbd5e1;
+    .eyebrow {
+      display: inline-block;
+      padding: 7px 12px;
+      border-radius: 999px;
+      background: rgba(96, 165, 250, 0.14);
+      border: 1px solid rgba(96, 165, 250, 0.2);
+      color: #dbeafe;
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.03em;
+      margin-bottom: 16px;
+    }
+
+    .title {
+      margin: 0 0 12px;
+      font-size: 38px;
+      line-height: 1.18;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+    }
+
+    .desc {
+      margin: 0;
+      color: var(--sub);
+      font-size: 15px;
+      line-height: 1.7;
+      word-break: keep-all;
+    }
+
+    .feature-list {
+      margin-top: 30px;
+      display: grid;
+      gap: 12px;
+    }
+
+    .feature-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      padding: 14px 16px;
+      border-radius: 16px;
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid rgba(255, 255, 255, 0.06);
+    }
+
+    .feature-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 999px;
+      background: linear-gradient(135deg, var(--point), var(--point2));
+      margin-top: 6px;
+      flex: 0 0 auto;
+    }
+
+    .feature-text {
+      color: #e2e8f0;
       font-size: 14px;
       line-height: 1.6;
     }
 
-    input, select, button {
-      width: 100%;
-      padding: 14px;
-      border-radius: 12px;
-      border: 1px solid rgba(255,255,255,0.1);
-      background: #1f2937;
-      color: #fff;
-      margin-top: 8px;
-      margin-bottom: 12px;
-      font-size: 15px;
+    .right-panel {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      min-height: 640px;
     }
 
-    button {
-      cursor: pointer;
-      background: linear-gradient(135deg, #2563eb, #1d4ed8);
-      border: none;
+    .form-head {
+      margin-bottom: 24px;
+    }
+
+    .form-title {
+      margin: 0 0 8px;
+      font-size: 28px;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+    }
+
+    .form-sub {
+      margin: 0;
+      color: var(--sub);
+      font-size: 14px;
+      line-height: 1.6;
+      word-break: keep-all;
+    }
+
+    .form-card {
+      background: var(--card-soft);
+      border: 1px solid var(--line);
+      border-radius: 20px;
+      padding: 20px;
+      margin-bottom: 16px;
+    }
+
+    .card-title {
+      margin: 0 0 14px;
+      font-size: 18px;
       font-weight: 700;
     }
 
-    button.secondary {
-      background: linear-gradient(135deg, #374151, #1f2937);
+    .label {
+      display: block;
+      margin-bottom: 8px;
+      font-size: 13px;
+      color: #dbeafe;
+      font-weight: 600;
     }
 
-    .main-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 20px;
-    }
-
-    .member {
-      padding: 14px;
+    .input {
+      width: 100%;
+      height: 52px;
+      padding: 0 16px;
       border-radius: 14px;
-      background: #1f2937;
-      margin-bottom: 10px;
-      border: 1px solid rgba(255,255,255,0.05);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      background: rgba(15, 23, 42, 0.9);
+      color: #fff;
+      outline: none;
+      font-size: 15px;
+      transition: 0.2s ease;
     }
 
-    .section-title {
-      margin-bottom: 14px;
-      padding-bottom: 10px;
-      border-bottom: 1px solid rgba(255,255,255,0.08);
+    .input::placeholder {
+      color: #94a3b8;
     }
 
-    @media (max-width: 900px) {
-      .hero-grid, .main-grid {
+    .input:focus {
+      border-color: rgba(96, 165, 250, 0.6);
+      box-shadow: 0 0 0 4px rgba(96, 165, 250, 0.12);
+    }
+
+    .btn {
+      width: 100%;
+      height: 52px;
+      border: 0;
+      border-radius: 14px;
+      cursor: pointer;
+      color: #fff;
+      font-size: 15px;
+      font-weight: 800;
+      transition: transform 0.12s ease, opacity 0.2s ease;
+    }
+
+    .btn:active {
+      transform: scale(0.99);
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, var(--point), var(--point2));
+      margin-top: 14px;
+    }
+
+    .btn-secondary {
+      background: linear-gradient(135deg, #334155, var(--btn-dark));
+      margin-top: 14px;
+    }
+
+    .result {
+      min-height: 22px;
+      margin-top: 10px;
+      font-size: 13px;
+      color: var(--sub);
+      line-height: 1.5;
+    }
+
+    .result.error {
+      color: var(--danger);
+    }
+
+    .divider {
+      height: 1px;
+      background: rgba(255, 255, 255, 0.08);
+      margin: 18px 0;
+    }
+
+    .footer-note {
+      margin-top: 8px;
+      color: #94a3b8;
+      font-size: 12px;
+      line-height: 1.6;
+    }
+
+    .mobile-logo {
+      display: none;
+      justify-content: center;
+      margin-bottom: 18px;
+    }
+
+    .mobile-logo .logo-wrap {
+      margin-bottom: 0;
+      width: 92px;
+      height: 92px;
+    }
+
+    .mobile-logo img {
+      width: 70px;
+      height: 70px;
+    }
+
+    @media (max-width: 980px) {
+      .shell {
         grid-template-columns: 1fr;
+        max-width: 640px;
+      }
+
+      .left-panel {
+        min-height: auto;
+        padding-bottom: 24px;
+      }
+
+      .right-panel {
+        min-height: auto;
+      }
+
+      .title {
+        font-size: 30px;
+      }
+    }
+
+    @media (max-width: 640px) {
+      .page {
+        padding: 14px;
+      }
+
+      .panel {
+        border-radius: 20px;
+        padding: 20px;
+      }
+
+      .left-panel {
+        display: none;
+      }
+
+      .right-panel {
+        min-height: auto;
+      }
+
+      .mobile-logo {
+        display: flex;
+      }
+
+      .form-title {
+        font-size: 24px;
+      }
+
+      .form-card {
+        padding: 16px;
+        border-radius: 16px;
+      }
+
+      .input,
+      .btn {
+        height: 50px;
+        font-size: 14px;
       }
     }
   </style>
 </head>
 <body>
-  <section id="loginScreen" class="hero">
-    <div class="hero-grid">
-      <div class="panel logo-box">
-        <img id="logoImage" src="" alt="길드 로고" />
-        <h1 id="siteTitle">NSB Guild</h1>
-        <div class="sub" id="noticeText">길드 페이지 로딩 중...</div>
-      </div>
+  <main class="page">
+    <section class="shell">
+      <article class="panel left-panel">
+        <div class="left-inner">
+          <div class="eyebrow">NSB GUILD RAID MANAGER</div>
 
-      <div class="panel">
-        <h2 id="loginTitle">로그인</h2>
-        <input type="text" id="mainName" placeholder="본캐명 입력" />
-        <button id="loginButton">입장하기</button>
-        <div id="loginResult" class="sub"></div>
+          <div class="logo-wrap">
+            <img
+              id="logoImagePc"
+              src="https://drive.google.com/uc?export=view&id=1hkPAg6h-o8VFxuEbWPhf8UydAsAlpBSn"
+              alt="길드 로고"
+            />
+          </div>
 
-        <hr style="border:none;border-top:1px solid rgba(255,255,255,0.08);margin:20px 0;">
+          <h1 class="title" id="siteTitle">NSB 길드 페이지</h1>
+          <p class="desc" id="noticeText">
+            요일별, 시간별 가능 캐릭터를 모아서 파티를 편성하고 주차별 참여 현황까지 관리할 수 있는 길드 전용 페이지입니다.
+          </p>
 
-        <h3 id="adminEnterTitle">관리자 입장</h3>
-        <input type="password" id="adminCode" placeholder="관리자 코드를 입력해주세요" />
-        <button id="adminButton" class="secondary">관리자 페이지 입장</button>
-        <div id="adminResult" class="sub"></div>
-      </div>
-    </div>
-  </section>
+          <div class="feature-list">
+            <div class="feature-item">
+              <div class="feature-dot"></div>
+              <div class="feature-text">본캐명 기준으로 로그인 후 내 캐릭터 정보를 확인</div>
+            </div>
+            <div class="feature-item">
+              <div class="feature-dot"></div>
+              <div class="feature-text">요일·시간 기준으로 가능한 캐릭터 취합</div>
+            </div>
+            <div class="feature-item">
+              <div class="feature-dot"></div>
+              <div class="feature-text">관리자가 파티를 직접 편성하고 참여 이력 관리</div>
+            </div>
+          </div>
+        </div>
+      </article>
 
-  <section id="userScreen" class="hidden">
-    <div class="wrap">
-      <div class="panel">
-        <h1 class="section-title">길드 메인</h1>
-        <div id="accountInfo"></div>
-      </div>
-
-      <div class="main-grid">
-        <div class="panel">
-          <h2 class="section-title">내 캐릭터</h2>
-          <div id="charList"></div>
+      <article class="panel right-panel">
+        <div class="mobile-logo">
+          <div class="logo-wrap">
+            <img
+              id="logoImageMobile"
+              src="https://drive.google.com/uc?export=view&id=1hkPAg6h-o8VFxuEbWPhf8UydAsAlpBSn"
+              alt="길드 로고"
+            />
+          </div>
         </div>
 
-        <div class="panel">
-          <h2 class="section-title">시간 선택</h2>
-          <select id="slotSelect">
-            <option value="">시간 선택</option>
-          </select>
-          <button id="loadMembersButton">가능 캐릭 보기</button>
-          <div id="slotMemberList"></div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <section id="adminScreen" class="hidden">
-    <div class="wrap">
-      <div class="panel">
-        <h1 class="section-title">관리자 관리 페이지</h1>
-        <div class="sub">여기에 관리자용 캐릭터 관리, 파티 배정, 주차별 현황 기능을 붙이면 됨</div>
-      </div>
-
-      <div class="main-grid">
-        <div class="panel">
-          <h2 class="section-title">관리자 메뉴</h2>
-          <div class="member">캐릭터 관리</div>
-          <div class="member">시간대별 가능 인원 조회</div>
-          <div class="member">파티 편성</div>
-          <div class="member">클리어 현황 관리</div>
+        <div class="form-head">
+          <h2 class="form-title" id="loginTitle">로그인</h2>
+          <p class="form-sub" id="loginDesc">
+            본캐명을 입력해서 길드 페이지에 입장해주세요.
+          </p>
         </div>
 
-        <div class="panel">
-          <h2 class="section-title">안내</h2>
-          <div class="sub">지금은 관리자 입장 분기만 먼저 넣은 상태</div>
+        <div class="form-card">
+          <h3 class="card-title">길드원 입장</h3>
+          <label class="label" for="mainName">본캐명</label>
+          <input
+            class="input"
+            type="text"
+            id="mainName"
+            placeholder="본캐명을 입력해주세요"
+            autocomplete="off"
+          />
+          <button class="btn btn-primary" id="loginButton">입장하기</button>
+          <div class="result" id="loginResult"></div>
         </div>
-      </div>
-    </div>
-  </section>
+
+        <div class="divider"></div>
+
+        <div class="form-card">
+          <h3 class="card-title" id="adminEnterTitle">관리자 입장</h3>
+          <label class="label" for="adminCode">관리자 코드</label>
+          <input
+            class="input"
+            type="password"
+            id="adminCode"
+            placeholder="관리자 코드를 입력해주세요"
+            autocomplete="off"
+          />
+          <button class="btn btn-secondary" id="adminButton">관리자 페이지 입장</button>
+          <div class="result" id="adminResult"></div>
+        </div>
+
+        <div class="footer-note">
+          로그인 후 길드원 화면으로 이동하고, 관리자 코드를 입력하면 관리자 전용 화면으로 이동하게 붙일 예정이야.
+        </div>
+      </article>
+    </section>
+  </main>
 
   <script>
-    const SCRIPT_URL = "여기에_앱스크립트_URL";
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwOlszRW-sCVG7WH8hlWcwULUqg44KNg2u3ASgp16itsVEZpfRtNoFGnkiB0-uqBIqnFA/exec";
 
     async function callApi(params = {}) {
       const url = new URL(SCRIPT_URL);
@@ -210,128 +468,102 @@
       return await res.json();
     }
 
+    function setMessage(targetId, message = "", isError = false) {
+      const el = document.getElementById(targetId);
+      el.textContent = message;
+      el.classList.toggle("error", isError);
+    }
+
     async function initPage() {
-      const data = await callApi({ action: "init" });
-      if (!data.ok) {
-        alert(data.message || "초기화 실패");
-        return;
+      try {
+        const data = await callApi({ action: "init" });
+        if (!data.ok) return;
+
+        const text = data.text || {};
+        const image = data.image || {};
+
+        document.getElementById("siteTitle").textContent = text.site_title || "NSB 길드 페이지";
+        document.getElementById("noticeText").textContent =
+          text.notice_text || "길드 전용 페이지에 오신 걸 환영합니다.";
+        document.getElementById("loginTitle").textContent = text.login_title || "로그인";
+        document.getElementById("loginDesc").textContent =
+          text.login_desc || "본캐명을 입력해서 길드 페이지에 입장해주세요.";
+        document.getElementById("mainName").placeholder =
+          text.login_placeholder || "본캐명을 입력해주세요";
+        document.getElementById("loginButton").textContent =
+          text.login_button || "입장하기";
+        document.getElementById("adminEnterTitle").textContent =
+          text.admin_enter_title || "관리자 입장";
+        document.getElementById("adminCode").placeholder =
+          text.admin_code_placeholder || "관리자 코드를 입력해주세요";
+        document.getElementById("adminButton").textContent =
+          text.admin_button || "관리자 페이지 입장";
+
+        if (image.IMG_LOGO && image.IMG_LOGO.url) {
+          document.getElementById("logoImagePc").src = image.IMG_LOGO.url;
+          document.getElementById("logoImageMobile").src = image.IMG_LOGO.url;
+        }
+      } catch (e) {
+        console.log(e);
       }
-
-      const text = data.text || {};
-      const image = data.image || {};
-      const timeSlots = data.timeSlots || [];
-
-      document.getElementById("siteTitle").innerText = text.site_title || "NSB Guild";
-      document.getElementById("noticeText").innerText = text.notice_text || "";
-      document.getElementById("loginTitle").innerText = text.login_title || "로그인";
-      document.getElementById("mainName").placeholder = text.login_placeholder || "본캐명 입력";
-      document.getElementById("loginButton").innerText = text.login_button || "입장하기";
-      document.getElementById("adminEnterTitle").innerText = text.admin_enter_title || "관리자 입장";
-      document.getElementById("adminCode").placeholder = text.admin_code_placeholder || "관리자 코드를 입력해주세요";
-      document.getElementById("adminButton").innerText = text.admin_button || "관리자 페이지 입장";
-
-      if (image.IMG_LOGO && image.IMG_LOGO.url) {
-        document.getElementById("logoImage").src = image.IMG_LOGO.url;
-      }
-
-      const slotSelect = document.getElementById("slotSelect");
-      timeSlots.forEach(slot => {
-        const option = document.createElement("option");
-        option.value = slot.slot_id;
-        option.textContent = `${slot.요일} ${slot.시간}`;
-        slotSelect.appendChild(option);
-      });
     }
 
     async function login() {
       const mainName = document.getElementById("mainName").value.trim();
-      const loginResult = document.getElementById("loginResult");
 
       if (!mainName) {
-        loginResult.innerText = "본캐명을 입력해주세요.";
+        setMessage("loginResult", "본캐명을 입력해주세요.", true);
         return;
       }
 
-      const data = await callApi({ action: "login", mainName });
-      loginResult.innerText = data.message || "";
+      try {
+        const data = await callApi({ action: "login", mainName });
 
-      if (!data.ok) return;
+        if (!data.ok) {
+          setMessage("loginResult", data.message || "로그인에 실패했습니다.", true);
+          return;
+        }
 
-      document.getElementById("loginScreen").classList.add("hidden");
-      document.getElementById("userScreen").classList.remove("hidden");
-
-      document.getElementById("accountInfo").innerHTML = `
-        <div class="member">
-          <div><strong>본캐명:</strong> ${data.account?.본캐명 || ""}</div>
-          <div><strong>상태:</strong> ${data.account?.상태 || ""}</div>
-          <div><strong>권한:</strong> ${data.account?.role || ""}</div>
-        </div>
-      `;
-
-      const characters = data.characters || [];
-      document.getElementById("charList").innerHTML = characters.length
-        ? characters.map(char => `
-          <div class="member">
-            <div><strong>${char.캐릭명 || ""}</strong></div>
-            <div class="sub">구분: ${char.본부캐구분 || ""}</div>
-            <div class="sub">클래스: ${char.클래스 || ""}</div>
-            <div class="sub">전투력구간: ${char.전투력구간 || ""}</div>
-            <div class="sub">전투력값: ${char.전투력값 || ""}</div>
-            <div class="sub">메모: ${char.메모 || ""}</div>
-          </div>
-        `).join("")
-        : `<div class="sub">등록된 캐릭터가 없습니다.</div>`;
+        setMessage("loginResult", data.message || "로그인되었습니다.");
+        alert("로그인 성공. 다음 단계에서 길드원 메인 화면으로 연결하면 돼.");
+      } catch (e) {
+        setMessage("loginResult", "로그인 중 오류가 발생했습니다.", true);
+      }
     }
 
     async function adminLogin() {
       const adminCode = document.getElementById("adminCode").value.trim();
-      const adminResult = document.getElementById("adminResult");
 
       if (!adminCode) {
-        adminResult.innerText = "관리자 코드를 입력해주세요.";
+        setMessage("adminResult", "관리자 코드를 입력해주세요.", true);
         return;
       }
 
-      const data = await callApi({ action: "adminLogin", adminCode });
-      adminResult.innerText = data.message || "";
+      try {
+        const data = await callApi({ action: "adminLogin", adminCode });
 
-      if (!data.ok) return;
+        if (!data.ok) {
+          setMessage("adminResult", data.message || "관리자 인증 실패", true);
+          return;
+        }
 
-      document.getElementById("loginScreen").classList.add("hidden");
-      document.getElementById("adminScreen").classList.remove("hidden");
-    }
-
-    async function loadMembersBySlot() {
-      const slotId = document.getElementById("slotSelect").value;
-      if (!slotId) {
-        alert("시간을 선택해주세요.");
-        return;
+        setMessage("adminResult", data.message || "관리자 인증 완료");
+        alert("관리자 인증 성공. 다음 단계에서 관리자 화면으로 연결하면 돼.");
+      } catch (e) {
+        setMessage("adminResult", "관리자 인증 중 오류가 발생했습니다.", true);
       }
-
-      const data = await callApi({ action: "getAvailability", slotId });
-      if (!data.ok) {
-        alert(data.message || "불러오기 실패");
-        return;
-      }
-
-      const members = data.members || [];
-      document.getElementById("slotMemberList").innerHTML = members.length
-        ? members.map(member => `
-          <div class="member">
-            <div><strong>${member.캐릭명 || ""}</strong> (${member.본부캐구분 || ""})</div>
-            <div class="sub">계정: ${member.본캐명 || ""}</div>
-            <div class="sub">클래스: ${member.클래스 || ""}</div>
-            <div class="sub">전투력구간: ${member.전투력구간 || ""}</div>
-            <div class="sub">전투력값: ${member.전투력값 || ""}</div>
-            <div class="sub">메모: ${member.메모 || ""}</div>
-          </div>
-        `).join("")
-        : `<div class="sub">가능한 캐릭터가 없습니다.</div>`;
     }
 
     document.getElementById("loginButton").addEventListener("click", login);
     document.getElementById("adminButton").addEventListener("click", adminLogin);
-    document.getElementById("loadMembersButton").addEventListener("click", loadMembersBySlot);
+
+    document.getElementById("mainName").addEventListener("keydown", (e) => {
+      if (e.key === "Enter") login();
+    });
+
+    document.getElementById("adminCode").addEventListener("keydown", (e) => {
+      if (e.key === "Enter") adminLogin();
+    });
 
     initPage();
   </script>
