@@ -1,5 +1,15 @@
+function getMainName() {
+  const params = new URLSearchParams(location.search);
+  return params.get("mainName") || "레기온원";
+}
+
+function initMainPage() {
+  const mainName = getMainName();
+  document.getElementById("accountMainName").textContent = mainName;
+}
+
 document.getElementById("logoutButton").addEventListener("click", () => {
-  alert("로그아웃 기능은 다음 단계에서 연결 예정");
+  location.href = "./index.html";
 });
 
 document.getElementById("addCharacterButton").addEventListener("click", () => {
@@ -17,3 +27,5 @@ document.getElementById("goPartyButton").addEventListener("click", () => {
 document.getElementById("goHistoryButton").addEventListener("click", () => {
   alert("내 기록 보기 페이지는 다음 단계에서 연결 예정");
 });
+
+initMainPage();

@@ -99,12 +99,8 @@ async function login() {
 
     setMessage("loginResult", data.message || "로그인되었습니다.");
 
-    if (data.redirectUrl) {
-      location.href = data.redirectUrl;
-      return;
-    }
-
-    alert("로그인 성공");
+const encodedMainName = encodeURIComponent(mainName);
+location.href = `./main.html?mainName=${encodedMainName}`;
   } catch (e) {
     setMessage("loginResult", "로그인 중 오류가 발생했습니다.", true);
   }
