@@ -599,3 +599,34 @@ a {
     align-items: flex-start;
   }
 }
+
+.left-hero {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+
+.logo-center {
+  display: flex;
+  justify-content: center;
+  width: 100%;
+}
+
+.left-hero .eyebrow {
+  margin-bottom: 14px;
+}
+
+.left-hero .title {
+  max-width: 520px;
+}
+
+.left-hero .desc {
+  max-width: 520px;
+}
+
+.left-hero .feature-list {
+  width: 100%;
+  margin-top: 30px;
+  text-align: left;
+}
