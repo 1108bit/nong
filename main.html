@@ -116,7 +116,7 @@ async function addCharacter() {
     }
 
     alert("등록 완료");
-    await loadCharacters();
+    await loadMainData();
   } catch (error) {
     console.error(error);
     alert("서버 오류. 다시 시도해주세요.");
@@ -170,6 +170,24 @@ document.getElementById("goHistoryButton").addEventListener("click", () => {
   alert("내 기록 보기 기능은 다음 단계에서 연결 예정");
 });
 
+async function loadMainData() {
+  const accountId = getAccountId();
+  if (!accountId) return;
+
+  const data = await callApi({
+    action: "getMainData",
+    accountId: accountId
+  });
+
+  if (!data.ok) return;
+
+  renderCharacters(data.items);
+
+  document.getElementById("characterCount").textContent = data.count;
+  document.getElementById("weeklyRunCount").textContent = data.weeklyCount;
+}
+
+
 initMainPage();
 initMainText();
-loadCharacters();
+loadMainData();

@@ -48,7 +48,7 @@ async function initPage() {
     setText("loginDesc", text.login_desc);
     setText("mainNameLabel", text.main_name_label);
     setText("loginButton", text.login_button);
-    setText("footerNote", text.footer_note);
+    setText("footerNote", text.copyright_text);
 
     setPlaceholder("mainName", text.login_placeholder);
 
