@@ -50,68 +50,164 @@
       color: #94a3b8;
       font-size: 14px;
     }
+.summary-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
 
-    .summary-grid {
-      display: grid;
-      grid-template-columns: 90px repeat(5, 1fr);
-      gap: 8px;
-    }
+.summary-cell {
+  min-height: 84px;
+  border-radius: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 10px;
+  box-sizing: border-box;
+  font-weight: 700;
+  background: rgba(255,255,255,0.03);
+  color: #f8fafc;
+  border: 1px solid rgba(255,255,255,0.08);
+  cursor: pointer;
+  flex-direction: column;
+  gap: 6px;
+}
 
-    .summary-head,
-    .summary-time,
-    .summary-cell {
-      min-height: 64px;
-      border-radius: 16px;
+.summary-cell strong {
+  font-size: 22px;
+  color: #00d4ff;
+}
+
+.summary-cell.active {
+  border-color: rgba(0, 212, 255, 0.42);
+  box-shadow: 0 0 0 1px rgba(0, 212, 255, 0.2) inset;
+}
+
+@media (max-width: 760px) {
+  .summary-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .summary-cell {
+    min-height: 76px;
+    font-size: 13px;
+  }
+
+  .summary-cell strong {
+    font-size: 18px;
+  }
+
+  .party-title {
+    font-size: 24px;
+  }
+}    .action-row {
       display: flex;
-      align-items: center;
-      justify-content: center;
-      text-align: center;
-      padding: 8px;
-      box-sizing: border-box;
-      font-weight: 700;
+      gap: 10px;
+      margin-top: 16px;
+      flex-wrap: wrap;
     }
 
-    .summary-head {
-      background: rgba(255,255,255,0.06);
-      color: #cbd5e1;
-      border: 1px solid rgba(255,255,255,0.06);
+    .status-board {
+      display: grid;
+      grid-template-columns: repeat(5, minmax(0, 1fr));
+      gap: 10px;
+      margin-bottom: 16px;
     }
 
-    .summary-time {
-      background: rgba(255,255,255,0.04);
-      color: #94a3b8;
-      border: 1px solid rgba(255,255,255,0.06);
-    }
-
-    .summary-cell {
+    .status-box {
+      padding: 14px 12px;
+      border-radius: 18px;
       background: rgba(255,255,255,0.03);
-      color: #f8fafc;
       border: 1px solid rgba(255,255,255,0.08);
-      cursor: pointer;
-      flex-direction: column;
-      gap: 4px;
     }
 
-    .summary-cell strong {
-      font-size: 20px;
-      color: #00d4ff;
+    .status-label {
+      font-size: 12px;
+      color: #94a3b8;
+      margin-bottom: 6px;
     }
 
-    .summary-cell.active {
-      border-color: rgba(0, 212, 255, 0.42);
-      box-shadow: 0 0 0 1px rgba(0, 212, 255, 0.2) inset;
-    }
-
-    .detail-title {
-      margin: 0 0 14px;
+    .status-value {
       font-size: 18px;
       font-weight: 800;
       color: #f8fafc;
     }
 
+    .status-value.good {
+      color: #67e8f9;
+    }
+
+    .status-value.warn {
+      color: #fbbf24;
+    }
+
+    .status-value.bad {
+      color: #f87171;
+    }
+
+    .party-columns {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 16px;
+    }
+
+    .party-box {
+      padding: 18px;
+      border-radius: 22px;
+      background: rgba(255,255,255,0.03);
+      border: 1px solid rgba(255,255,255,0.08);
+    }
+
+    .party-box-title {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 14px;
+    }
+
+    .party-box-title h3 {
+      margin: 0;
+      font-size: 20px;
+      color: #f8fafc;
+    }
+
+    .party-mini-badges {
+      display: flex;
+      gap: 6px;
+      flex-wrap: wrap;
+    }
+
+    .mini-badge {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 28px;
+      padding: 0 10px;
+      border-radius: 999px;
+      font-size: 12px;
+      font-weight: 800;
+      border: 1px solid rgba(255,255,255,0.08);
+      background: rgba(255,255,255,0.05);
+      color: #cbd5e1;
+    }
+
+    .mini-badge.good {
+      background: rgba(0, 212, 255, 0.12);
+      color: #a5f3fc;
+      border-color: rgba(0, 212, 255, 0.2);
+    }
+
+    .mini-badge.warn {
+      background: rgba(251, 191, 36, 0.12);
+      color: #fde68a;
+      border-color: rgba(251, 191, 36, 0.2);
+    }
+
     .member-list {
       display: grid;
-      gap: 12px;
+      gap: 10px;
     }
 
     .member-item {
@@ -147,33 +243,36 @@
       border-radius: 999px;
       font-size: 12px;
       font-weight: 700;
+      white-space: nowrap;
       background: rgba(0, 212, 255, 0.12);
       color: #a5f3fc;
       border: 1px solid rgba(0, 212, 255, 0.2);
-      white-space: nowrap;
     }
 
-    @media (max-width: 760px) {
-      .summary-grid {
-        grid-template-columns: 70px repeat(5, 1fr);
-        gap: 6px;
-      }
-
-      .summary-head,
-      .summary-time,
-      .summary-cell {
-        min-height: 54px;
-        font-size: 12px;
-      }
-
-      .summary-cell strong {
-        font-size: 16px;
-      }
-
-      .party-title {
-        font-size: 24px;
+    @media (max-width: 900px) {
+      .party-columns,
+      .status-board {
+        grid-template-columns: 1fr;
       }
     }
+
+@media (max-width: 760px) {
+  .summary-head,
+  .summary-time,
+  .summary-cell {
+    min-height: 54px;
+    font-size: 12px;
+  }
+
+  .summary-cell strong {
+    font-size: 16px;
+  }
+
+  .party-title {
+    font-size: 24px;
+  }
+}
+
   </style>
 </head>
 <body>
@@ -183,23 +282,57 @@
         <div class="party-top">
           <div>
             <h1 class="party-title">파티 보기</h1>
-            <p class="party-desc">요일과 시간별 참여 가능 인원을 한눈에 확인하세요</p>
+            <p class="party-desc">요일과 시간별 참여 가능 인원, 자동 파티 추천을 확인하세요</p>
           </div>
           <button class="btn btn-secondary" id="backButton">뒤로가기</button>
         </div>
 
         <div class="summary-grid" id="summaryGrid"></div>
+
+        <div class="action-row">
+          <button class="btn btn-primary" id="autoMatchButton">자동 8인 추천</button>
+        </div>
       </section>
 
       <section class="party-card">
-        <h2 class="detail-title" id="detailTitle">상세 인원 목록</h2>
-        <div class="member-list" id="memberList">
-          <div class="member-item">
-            <div>
-              <div class="member-name">시간 칸을 선택해주세요</div>
-              <div class="member-meta">선택한 시간대의 캐릭터 목록이 표시됩니다</div>
+        <div class="status-board">
+          <div class="status-box">
+            <div class="status-label">선택 시간</div>
+            <div class="status-value" id="statusTime">선택 전</div>
+          </div>
+          <div class="status-box">
+            <div class="status-label">클리어 판단</div>
+            <div class="status-value" id="statusClear">-</div>
+          </div>
+          <div class="status-box">
+            <div class="status-label">총 추천 인원</div>
+            <div class="status-value" id="statusPicked">0</div>
+          </div>
+          <div class="status-box">
+            <div class="status-label">400+ 인원</div>
+            <div class="status-value" id="status400">0</div>
+          </div>
+          <div class="status-box">
+            <div class="status-label">2파티 치유성</div>
+            <div class="status-value" id="statusParty2Heal">-</div>
+          </div>
+        </div>
+
+        <div class="party-columns">
+          <div class="party-box">
+            <div class="party-box-title">
+              <h3>1파티</h3>
+              <div class="party-mini-badges" id="party1Badges"></div>
             </div>
-            <div class="member-badge">대기</div>
+            <div class="member-list" id="party1List"></div>
+          </div>
+
+          <div class="party-box">
+            <div class="party-box-title">
+              <h3>2파티</h3>
+              <div class="party-mini-badges" id="party2Badges"></div>
+            </div>
+            <div class="member-list" id="party2List"></div>
           </div>
         </div>
       </section>
