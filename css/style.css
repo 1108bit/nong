@@ -328,3 +328,167 @@ body {
     padding: 12px;
   }
 }
+
+/* =========================
+   summary
+========================= */
+
+.summary-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.summary-item {
+  padding: 14px;
+  border-radius: 12px;
+  background: #1e293b;
+}
+
+.summary-title {
+  font-size: 12px;
+  opacity: 0.7;
+  margin-bottom: 6px;
+}
+
+.summary-main {
+  font-size: 18px;
+  font-weight: 700;
+}
+
+.summary-sub {
+  margin-top: 4px;
+  font-size: 12px;
+  opacity: 0.7;
+}
+
+/* =========================
+   availability extra
+========================= */
+
+.availability-top-actions {
+  display: flex;
+  gap: 10px;
+  margin-top: 14px;
+  flex-direction: column;
+}
+
+.character-select {
+  width: 100%;
+  padding: 14px;
+  border-radius: 12px;
+  border: none;
+  background: #fff;
+  color: #111827;
+}
+
+.availability-grid,
+.party-grid,
+.admin-grid {
+  display: block;
+}
+
+.availability-card-full,
+.party-card-full,
+.admin-card-full {
+  width: 100%;
+}
+
+.mini-guide {
+  font-size: 12px;
+  opacity: 0.7;
+}
+
+.availability-list,
+.party-summary-list,
+.party-member-list,
+.admin-list {
+  margin-top: 10px;
+}
+
+.availability-note {
+  margin-top: 6px;
+  font-size: 12px;
+  opacity: 0.7;
+}
+
+.page-message.error,
+.result.error {
+  color: #f87171;
+}
+
+/* =========================
+   party extra
+========================= */
+
+.single-action {
+  margin-top: 14px;
+}
+
+.party-refresh-btn {
+  padding: 10px 12px;
+}
+
+.party-badges {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+/* =========================
+   admin
+========================= */
+
+.admin-form-grid {
+  display: grid;
+  gap: 12px;
+}
+
+.admin-action-row {
+  display: flex;
+  gap: 10px;
+  margin-top: 14px;
+}
+
+.admin-item {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 12px;
+  border-radius: 12px;
+  background: #1e293b;
+  margin-bottom: 10px;
+  align-items: center;
+}
+
+.admin-item-title {
+  font-weight: 700;
+}
+
+.admin-item-meta {
+  margin-top: 4px;
+  font-size: 12px;
+  opacity: 0.7;
+}
+
+.admin-item-actions {
+  display: flex;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.character-empty {
+  text-align: center;
+  opacity: 0.7;
+  padding: 18px 0;
+}
+
+@media (min-width: 768px) {
+  .admin-form-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .availability-top-actions {
+    flex-direction: row;
+  }
+}

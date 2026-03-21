@@ -8,12 +8,12 @@ function getMainName() {
   return getParams().get("mainName") || "";
 }
 
-function getAdminCode() {
-  return getParams().get("adminCode") || "";
-}
-
 function getAccountId() {
   return getParams().get("accountId") || "";
+}
+
+function getAdminCode() {
+  return getParams().get("adminCode") || "";
 }
 
 async function callApi(params) {
@@ -25,6 +25,7 @@ async function callApi(params) {
 function setMessage(message, isError = false) {
   const el = document.getElementById("adminMessage");
   if (!el) return;
+
   el.textContent = message || "";
   el.classList.toggle("error", isError);
 }
@@ -34,176 +35,188 @@ function getValue(id) {
   return el ? String(el.value || "").trim() : "";
 }
 
-function renderScheduleList(items) {
-  const target = document.getElementById("scheduleList");
-  if (!target) return;
+function setValue(id, value) {
+  const el = document.getElementById(id);
+  if (el) el.value = value || "";
+}
 
-  const head = `
-    <div class="admin-row admin-head">
-      <div>주간키</div>
-      <div>요일</div>
-      <div>시간</div>
-      <div>상태</div>
-      <div>메모</div>
-      <div>정렬</div>
-      <div>관리</div>
-    </div>
-  `;
-
-  if (!items || !items.length) {
-    target.innerHTML = head + `
-      <div class="admin-row">
-        <div class="admin-cell">등록된 일정이 없습니다</div>
-        <div class="admin-cell">-</div>
-        <div class="admin-cell">-</div>
-        <div class="admin-cell">-</div>
-        <div class="admin-cell">-</div>
-        <div class="admin-cell">-</div>
-        <div class="admin-cell">-</div>
-      </div>
-    `;
-    return;
-  }
-
-  target.innerHTML = head + items.map(item => `
-    <div class="admin-row">
-      <div class="admin-cell">${item.week_key || ""}<br>${item.date || ""}</div>
-      <div class="admin-cell">${item.day || ""}</div>
-      <div class="admin-cell">${item.time_slot || ""}</div>
-      <div class="admin-cell">
-        <span class="admin-badge ${item.open_yn === "Y" ? "" : "off"}">${item.open_yn === "Y" ? "열림" : "닫힘"}</span>
-      </div>
-      <div class="admin-cell">${item.note || "-"}</div>
-      <div class="admin-cell">${item.sort || "-"}</div>
-      <div class="admin-actions">
-        <button class="btn btn-secondary toggle-btn"
-          data-week="${item.week_key || ""}"
-          data-date="${item.date || ""}"
-          data-day="${item.day || ""}"
-          data-time="${item.time_slot || ""}"
-          data-open="${item.open_yn || "Y"}"
-          data-note="${item.note || ""}"
-          data-sort="${item.sort || ""}">
-          상태변경
-        </button>
-        <button class="btn btn-secondary delete-btn"
-          data-week="${item.week_key || ""}"
-          data-date="${item.date || ""}"
-          data-day="${item.day || ""}"
-          data-time="${item.time_slot || ""}">
-          삭제
-        </button>
-      </div>
-    </div>
-  `).join("");
-
-  target.querySelectorAll(".toggle-btn").forEach(btn => {
-    btn.addEventListener("click", async () => {
-      const nextOpenYn = btn.dataset.open === "Y" ? "N" : "Y";
-
-      try {
-const data = await callApi({
-  action: "saveRaidSchedule",
-  weekKey: btn.dataset.week,
-  date: btn.dataset.date,
-  day: btn.dataset.day,
-  timeSlot: btn.dataset.time,
-  openYn: nextOpenYn,
-  note: btn.dataset.note,
-  sort: btn.dataset.sort,
-  adminCode: getAdminCode()
-});
-
-        if (!data.ok) {
-          setMessage(data.message || "상태 변경 실패", true);
-          return;
-        }
-
-        setMessage("상태 변경 완료");
-        await loadSchedule();
-      } catch (error) {
-        console.error(error);
-        setMessage("상태 변경 실패", true);
-      }
-    });
-  });
-
-  target.querySelectorAll(".delete-btn").forEach(btn => {
-    btn.addEventListener("click", async () => {
-      try {
-const data = await callApi({
-  action: "deleteRaidSchedule",
-  weekKey: btn.dataset.week,
-  date: btn.dataset.date,
-  day: btn.dataset.day,
-  timeSlot: btn.dataset.time,
-  adminCode: getAdminCode()
-});
-
-        if (!data.ok) {
-          setMessage(data.message || "삭제 실패", true);
-          return;
-        }
-
-        setMessage("삭제 완료");
-        await loadSchedule();
-      } catch (error) {
-        console.error(error);
-        setMessage("삭제 실패", true);
-      }
-    });
-  });
+function escapeHtml(value) {
+  return String(value || "")
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;")
+    .replaceAll('"', "&quot;")
+    .replaceAll("'", "&#39;");
 }
 
 async function loadWeekKey() {
   const data = await callApi({ action: "getCurrentWeekKey" });
+
   if (!data.ok || !data.weekKey) {
-    throw new Error("주간 키 불러오기 실패");
+    throw new Error("주간 정보를 불러오지 못했습니다.");
   }
-  document.getElementById("weekKeyInput").value = data.weekKey;
+
+  setValue("weekKeyInput", data.weekKey);
+}
+
+function updateSummary(items) {
+  const openCount = (items || []).filter(item => String(item.open_yn || "").toUpperCase() === "Y").length;
+  const finalCount = (items || []).filter(item => String(item.status || "").toUpperCase() === "FINAL").length;
+
+  document.getElementById("openCountText").textContent = `${openCount}개`;
+  document.getElementById("finalCountText").textContent = `${finalCount}개`;
+}
+
+function fillForm(item) {
+  setValue("weekKeyInput", item.week_key || "");
+  setValue("dateInput", item.date || "");
+  setValue("dayInput", item.day || "");
+  setValue("timeSlotInput", item.time_slot || "");
+  setValue("openYnInput", item.open_yn || "Y");
+  setValue("statusInput", item.status || "OPEN");
+  setValue("noteInput", item.note || "");
+  setValue("sortInput", item.sort || "");
+}
+
+function renderScheduleList(items) {
+  const target = document.getElementById("scheduleList");
+
+  if (!items || !items.length) {
+    target.innerHTML = `<div class="availability-empty">등록된 일정이 없습니다.</div>`;
+    updateSummary([]);
+    return;
+  }
+
+  updateSummary(items);
+
+  target.innerHTML = items.map(item => {
+    const openText = String(item.open_yn || "").toUpperCase() === "Y" ? "열림" : "닫힘";
+    const status = escapeHtml(item.status || "OPEN");
+
+    return `
+      <div class="admin-item">
+        <div class="admin-item-main">
+          <div class="admin-item-title">${escapeHtml(item.date || "")} ${escapeHtml(item.day || "")} ${escapeHtml(item.time_slot || "")}</div>
+          <div class="admin-item-meta">${openText} · ${status} · ${escapeHtml(item.note || "-")}</div>
+        </div>
+
+        <div class="admin-item-actions">
+          <button
+            class="mini-btn edit-btn"
+            data-week="${escapeHtml(item.week_key || "")}"
+            data-date="${escapeHtml(item.date || "")}"
+            data-day="${escapeHtml(item.day || "")}"
+            data-time="${escapeHtml(item.time_slot || "")}"
+            data-open="${escapeHtml(item.open_yn || "Y")}"
+            data-status="${escapeHtml(item.status || "OPEN")}"
+            data-note="${escapeHtml(item.note || "")}"
+            data-sort="${escapeHtml(item.sort || "")}"
+          >
+            수정
+          </button>
+
+          <button
+            class="mini-btn delete-btn"
+            data-week="${escapeHtml(item.week_key || "")}"
+            data-date="${escapeHtml(item.date || "")}"
+            data-day="${escapeHtml(item.day || "")}"
+            data-time="${escapeHtml(item.time_slot || "")}"
+          >
+            삭제
+          </button>
+        </div>
+      </div>
+    `;
+  }).join("");
+
+  bindListEvents();
+}
+
+function bindListEvents() {
+  document.querySelectorAll(".edit-btn").forEach(btn => {
+    btn.addEventListener("click", () => {
+      fillForm({
+        week_key: btn.dataset.week,
+        date: btn.dataset.date,
+        day: btn.dataset.day,
+        time_slot: btn.dataset.time,
+        open_yn: btn.dataset.open,
+        status: btn.dataset.status,
+        note: btn.dataset.note,
+        sort: btn.dataset.sort
+      });
+
+      setMessage("입력창에 일정 정보를 불러왔습니다.");
+    });
+  });
+
+  document.querySelectorAll(".delete-btn").forEach(btn => {
+    btn.addEventListener("click", async () => {
+      try {
+        const data = await callApi({
+          action: "deleteRaidSchedule",
+          weekKey: btn.dataset.week,
+          date: btn.dataset.date,
+          day: btn.dataset.day,
+          timeSlot: btn.dataset.time,
+          adminCode: getAdminCode()
+        });
+
+        if (!data.ok) {
+          setMessage(data.message || "삭제하지 못했습니다.", true);
+          return;
+        }
+
+        setMessage("삭제되었습니다.");
+        await loadSchedule();
+      } catch (error) {
+        console.error(error);
+        setMessage("삭제 중 문제가 발생했습니다.", true);
+      }
+    });
+  });
 }
 
 async function loadSchedule() {
   const weekKey = getValue("weekKeyInput");
+
   if (!weekKey) {
-    setMessage("week_key를 입력해주세요", true);
+    setMessage("주간 키를 먼저 확인해주세요.", true);
     return;
   }
 
-  try {
-const data = await callApi({
-  action: "getRaidScheduleAdmin",
-  weekKey,
-  adminCode: getAdminCode()
-});
+  const data = await callApi({
+    action: "getRaidScheduleAdmin",
+    weekKey,
+    adminCode: getAdminCode()
+  });
 
-    if (!data.ok) {
-      setMessage(data.message || "일정 불러오기 실패", true);
-      return;
-    }
-
-    renderScheduleList(data.items || []);
-  } catch (error) {
-    console.error(error);
-    setMessage("일정 불러오기 실패", true);
+  if (!data.ok) {
+    setMessage(data.message || "일정을 불러오지 못했습니다.", true);
+    return;
   }
+
+  renderScheduleList(data.items || []);
 }
 
-async function addSchedule() {
+async function saveSchedule() {
   const weekKey = getValue("weekKeyInput");
   const date = getValue("dateInput");
   const day = getValue("dayInput");
   const timeSlot = getValue("timeSlotInput");
   const openYn = getValue("openYnInput");
+  const status = getValue("statusInput");
   const note = getValue("noteInput");
   const sort = getValue("sortInput");
 
   if (!weekKey || !date || !day || !timeSlot) {
-    setMessage("week_key / date / day / time_slot 확인", true);
+    setMessage("주간 키, 날짜, 요일, 시간은 필수입니다.", true);
     return;
   }
 
   try {
+    setMessage("저장 중입니다...");
+
     const data = await callApi({
       action: "saveRaidSchedule",
       weekKey,
@@ -211,25 +224,22 @@ async function addSchedule() {
       day,
       timeSlot,
       openYn,
+      status,
       note,
-      sort
+      sort,
       adminCode: getAdminCode()
     });
 
     if (!data.ok) {
-      setMessage(data.message || "일정 저장 실패", true);
+      setMessage(data.message || "저장하지 못했습니다.", true);
       return;
     }
 
-    setMessage("일정 저장 완료");
-    document.getElementById("dateInput").value = "";
-    document.getElementById("timeSlotInput").value = "";
-    document.getElementById("noteInput").value = "";
-    document.getElementById("sortInput").value = "";
+    setMessage("저장되었습니다.");
     await loadSchedule();
   } catch (error) {
     console.error(error);
-    setMessage("일정 저장 실패", true);
+    setMessage("저장 중 문제가 발생했습니다.", true);
   }
 }
 
@@ -237,12 +247,12 @@ async function initPage() {
   const adminCode = getAdminCode();
 
   if (!adminCode) {
-    setMessage("관리자 인증 정보가 없습니다", true);
+    setMessage("관리자 확인 정보가 없습니다.", true);
     setTimeout(() => {
       const mainName = encodeURIComponent(getMainName());
       const accountId = encodeURIComponent(getAccountId());
       location.href = `./admin-login.html?mainName=${mainName}&accountId=${accountId}`;
-    }, 500);
+    }, 400);
     return;
   }
 
@@ -253,25 +263,26 @@ async function initPage() {
     });
 
     if (!auth.ok) {
-      setMessage(auth.message || "관리자 인증 실패", true);
+      setMessage(auth.message || "관리자 확인에 실패했습니다.", true);
       setTimeout(() => {
         const mainName = encodeURIComponent(getMainName());
         const accountId = encodeURIComponent(getAccountId());
         location.href = `./admin-login.html?mainName=${mainName}&accountId=${accountId}`;
-      }, 500);
+      }, 400);
       return;
     }
 
     await loadWeekKey();
     await loadSchedule();
+    setMessage("일정 목록을 불러왔습니다.");
   } catch (error) {
     console.error(error);
-    setMessage("초기 로딩 실패", true);
+    setMessage("초기 화면을 불러오지 못했습니다.", true);
   }
 }
 
-document.getElementById("addButton").addEventListener("click", addSchedule);
-document.getElementById("loadButton").addEventListener("click", loadSchedule);
+document.getElementById("saveButton").addEventListener("click", saveSchedule);
+document.getElementById("refreshButton").addEventListener("click", loadSchedule);
 document.getElementById("backButton").addEventListener("click", () => {
   const mainName = encodeURIComponent(getMainName());
   const accountId = encodeURIComponent(getAccountId());

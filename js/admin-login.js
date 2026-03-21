@@ -15,6 +15,7 @@ function getAccountId() {
 function setMessage(message, isError = false) {
   const el = document.getElementById("loginMessage");
   if (!el) return;
+
   el.textContent = message || "";
   el.classList.toggle("error", isError);
 }
@@ -29,12 +30,12 @@ async function loginAdmin() {
   const adminCode = document.getElementById("adminCode").value.trim();
 
   if (!adminCode) {
-    setMessage("관리자 코드를 입력해주세요", true);
+    setMessage("관리자 코드를 입력해주세요.", true);
     return;
   }
 
   try {
-    setMessage("확인 중...");
+    setMessage("확인 중입니다...");
 
     const data = await callApi({
       action: "adminLogin",
@@ -42,7 +43,7 @@ async function loginAdmin() {
     });
 
     if (!data.ok) {
-      setMessage(data.message || "관리자 인증 실패", true);
+      setMessage(data.message || "관리자 확인에 실패했습니다.", true);
       return;
     }
 
@@ -53,7 +54,7 @@ async function loginAdmin() {
     location.href = `./admin.html?mainName=${mainName}&accountId=${accountId}&adminCode=${code}`;
   } catch (error) {
     console.error(error);
-    setMessage("관리자 인증 실패", true);
+    setMessage("관리자 확인 중 문제가 발생했습니다.", true);
   }
 }
 
