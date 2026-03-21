@@ -14,7 +14,7 @@ if (goAdminButton) {
   goAdminButton.addEventListener("click", () => {
     const mainName = encodeURIComponent(getMainName());
     const accountId = encodeURIComponent(getAccountId());
-    location.href = `./admin.html?mainName=${mainName}&accountId=${accountId}`;
+    location.href = `./admin-login.html?mainName=${mainName}&accountId=${accountId}`;
   });
 }
 

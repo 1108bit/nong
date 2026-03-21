@@ -8,6 +8,10 @@ function getMainName() {
   return getParams().get("mainName") || "";
 }
 
+function getAdminCode() {
+  return getParams().get("adminCode") || "";
+}
+
 function getAccountId() {
   return getParams().get("accountId") || "";
 }
@@ -98,16 +102,17 @@ function renderScheduleList(items) {
       const nextOpenYn = btn.dataset.open === "Y" ? "N" : "Y";
 
       try {
-        const data = await callApi({
-          action: "saveRaidSchedule",
-          weekKey: btn.dataset.week,
-          date: btn.dataset.date,
-          day: btn.dataset.day,
-          timeSlot: btn.dataset.time,
-          openYn: nextOpenYn,
-          note: btn.dataset.note,
-          sort: btn.dataset.sort
-        });
+const data = await callApi({
+  action: "saveRaidSchedule",
+  weekKey: btn.dataset.week,
+  date: btn.dataset.date,
+  day: btn.dataset.day,
+  timeSlot: btn.dataset.time,
+  openYn: nextOpenYn,
+  note: btn.dataset.note,
+  sort: btn.dataset.sort,
+  adminCode: getAdminCode()
+});
 
         if (!data.ok) {
           setMessage(data.message || "상태 변경 실패", true);
@@ -126,13 +131,14 @@ function renderScheduleList(items) {
   target.querySelectorAll(".delete-btn").forEach(btn => {
     btn.addEventListener("click", async () => {
       try {
-        const data = await callApi({
-          action: "deleteRaidSchedule",
-          weekKey: btn.dataset.week,
-          date: btn.dataset.date,
-          day: btn.dataset.day,
-          timeSlot: btn.dataset.time
-        });
+const data = await callApi({
+  action: "deleteRaidSchedule",
+  weekKey: btn.dataset.week,
+  date: btn.dataset.date,
+  day: btn.dataset.day,
+  timeSlot: btn.dataset.time,
+  adminCode: getAdminCode()
+});
 
         if (!data.ok) {
           setMessage(data.message || "삭제 실패", true);
@@ -165,10 +171,11 @@ async function loadSchedule() {
   }
 
   try {
-    const data = await callApi({
-      action: "getRaidScheduleAdmin",
-      weekKey
-    });
+const data = await callApi({
+  action: "getRaidScheduleAdmin",
+  weekKey,
+  adminCode: getAdminCode()
+});
 
     if (!data.ok) {
       setMessage(data.message || "일정 불러오기 실패", true);
@@ -206,6 +213,7 @@ async function addSchedule() {
       openYn,
       note,
       sort
+      adminCode: getAdminCode()
     });
 
     if (!data.ok) {
@@ -226,7 +234,34 @@ async function addSchedule() {
 }
 
 async function initPage() {
+  const adminCode = getAdminCode();
+
+  if (!adminCode) {
+    setMessage("관리자 인증 정보가 없습니다", true);
+    setTimeout(() => {
+      const mainName = encodeURIComponent(getMainName());
+      const accountId = encodeURIComponent(getAccountId());
+      location.href = `./admin-login.html?mainName=${mainName}&accountId=${accountId}`;
+    }, 500);
+    return;
+  }
+
   try {
+    const auth = await callApi({
+      action: "adminLogin",
+      adminCode
+    });
+
+    if (!auth.ok) {
+      setMessage(auth.message || "관리자 인증 실패", true);
+      setTimeout(() => {
+        const mainName = encodeURIComponent(getMainName());
+        const accountId = encodeURIComponent(getAccountId());
+        location.href = `./admin-login.html?mainName=${mainName}&accountId=${accountId}`;
+      }, 500);
+      return;
+    }
+
     await loadWeekKey();
     await loadSchedule();
   } catch (error) {
