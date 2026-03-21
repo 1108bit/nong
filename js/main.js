@@ -172,7 +172,9 @@ document.getElementById("logoutButton").addEventListener("click", () => {
 document.getElementById("addCharacterButton").addEventListener("click", addCharacter);
 
 document.getElementById("goAvailabilityButton").addEventListener("click", () => {
-  alert("시간 등록 기능은 다음 단계에서 연결 예정");
+  const mainName = encodeURIComponent(getMainName());
+  const accountId = encodeURIComponent(getAccountId());
+  location.href = `./availability.html?mainName=${mainName}&accountId=${accountId}`;
 });
 
 document.getElementById("goPartyButton").addEventListener("click", () => {
