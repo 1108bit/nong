@@ -1,4 +1,4 @@
-const API_URL = "여기에_앱스크립트_웹앱_URL_넣기";
+const API_URL = "https://script.google.com/macros/s/AKfycbwOlszRW-sCVG7WH8hlWcwULUqg44KNg2u3ASgp16itsVEZpfRtNoFGnkiB0-uqBIqnFA/exec";
 
 const mainNameInput = document.getElementById("mainName");
 const loginButton = document.getElementById("loginButton");

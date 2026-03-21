@@ -48,9 +48,23 @@ body {
 .bg-logo {
   position: absolute;
   inset: 0;
-  background: var(--login-logo-url, url("../images/logo_main1.png")) center 18% / 240px auto no-repeat;
-  opacity: 0.30;
+  background: var(--login-logo-url, url("../images/logo_main1.png")) center center / cover no-repeat;
+  opacity: 0.03;
   z-index: 0;
+  transform: scale(1.02);
+  animation: logoFloat 8s ease-in-out infinite;
+}
+
+@keyframes logoFloat {
+  0% {
+    transform: scale(1.02) translateY(0px);
+  }
+  50% {
+    transform: scale(1.06) translateY(-6px);
+  }
+  100% {
+    transform: scale(1.02) translateY(0px);
+  }
 }
 
 .bg-dim {
