@@ -48,8 +48,8 @@ body {
 .bg-logo {
   position: absolute;
   inset: 0;
-  background: url("../images/logo_main1.png") center 18% / 240px auto no-repeat;
-  opacity: 0.06;
+  background: var(--login-logo-url, url("../images/logo_main1.png")) center 18% / 240px auto no-repeat;
+  opacity: 0.30;
   z-index: 0;
 }
 
