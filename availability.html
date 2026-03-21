@@ -3,81 +3,188 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>노스텝백 메인</title>
+  <title>시간 등록</title>
   <link rel="stylesheet" href="./css/style.css" />
+  <style>
+    .availability-page {
+      min-height: 100vh;
+      padding: 24px 16px 40px;
+      background:
+        radial-gradient(circle at top, rgba(0, 212, 255, 0.12), transparent 30%),
+        radial-gradient(circle at 80% 20%, rgba(139, 92, 246, 0.08), transparent 22%),
+        linear-gradient(180deg, #020617 0%, #0f172a 100%);
+    }
+
+    .availability-shell {
+      max-width: 900px;
+      margin: 0 auto;
+    }
+
+    .availability-card {
+      background: linear-gradient(180deg, rgba(8, 15, 28, 0.82) 0%, rgba(10, 18, 32, 0.72) 100%);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 24px;
+      padding: 20px;
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.35);
+      backdrop-filter: blur(16px);
+      margin-bottom: 16px;
+    }
+
+    .availability-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+
+    .availability-title {
+      margin: 0;
+      font-size: 28px;
+      font-weight: 800;
+      color: #f8fafc;
+    }
+
+    .availability-desc {
+      margin: 8px 0 0;
+      color: #94a3b8;
+      font-size: 14px;
+    }
+
+    .character-select {
+      width: 100%;
+      height: 52px;
+      border-radius: 16px;
+      border: 1px solid rgba(255,255,255,0.08);
+      background: rgba(255,255,255,0.04);
+      color: #f8fafc;
+      padding: 0 14px;
+      font-size: 15px;
+      outline: none;
+    }
+
+    .grid-title {
+      margin: 0 0 12px;
+      font-size: 17px;
+      font-weight: 800;
+      color: #f8fafc;
+    }
+
+    .time-grid {
+      display: grid;
+      grid-template-columns: 100px repeat(5, 1fr);
+      gap: 8px;
+      align-items: stretch;
+    }
+
+    .cell {
+      min-height: 52px;
+      border-radius: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      font-size: 14px;
+      font-weight: 700;
+      padding: 8px;
+      box-sizing: border-box;
+    }
+
+    .cell.head {
+      background: rgba(255,255,255,0.06);
+      color: #cbd5e1;
+      border: 1px solid rgba(255,255,255,0.06);
+    }
+
+    .cell.time {
+      background: rgba(255,255,255,0.04);
+      color: #94a3b8;
+      border: 1px solid rgba(255,255,255,0.06);
+    }
+
+    .slot-btn {
+      width: 100%;
+      min-height: 52px;
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 14px;
+      background: rgba(255,255,255,0.03);
+      color: #cbd5e1;
+      font-size: 14px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    .slot-btn.active {
+      background: linear-gradient(180deg, #00d4ff 0%, #0ea5e9 100%);
+      color: #fff;
+      box-shadow: 0 10px 20px rgba(14, 165, 233, 0.24);
+      border-color: rgba(0, 212, 255, 0.4);
+    }
+
+    .bottom-actions {
+      display: flex;
+      gap: 10px;
+      margin-top: 18px;
+    }
+
+    .save-message {
+      min-height: 22px;
+      margin-top: 12px;
+      color: #94a3b8;
+      font-size: 13px;
+    }
+
+    .save-message.error {
+      color: #f87171;
+    }
+
+    @media (max-width: 760px) {
+      .time-grid {
+        grid-template-columns: 76px repeat(5, 1fr);
+        gap: 6px;
+      }
+
+      .cell,
+      .slot-btn {
+        min-height: 46px;
+        font-size: 12px;
+      }
+
+      .availability-title {
+        font-size: 24px;
+      }
+    }
+  </style>
 </head>
 <body>
-  <main class="page">
-    <div class="main-shell">
-      <header class="main-header">
-        <div>
-          <div class="main-eyebrow">AION2</div>
-          <h1 class="main-page-title" id="mainTitle">레이드 대시보드</h1>
-          <p class="main-page-desc" id="mainDesc">이번 주 파티 현황과 캐릭터 상태를 확인하세요</p>
+  <main class="availability-page">
+    <div class="availability-shell">
+      <section class="availability-card">
+        <div class="availability-top">
+          <div>
+            <h1 class="availability-title">시간 등록</h1>
+            <p class="availability-desc">캐릭터별 참여 가능한 요일과 시간을 선택해주세요</p>
+          </div>
+          <button class="btn btn-secondary" id="backButton">뒤로가기</button>
         </div>
-        <button class="btn btn-secondary header-btn" id="logoutButton">로그아웃</button>
-      </header>
 
-      <section class="main-grid">
-        <article class="main-card">
-          <h2 class="section-title" id="sectionMyInfo">내 정보</h2>
-          <div class="info-list">
-            <div class="info-row">
-              <span class="info-label">본캐명</span>
-              <strong class="info-value" id="accountMainName">-</strong>
-            </div>
-            <div class="info-row">
-              <span class="info-label">등록 캐릭터</span>
-              <strong class="info-value" id="characterCount">0</strong>
-            </div>
-            <div class="info-row">
-              <span class="info-label">주간 레이드</span>
-              <strong class="info-value" id="weeklyRunCount">0 / 2</strong>
-            </div>
-          </div>
-        </article>
+        <select id="characterSelect" class="character-select"></select>
+      </section>
 
-        <article class="main-card">
-          <div class="card-head">
-            <h2 class="section-title" id="sectionCharacter">캐릭터</h2>
-            <button class="mini-btn" id="addCharacterButton">캐릭터 추가</button>
-          </div>
-          <div class="character-list" id="characterList">
-            <div class="character-item">
-              <div>
-                <div class="character-name">불러오는 중...</div>
-                <div class="character-meta">캐릭터 정보를 불러오고 있습니다</div>
-              </div>
-              <div class="character-badge off">대기</div>
-            </div>
-          </div>
-        </article>
+      <section class="availability-card">
+        <h2 class="grid-title">가능 시간 선택</h2>
+        <div class="time-grid" id="timeGrid"></div>
 
-        <article class="main-card">
-          <h2 class="section-title" id="sectionHistory">진행 기록</h2>
-          <div class="history-list" id="historyList">
-            <div class="history-item">
-              <div>
-                <div class="history-time">아직 기록이 없습니다</div>
-                <div class="history-desc">추후 연결 예정입니다</div>
-              </div>
-              <div class="history-state plan">예정</div>
-            </div>
-          </div>
-        </article>
+        <div class="bottom-actions">
+          <button class="btn btn-primary" id="saveButton">저장하기</button>
+          <button class="btn btn-secondary" id="resetButton">선택 초기화</button>
+        </div>
 
-        <article class="main-card">
-          <h2 class="section-title" id="sectionQuickMenu">빠른 메뉴</h2>
-          <div class="quick-menu">
-            <button class="btn btn-primary" id="goAvailabilityButton">시간 등록</button>
-            <button class="btn btn-secondary" id="goPartyButton">파티 보기</button>
-            <button class="btn btn-secondary" id="goHistoryButton">내 기록 보기</button>
-          </div>
-        </article>
+        <div class="save-message" id="saveMessage"></div>
       </section>
     </div>
   </main>
 
-  <script src="./js/main.js"></script>
+  <script src="./js/availability.js"></script>
 </body>
 </html>
