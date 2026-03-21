@@ -123,6 +123,22 @@ async function addCharacter() {
   }
 }
 
+async function initMainText() {
+  try {
+    const data = await callApi({ action: "init" });
+
+    if (!data.ok) return;
+
+    const text = data.text || {};
+
+    document.getElementById("mainTitle").textContent = text.main_title || "";
+    document.getElementById("mainDesc").textContent = text.main_desc || "";
+
+  } catch (e) {
+    console.error(e);
+  }
+}
+
 function initMainPage() {
   const mainName = getMainName();
 
@@ -155,4 +171,5 @@ document.getElementById("goHistoryButton").addEventListener("click", () => {
 });
 
 initMainPage();
+initMainText();
 loadCharacters();
