@@ -9,11 +9,14 @@ function getMainName() {
   return params.get("mainName") || "";
 }
 
-document.getElementById("goAdminButton").addEventListener("click", () => {
-  const mainName = encodeURIComponent(getMainName());
-  const accountId = encodeURIComponent(getAccountId());
-  location.href = `./admin.html?mainName=${mainName}&accountId=${accountId}`;
-});
+const goAdminButton = document.getElementById("goAdminButton");
+if (goAdminButton) {
+  goAdminButton.addEventListener("click", () => {
+    const mainName = encodeURIComponent(getMainName());
+    const accountId = encodeURIComponent(getAccountId());
+    location.href = `./admin.html?mainName=${mainName}&accountId=${accountId}`;
+  });
+}
 
 function getAccountId() {
   const params = getParams();
