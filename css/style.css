@@ -56,7 +56,7 @@ body {
   z-index: 0;
   transform: scale(1.05);
   filter: blur(0.6px);
-  animation: logoFloat 12s ease-in-out infinite;
+  animation: logoFloat 6s ease-in-out infinite;
 }
 
 /* 태블릿 / 작은 창 */
