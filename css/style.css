@@ -54,9 +54,9 @@ body {
   background: var(--login-logo-url, url("../images/logo_main1.png")) center center / contain no-repeat;
   opacity: 0.1;
   z-index: 0;
-  transform: scale(1.05);
+  transform: scale(1.25);
   filter: blur(0.6px);
-  animation: logoFloat 6s ease-in-out infinite;
+  animation: logoFloat 9s ease-in-out infinite;
 }
 
 /* 태블릿 / 작은 창 */
