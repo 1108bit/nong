@@ -59,6 +59,14 @@ body {
   animation: logoFloat 12s ease-in-out infinite;
 }
 
+@media (max-width: 480px) {
+  .bg-logo {
+    background-position: center 15%;
+    background-size: 120%;
+    opacity: 0.08;
+  }
+}
+
 @keyframes logoFloat {
   0% {
     transform: scale(1.02) translateY(0px);
@@ -236,7 +244,7 @@ body {
   margin: 14px 0 0;
   text-align: center;
   color: rgba(255, 255, 255, 0.75);
-  font-size: 11px;
+  font-size: 14px;
   line-height: 1.6;
   letter-spacing: 0.03em;
   text-shadow: 0 0 6px rgba(0, 212, 255, 0.12);
