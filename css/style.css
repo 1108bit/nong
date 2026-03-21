@@ -52,11 +52,11 @@ body {
   position: absolute;
   inset: 0;
   background: var(--login-logo-url, url("../images/logo_main1.png")) center center / contain no-repeat;
-  opacity: 0.5;
+  opacity: 0.1;
   z-index: 0;
-  transform: scale(1.02);
-  filter: blur(0.9px);
-  animation: logoFloat 6s ease-in-out infinite;
+  transform: scale(1.05);
+  filter: blur(0.6px);
+  animation: logoFloat 12s ease-in-out infinite;
 }
 
 @keyframes logoFloat {
