@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>파티 보기</title>
+  <link rel="stylesheet" href="./css/style.css" />
+  <style>
+    .party-page {
+      min-height: 100vh;
+      padding: 24px 16px 40px;
+      background:
+        radial-gradient(circle at top, rgba(0, 212, 255, 0.12), transparent 30%),
+        radial-gradient(circle at 80% 20%, rgba(139, 92, 246, 0.08), transparent 22%),
+        linear-gradient(180deg, #020617 0%, #0f172a 100%);
+    }
+
+    .party-shell {
+      max-width: 1100px;
+      margin: 0 auto;
+    }
+
+    .party-card {
+      background: linear-gradient(180deg, rgba(8, 15, 28, 0.82) 0%, rgba(10, 18, 32, 0.72) 100%);
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 24px;
+      padding: 20px;
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.35);
+      backdrop-filter: blur(16px);
+      margin-bottom: 16px;
+    }
+
+    .party-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 14px;
+    }
+
+    .party-title {
+      margin: 0;
+      font-size: 28px;
+      font-weight: 800;
+      color: #f8fafc;
+    }
+
+    .party-desc {
+      margin: 8px 0 0;
+      color: #94a3b8;
+      font-size: 14px;
+    }
+
+    .summary-grid {
+      display: grid;
+      grid-template-columns: 90px repeat(5, 1fr);
+      gap: 8px;
+    }
+
+    .summary-head,
+    .summary-time,
+    .summary-cell {
+      min-height: 64px;
+      border-radius: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 8px;
+      box-sizing: border-box;
+      font-weight: 700;
+    }
+
+    .summary-head {
+      background: rgba(255,255,255,0.06);
+      color: #cbd5e1;
+      border: 1px solid rgba(255,255,255,0.06);
+    }
+
+    .summary-time {
+      background: rgba(255,255,255,0.04);
+      color: #94a3b8;
+      border: 1px solid rgba(255,255,255,0.06);
+    }
+
+    .summary-cell {
+      background: rgba(255,255,255,0.03);
+      color: #f8fafc;
+      border: 1px solid rgba(255,255,255,0.08);
+      cursor: pointer;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .summary-cell strong {
+      font-size: 20px;
+      color: #00d4ff;
+    }
+
+    .summary-cell.active {
+      border-color: rgba(0, 212, 255, 0.42);
+      box-shadow: 0 0 0 1px rgba(0, 212, 255, 0.2) inset;
+    }
+
+    .detail-title {
+      margin: 0 0 14px;
+      font-size: 18px;
+      font-weight: 800;
+      color: #f8fafc;
+    }
+
+    .member-list {
+      display: grid;
+      gap: 12px;
+    }
+
+    .member-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 14px 16px;
+      border-radius: 18px;
+      background: rgba(255,255,255,0.03);
+      border: 1px solid rgba(255,255,255,0.06);
+    }
+
+    .member-name {
+      font-size: 15px;
+      font-weight: 800;
+      color: #f8fafc;
+    }
+
+    .member-meta {
+      margin-top: 4px;
+      font-size: 13px;
+      color: #94a3b8;
+    }
+
+    .member-badge {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 66px;
+      height: 32px;
+      padding: 0 10px;
+      border-radius: 999px;
+      font-size: 12px;
+      font-weight: 700;
+      background: rgba(0, 212, 255, 0.12);
+      color: #a5f3fc;
+      border: 1px solid rgba(0, 212, 255, 0.2);
+      white-space: nowrap;
+    }
+
+    @media (max-width: 760px) {
+      .summary-grid {
+        grid-template-columns: 70px repeat(5, 1fr);
+        gap: 6px;
+      }
+
+      .summary-head,
+      .summary-time,
+      .summary-cell {
+        min-height: 54px;
+        font-size: 12px;
+      }
+
+      .summary-cell strong {
+        font-size: 16px;
+      }
+
+      .party-title {
+        font-size: 24px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="party-page">
+    <div class="party-shell">
+      <section class="party-card">
+        <div class="party-top">
+          <div>
+            <h1 class="party-title">파티 보기</h1>
+            <p class="party-desc">요일과 시간별 참여 가능 인원을 한눈에 확인하세요</p>
+          </div>
+          <button class="btn btn-secondary" id="backButton">뒤로가기</button>
+        </div>
+
+        <div class="summary-grid" id="summaryGrid"></div>
+      </section>
+
+      <section class="party-card">
+        <h2 class="detail-title" id="detailTitle">상세 인원 목록</h2>
+        <div class="member-list" id="memberList">
+          <div class="member-item">
+            <div>
+              <div class="member-name">시간 칸을 선택해주세요</div>
+              <div class="member-meta">선택한 시간대의 캐릭터 목록이 표시됩니다</div>
+            </div>
+            <div class="member-badge">대기</div>
+          </div>
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <script src="./js/party.js"></script>
+</body>
+</html>

@@ -178,7 +178,9 @@ document.getElementById("goAvailabilityButton").addEventListener("click", () => 
 });
 
 document.getElementById("goPartyButton").addEventListener("click", () => {
-  alert("파티 보기 기능은 다음 단계에서 연결 예정");
+  const mainName = encodeURIComponent(getMainName());
+  const accountId = encodeURIComponent(getAccountId());
+  location.href = `./party.html?mainName=${mainName}&accountId=${accountId}`;
 });
 
 document.getElementById("goHistoryButton").addEventListener("click", () => {
