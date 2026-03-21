@@ -52,11 +52,11 @@ body {
   position: absolute;
   inset: 0;
   background: var(--login-logo-url, url("../images/logo_main1.png")) center center / contain no-repeat;
-  opacity: 0.1;
+  opacity: 0.15;
   z-index: 0;
   transform: scale(1.25);
   filter: blur(0.6px);
-  animation: logoFloat 9s ease-in-out infinite;
+  animation: logoFloat 8s ease-in-out infinite;
 }
 
 /* 태블릿 / 작은 창 */
@@ -64,7 +64,7 @@ body {
   .bg-logo {
     background-position: center 75%;
     background-size: 110%;
-    opacity: 0.09;
+    opacity: 0.15;
   }
 }
 
@@ -73,7 +73,7 @@ body {
   .bg-logo {
     background-position: center 85%;
     background-size: 120%;
-    opacity: 0.09;
+    opacity: 0.15;
   }
 }
 
