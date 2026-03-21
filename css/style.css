@@ -62,7 +62,7 @@ body {
 /* 태블릿 / 작은 창 */
 @media (max-width: 900px) {
   .bg-logo {
-    background-position: center 25%;
+    background-position: center 75%;
     background-size: 110%;
     opacity: 0.09;
   }
@@ -71,9 +71,9 @@ body {
 /* 모바일 */
 @media (max-width: 480px) {
   .bg-logo {
-    background-position: center 15%;
+    background-position: center 85%;
     background-size: 120%;
-    opacity: 0.08;
+    opacity: 0.09;
   }
 }
 
