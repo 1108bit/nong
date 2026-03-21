@@ -2,18 +2,23 @@ const API_URL = "https://script.google.com/macros/s/AKfycbwOlszRW-sCVG7WH8hlWcwU
 
 let weekKey = "";
 let summaryItems = [];
-let selectedKey = "";
+let selectedSlot = null;
+let refreshTimer = null;
+
+/* =========================
+   공통
+========================= */
 
 function getParams() {
   return new URLSearchParams(location.search);
 }
 
-function getMainName() {
-  return getParams().get("mainName") || "";
-}
-
 function getAccountId() {
   return getParams().get("accountId") || "";
+}
+
+function getMainName() {
+  return getParams().get("mainName") || "";
 }
 
 async function callApi(params) {
@@ -22,226 +27,34 @@ async function callApi(params) {
   return await res.json();
 }
 
-function makeKey(day, time) {
-  return `${day}|${time}`;
-}
-
-function getCount(day, time) {
-  return summaryItems.filter(item => item.day === day && item.time_slot === time).length;
-}
-
-function getMembers(day, time) {
-  return summaryItems.filter(item => item.day === day && item.time_slot === time);
-}
-
-function setStatusValue(id, value, cls = "") {
+function setText(id, value) {
   const el = document.getElementById(id);
-  if (!el) return;
-  el.textContent = value;
-  el.className = "status-value" + (cls ? ` ${cls}` : "");
+  if (el && value !== undefined && value !== null) {
+    el.textContent = value;
+  }
 }
 
-function renderMemberRow(item) {
-  const roleBadge = item.isHealer ? "치유" : item.isBuffer ? "호법" : (item.type || "-");
-  const powerText = item.powerValue || item.powerText || "-";
-
-  return `
-    <div class="member-item">
-      <div>
-        <div class="member-name">${item.characterName || item.character_name || "-"}</div>
-        <div class="member-meta">
-          ${(item.mainName || item.main_name || "-")} · ${(item.className || item.class_name || "-")} · ${powerText}
-        </div>
-      </div>
-      <div class="member-badge">${roleBadge}</div>
-    </div>
-  `;
-}
-
-function renderEmptyParty(targetId, message) {
-  const el = document.getElementById(targetId);
+function setMessage(message, isError = false) {
+  const el = document.getElementById("pageMessage");
   if (!el) return;
 
-  el.innerHTML = `
-    <div class="member-item">
-      <div>
-        <div class="member-name">${message}</div>
-        <div class="member-meta">조건에 맞는 인원이 없습니다</div>
-      </div>
-      <div class="member-badge">0명</div>
-    </div>
-  `;
+  el.textContent = message || "";
+  el.classList.toggle("error", isError);
 }
 
-function renderPartyBadges(targetId, party) {
-  const target = document.getElementById(targetId);
-  if (!target) return;
-
-  if (!party) {
-    target.innerHTML = "";
-    return;
-  }
-
-  const html = [
-    `<span class="mini-badge">${party.memberCount || 0}/4</span>`,
-    `<span class="mini-badge ${party.healerYn === "Y" ? "good" : "warn"}">치유 ${party.healerYn || "N"}</span>`,
-    `<span class="mini-badge ${party.bufferYn === "Y" ? "good" : ""}">호법 ${party.bufferYn || "N"}</span>`,
-    `<span class="mini-badge ${Number(party.count400Plus || 0) > 0 ? "good" : ""}">400+ ${party.count400Plus || 0}</span>`,
-    `<span class="mini-badge">점수 ${party.totalScore || 0}</span>`
-  ];
-
-  target.innerHTML = html.join("");
+function makeKey(day, time) {
+  return `${day}__${time}`;
 }
 
-function renderDefaultSelectedInfo(day, time) {
-  const members = getMembers(day, time);
-
-  setStatusValue("statusTime", `${day} ${time}`);
-  setStatusValue("statusClear", "선택됨");
-  setStatusValue("statusPicked", String(members.length));
-  setStatusValue("status400", "-");
-  setStatusValue("statusParty2Heal", "-");
-
-  document.getElementById("party1Badges").innerHTML = "";
-  document.getElementById("party2Badges").innerHTML = "";
-
-  const previewRows = members.slice(0, 4).map(item => renderMemberRow(item)).join("");
-
-  document.getElementById("party1List").innerHTML = previewRows || `
-    <div class="member-item">
-      <div>
-        <div class="member-name">가능 인원이 없습니다</div>
-        <div class="member-meta">다른 시간대를 선택해주세요</div>
-      </div>
-      <div class="member-badge">0명</div>
-    </div>
-  `;
-
-  document.getElementById("party2List").innerHTML = `
-    <div class="member-item">
-      <div>
-        <div class="member-name">자동 추천 버튼을 눌러주세요</div>
-        <div class="member-meta">1파티 / 2파티 자동 분배</div>
-      </div>
-      <div class="member-badge">대기</div>
-    </div>
-  `;
-}
-
-function renderAutoMatchResult(data) {
-  const party1 = data.party1 || {};
-  const party2 = data.party2 || {};
-
-  setStatusValue("statusTime", `${data.day} ${data.timeSlot}`);
-  setStatusValue(
-    "statusClear",
-    data.clearLevel || "-",
-    data.clearLevel === "안정" ? "good" :
-    data.clearLevel === "가능" || data.clearLevel === "도전" || data.clearLevel === "주의" ? "warn" : "bad"
-  );
-  setStatusValue("statusPicked", String(data.totalPicked || 0), (data.totalPicked || 0) >= 8 ? "good" : "warn");
-  setStatusValue(
-    "status400",
-    String(data.conditions?.count400Plus || 0),
-    (data.conditions?.count400Plus || 0) >= 2 ? "good" : "warn"
-  );
-  setStatusValue(
-    "statusParty2Heal",
-    data.conditions?.hasParty2HealerYn || "N",
-    data.conditions?.hasParty2HealerYn === "Y" ? "good" : "bad"
-  );
-
-  renderPartyBadges("party1Badges", party1);
-  renderPartyBadges("party2Badges", party2);
-
-  if (party1.members && party1.members.length > 0) {
-    document.getElementById("party1List").innerHTML = party1.members.map(renderMemberRow).join("");
-  } else {
-    renderEmptyParty("party1List", "1파티 추천 인원이 없습니다");
-  }
-
-  if (party2.members && party2.members.length > 0) {
-    document.getElementById("party2List").innerHTML = party2.members.map(renderMemberRow).join("");
-  } else {
-    renderEmptyParty("party2List", "2파티 추천 인원이 없습니다");
-  }
-}
-
-function renderSummaryGrid() {
-  const target = document.getElementById("summaryGrid");
-  if (!target) return;
-
-  if (!summaryItems.length) {
-    target.style.display = "block";
-    target.innerHTML = `
-      <div style="
-        padding:18px;
-        border-radius:16px;
-        background:rgba(255,255,255,0.04);
-        border:1px solid rgba(255,255,255,0.08);
-        color:#cbd5e1;
-        text-align:center;
-      ">
-        현재 집계할 수 있는 일정이 없습니다
-      </div>
-    `;
-    return;
-  }
-
-  const scheduleMap = new Map();
-
-  summaryItems.forEach(item => {
-    const key = makeKey(item.day, item.time_slot);
-    if (!scheduleMap.has(key)) {
-      scheduleMap.set(key, {
-        date: item.date || "",
-        day: item.day || "",
-        time_slot: item.time_slot || "",
-        note: item.note || ""
-      });
-    }
-  });
-
-  const scheduleList = Array.from(scheduleMap.values()).sort((a, b) => {
-    const dateA = String(a.date || "");
-    const dateB = String(b.date || "");
-    if (dateA !== dateB) return dateA.localeCompare(dateB, "ko");
-    return String(a.time_slot || "").localeCompare(String(b.time_slot || ""), "ko");
-  });
-
-  target.style.display = "grid";
-  target.style.gridTemplateColumns = "repeat(2, minmax(0, 1fr))";
-  target.style.gap = "10px";
-
-  target.innerHTML = scheduleList.map(item => {
-    const key = makeKey(item.day, item.time_slot);
-    const count = getCount(item.day, item.time_slot);
-    const active = selectedKey === key ? "active" : "";
-
-    return `
-      <button class="summary-cell ${active}" data-day="${item.day}" data-time="${item.time_slot}" style="min-height:84px;">
-        <strong>${count}</strong>
-        <span>${item.date || ""} ${item.day} ${item.time_slot}</span>
-      </button>
-    `;
-  }).join("");
-
-  target.querySelectorAll(".summary-cell").forEach(btn => {
-    btn.addEventListener("click", () => {
-      const day = btn.dataset.day;
-      const time = btn.dataset.time;
-      selectedKey = makeKey(day, time);
-      renderSummaryGrid();
-      renderDefaultSelectedInfo(day, time);
-    });
-  });
-}
+/* =========================
+   데이터 로드
+========================= */
 
 async function loadWeekKey() {
   const data = await callApi({ action: "getCurrentWeekKey" });
 
-  if (!data.ok || !data.weekKey) {
-    throw new Error("주간 키 불러오기 실패");
+  if (!data.ok) {
+    throw new Error("주간 정보를 불러오지 못했습니다.");
   }
 
   weekKey = data.weekKey;
@@ -254,57 +67,247 @@ async function loadSummary() {
   });
 
   if (!data.ok) {
-    throw new Error(data.message || "집계 불러오기 실패");
+    throw new Error("요약 데이터를 불러오지 못했습니다.");
   }
 
   summaryItems = data.items || [];
-  renderSummaryGrid();
 }
 
-async function runAutoMatch() {
-  if (!selectedKey) {
-    alert("먼저 시간대를 선택해주세요.");
+/* =========================
+   요약 계산
+========================= */
+
+function groupBySlot() {
+  const map = new Map();
+
+  summaryItems.forEach(item => {
+    const key = makeKey(item.day, item.time_slot);
+
+    if (!map.has(key)) {
+      map.set(key, []);
+    }
+
+    map.get(key).push(item);
+  });
+
+  return map;
+}
+
+function getUniqueAccountCount(items) {
+  const set = new Set(items.map(i => i.account_id));
+  return set.size;
+}
+
+function getHealerCount(items) {
+  return items.filter(i => i.class === "치유성").length;
+}
+
+function getHighPowerCount(items) {
+  return items.filter(i => {
+    const power = Number(i.power_value || 0);
+    return power >= 400;
+  }).length;
+}
+
+function getStatusText(realCount, healerCount) {
+  if (realCount >= 9) return "사람 많음";
+  if (realCount >= 6 && healerCount > 0) return "추천";
+  if (realCount >= 4) return "무난";
+  return "부족";
+}
+
+/* =========================
+   시간 목록 렌더
+========================= */
+
+function renderSummaryGrid() {
+  const target = document.getElementById("summaryGrid");
+
+  const map = groupBySlot();
+
+  if (map.size === 0) {
+    target.innerHTML = `<div class="availability-empty">데이터 없음</div>`;
     return;
   }
 
-  const [day, timeSlot] = selectedKey.split("|");
+  const html = Array.from(map.entries()).map(([key, items]) => {
+    const [day, time] = key.split("__");
+
+    const realCount = getUniqueAccountCount(items);
+    const healerCount = getHealerCount(items);
+
+    const status = getStatusText(realCount, healerCount);
+
+    return `
+      <button class="party-slot-btn" data-key="${key}">
+        <div class="party-slot-time">${day} ${time}</div>
+        <div class="party-slot-meta">${realCount}명 · 치유 ${healerCount}</div>
+        <div class="party-slot-status">${status}</div>
+      </button>
+    `;
+  }).join("");
+
+  target.innerHTML = html;
+
+  bindSlotEvents();
+}
+
+/* =========================
+   슬롯 선택
+========================= */
+
+function bindSlotEvents() {
+  document.querySelectorAll(".party-slot-btn").forEach(btn => {
+    btn.onclick = () => {
+      selectedSlot = btn.dataset.key;
+
+      document.querySelectorAll(".party-slot-btn").forEach(b => b.classList.remove("active"));
+      btn.classList.add("active");
+
+      const [day, time] = selectedSlot.split("__");
+      setText("statusTime", `${day} ${time}`);
+    };
+  });
+}
+
+/* =========================
+   자동 조합
+========================= */
+
+async function autoMatch() {
+  if (!selectedSlot) {
+    setMessage("시간을 먼저 선택해주세요.", true);
+    return;
+  }
+
+  const [day, time] = selectedSlot.split("__");
 
   try {
+    setMessage("조합 계산 중입니다...");
+
     const data = await callApi({
-      action: "getPartyAutoMatch",
+      action: "getPartyComposition",
+      weekKey,
       day,
-      timeSlot,
-      weekKey
+      time_slot: time
     });
 
     if (!data.ok) {
-      alert(data.message || "자동 추천 실패");
+      setMessage("조합을 불러오지 못했습니다.", true);
       return;
     }
 
-    renderAutoMatchResult(data);
+    renderParty(data.party1, "party1List");
+    renderParty(data.party2, "party2List");
+
+    updateStatus(data);
+
+    setMessage("조합이 반영되었습니다.");
   } catch (error) {
     console.error(error);
-    alert("자동 추천 실패");
+    setMessage("조합 처리 중 오류가 발생했습니다.", true);
   }
 }
+
+/* =========================
+   파티 렌더
+========================= */
+
+function renderParty(list, targetId) {
+  const target = document.getElementById(targetId);
+
+  if (!list || list.length === 0) {
+    target.innerHTML = `<div class="availability-empty">구성 없음</div>`;
+    return;
+  }
+
+  target.innerHTML = list.map(item => {
+    return `
+      <div class="party-member">
+        <div class="party-name">${item.character_name}</div>
+        <div class="party-meta">${item.class} · ${item.power}</div>
+      </div>
+    `;
+  }).join("");
+}
+
+/* =========================
+   상태 업데이트
+========================= */
+
+function updateStatus(data) {
+  setText("statusPicked", data.totalCount || 0);
+  setText("status400", data.highPowerCount || 0);
+  setText("statusParty2Heal", data.party2HasHeal ? "있음" : "없음");
+
+  if (data.totalCount >= 8 && data.hasHeal) {
+    setText("statusClear", "진행 가능");
+  } else {
+    setText("statusClear", "부족");
+  }
+}
+
+/* =========================
+   새로고침
+========================= */
+
+async function refreshPage(showMessage = true) {
+  try {
+    if (showMessage) {
+      setMessage("상태를 다시 불러오는 중입니다...");
+    }
+
+    await loadSummary();
+    renderSummaryGrid();
+
+    if (showMessage) {
+      setMessage("최신 상태로 반영되었습니다.");
+    }
+  } catch (error) {
+    console.error(error);
+    setMessage("새로고침 실패", true);
+  }
+}
+
+/* =========================
+   이벤트
+========================= */
+
+function bindEvents() {
+  document.getElementById("autoMatchButton").onclick = autoMatch;
+  document.getElementById("refreshButton").onclick = () => refreshPage(true);
+
+  document.getElementById("backButton").onclick = () => {
+    const params = getParams().toString();
+    location.href = `main.html?${params}`;
+  };
+}
+
+/* =========================
+   초기화
+========================= */
 
 async function initPage() {
   try {
+    setMessage("불러오는 중입니다...");
+
     await loadWeekKey();
     await loadSummary();
+
+    renderSummaryGrid();
+
+    setMessage("시간을 선택해주세요.");
+
+    if (refreshTimer) clearInterval(refreshTimer);
+    refreshTimer = setInterval(() => {
+      refreshPage(false);
+    }, 30000);
+
   } catch (error) {
     console.error(error);
-    alert(error.message || "초기 로딩 실패");
+    setMessage("화면을 불러오지 못했습니다.", true);
   }
 }
 
-document.getElementById("backButton").addEventListener("click", () => {
-  const mainName = encodeURIComponent(getMainName());
-  const accountId = encodeURIComponent(getAccountId());
-  location.href = `./main.html?mainName=${mainName}&accountId=${accountId}`;
-});
-
-document.getElementById("autoMatchButton").addEventListener("click", runAutoMatch);
-
+bindEvents();
 initPage();

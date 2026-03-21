@@ -34,7 +34,7 @@ async function initPage() {
     const data = await callApi({ action: "init" });
 
     if (!data.ok) {
-      setMessage(data.message || "초기 데이터 불러오기 실패", true);
+      setMessage(data.message || "초기 데이터를 불러오지 못했습니다.", true);
       return;
     }
 
@@ -48,7 +48,7 @@ async function initPage() {
     setText("loginDesc", text.login_desc);
     setText("mainNameLabel", text.main_name_label);
     setText("loginButton", text.login_button);
-    setText("footerNote", text.copyright_text);
+    setText("footerNote", text.footer_note);
 
     setPlaceholder("mainName", text.login_placeholder);
 
@@ -60,7 +60,7 @@ async function initPage() {
     }
   } catch (error) {
     console.error(error);
-    setMessage("초기 데이터 불러오기 실패", true);
+    setMessage("초기 데이터를 불러오지 못했습니다.", true);
   }
 }
 
@@ -73,23 +73,23 @@ async function login() {
     return;
   }
 
-  setMessage("로그인 중입니다...");
+  setMessage("확인 중입니다...");
 
   try {
     const data = await callApi({
       action: "login",
-      mainName: mainName
+      mainName
     });
 
     if (!data.ok) {
-      setMessage(data.message || "로그인 실패", true);
+      setMessage(data.message || "입장에 실패했습니다.", true);
       return;
     }
 
     location.href = `./main.html?mainName=${encodeURIComponent(data.mainName || mainName)}&accountId=${encodeURIComponent(data.accountId || "")}`;
   } catch (error) {
     console.error(error);
-    setMessage("서버 연결 실패", true);
+    setMessage("서버 연결에 실패했습니다.", true);
   }
 }
 

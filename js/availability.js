@@ -1,32 +1,31 @@
 const API_URL = "https://script.google.com/macros/s/AKfycbwOlszRW-sCVG7WH8hlWcwULUqg44KNg2u3ASgp16itsVEZpfRtNoFGnkiB0-uqBIqnFA/exec";
 
 let weekKey = "";
-let scheduleItems = [];
 let characterItems = [];
-const selectedMap = new Set();
+let scheduleItems = [];
+let summaryItems = [];
+let selectedMap = new Set();
+let refreshTimer = null;
+
+/* =========================
+   공통
+========================= */
 
 function getParams() {
   return new URLSearchParams(location.search);
-}
-
-function getMainName() {
-  return getParams().get("mainName") || "";
 }
 
 function getAccountId() {
   return getParams().get("accountId") || "";
 }
 
+function getMainName() {
+  return getParams().get("mainName") || "";
+}
+
 function getSelectedCharacterName() {
   const el = document.getElementById("characterSelect");
   return el ? el.value || "" : "";
-}
-
-function setMessage(message, isError = false) {
-  const el = document.getElementById("saveMessage");
-  if (!el) return;
-  el.textContent = message || "";
-  el.classList.toggle("error", isError);
 }
 
 async function callApi(params) {
@@ -36,108 +35,45 @@ async function callApi(params) {
 }
 
 function makeKey(day, time) {
-  return `${day}|${time}`;
+  return `${day}__${time}`;
 }
 
-function renderCharacterOptions(items) {
-  const select = document.getElementById("characterSelect");
-  if (!select) return;
+function setMessage(message, isError = false) {
+  const el = document.getElementById("pageMessage");
+  if (!el) return;
 
-  if (!items || items.length === 0) {
-    select.innerHTML = `<option value="">등록된 캐릭터 없음</option>`;
-    return;
+  el.textContent = message || "";
+  el.classList.toggle("error", isError);
+}
+
+function setText(id, value) {
+  const el = document.getElementById(id);
+  if (el && value !== undefined && value !== null) {
+    el.textContent = value;
   }
-
-  select.innerHTML = items.map(item => {
-    const typeText = item.type || "-";
-    const classText = item.className || "클래스 미입력";
-    return `<option value="${item.name}">${item.name} (${typeText} / ${classText})</option>`;
-  }).join("");
 }
 
-function renderScheduleGrid() {
-  const grid = document.getElementById("timeGrid");
-  if (!grid) return;
-
-  if (!scheduleItems.length) {
-    grid.style.display = "block";
-    grid.innerHTML = `
-      <div style="
-        padding:18px;
-        border-radius:16px;
-        background:rgba(255,255,255,0.04);
-        border:1px solid rgba(255,255,255,0.08);
-        color:#cbd5e1;
-        text-align:center;
-      ">
-        현재 열려있는 일정이 없습니다
-      </div>
-    `;
-    return;
-  }
-
-  grid.style.display = "grid";
-  grid.style.gridTemplateColumns = "repeat(2, minmax(0, 1fr))";
-  grid.style.gap = "10px";
-
-  grid.innerHTML = scheduleItems.map(item => {
-    const key = makeKey(item.day, item.time_slot);
-    const active = selectedMap.has(key);
-
-    return `
-      <button
-        type="button"
-        class="slot-btn ${active ? "active" : ""}"
-        data-day="${item.day}"
-        data-time="${item.time_slot}"
-        style="min-height:72px; display:flex; flex-direction:column; gap:4px;"
-      >
-        <strong>${item.date || ""} ${item.day}</strong>
-        <span>${item.time_slot}</span>
-        <small style="opacity:${item.note ? "0.9" : "0.5"};">${item.note || "-"}</small>
-      </button>
-    `;
-  }).join("");
-
-  grid.querySelectorAll(".slot-btn").forEach(btn => {
-    btn.addEventListener("click", () => {
-      const day = btn.dataset.day;
-      const time = btn.dataset.time;
-      const key = makeKey(day, time);
-
-      if (selectedMap.has(key)) {
-        selectedMap.delete(key);
-      } else {
-        selectedMap.add(key);
-      }
-
-      renderScheduleGrid();
-    });
-  });
+function escapeHtml(value) {
+  return String(value || "")
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;")
+    .replaceAll('"', "&quot;")
+    .replaceAll("'", "&#39;");
 }
+
+/* =========================
+   데이터 로드
+========================= */
 
 async function loadWeekKey() {
   const data = await callApi({ action: "getCurrentWeekKey" });
 
   if (!data.ok || !data.weekKey) {
-    throw new Error("주간 키 불러오기 실패");
+    throw new Error("주간 정보를 불러오지 못했습니다.");
   }
 
   weekKey = data.weekKey;
-}
-
-async function loadRaidSchedule() {
-  const data = await callApi({
-    action: "getRaidSchedule",
-    weekKey
-  });
-
-  if (!data.ok) {
-    throw new Error(data.message || "일정 불러오기 실패");
-  }
-
-  scheduleItems = data.items || [];
-  renderScheduleGrid();
 }
 
 async function loadCharacters() {
@@ -154,11 +90,37 @@ async function loadCharacters() {
   });
 
   if (!data.ok) {
-    throw new Error(data.message || "캐릭터 불러오기 실패");
+    throw new Error(data.message || "캐릭터를 불러오지 못했습니다.");
   }
 
   characterItems = data.items || [];
-  renderCharacterOptions(characterItems);
+  renderCharacterOptions();
+}
+
+async function loadRaidSchedule() {
+  const data = await callApi({
+    action: "getRaidSchedule",
+    weekKey
+  });
+
+  if (!data.ok) {
+    throw new Error(data.message || "일정을 불러오지 못했습니다.");
+  }
+
+  scheduleItems = data.items || [];
+}
+
+async function loadSummary() {
+  const data = await callApi({
+    action: "getAvailabilitySummary",
+    weekKey
+  });
+
+  if (!data.ok) {
+    throw new Error(data.message || "집계 데이터를 불러오지 못했습니다.");
+  }
+
+  summaryItems = data.items || [];
 }
 
 async function loadAvailability() {
@@ -168,7 +130,7 @@ async function loadAvailability() {
   selectedMap.clear();
 
   if (!accountId || !characterName || !weekKey) {
-    renderScheduleGrid();
+    updateSelectedCount();
     return;
   }
 
@@ -180,18 +142,237 @@ async function loadAvailability() {
   });
 
   if (!data.ok) {
-    throw new Error(data.message || "참여 가능 시간 불러오기 실패");
+    throw new Error(data.message || "선택한 시간을 불러오지 못했습니다.");
   }
 
-  const items = data.items || [];
-  items.forEach(item => {
+  (data.items || []).forEach(item => {
     if (item.day && item.time_slot) {
       selectedMap.add(makeKey(item.day, item.time_slot));
     }
   });
 
-  renderScheduleGrid();
+  updateSelectedCount();
 }
+
+/* =========================
+   캐릭터
+========================= */
+
+function renderCharacterOptions() {
+  const select = document.getElementById("characterSelect");
+  if (!select) return;
+
+  if (!characterItems.length) {
+    select.innerHTML = `<option value="">등록된 캐릭터 없음</option>`;
+    setText("selectedCharacterText", "-");
+    return;
+  }
+
+  select.innerHTML = characterItems.map(item => {
+    const name = escapeHtml(item.name || "");
+    const type = escapeHtml(item.type || "-");
+    const className = escapeHtml(item.className || "클래스 미입력");
+    return `<option value="${name}">${name} (${type} / ${className})</option>`;
+  }).join("");
+
+  setText("selectedCharacterText", getSelectedCharacterName() || "-");
+}
+
+/* =========================
+   요약 계산
+========================= */
+
+function getSummaryBySlot(day, timeSlot) {
+  return summaryItems.filter(item => item.day === day && item.time_slot === timeSlot);
+}
+
+function getUniqueAccountCount(items) {
+  const set = new Set(
+    items.map(item => String(item.accountId || item.account_id || "").trim()).filter(Boolean)
+  );
+  return set.size;
+}
+
+function getHealerCount(items) {
+  return items.filter(item => {
+    const className = String(item.className || item.class_name || item.class || "").trim();
+    return className === "치유성";
+  }).length;
+}
+
+function getHighPowerCount(items) {
+  return items.filter(item => {
+    const powerValue = Number(item.powerValue || item.power_value || 0);
+    const powerText = String(item.powerText || item.power_text || "");
+
+    if (powerValue >= 400) return true;
+    return powerText.includes("400");
+  }).length;
+}
+
+function getStatusInfo(realCount, healerCount) {
+  if (realCount >= 9) {
+    return {
+      text: "사람 많음",
+      className: "crowded"
+    };
+  }
+
+  if (realCount >= 6 && healerCount > 0) {
+    return {
+      text: "추천",
+      className: "good"
+    };
+  }
+
+  if (realCount >= 4) {
+    return {
+      text: "무난",
+      className: "normal"
+    };
+  }
+
+  return {
+    text: "부족",
+    className: "bad"
+  };
+}
+
+function getBestTime() {
+  const slotMap = new Map();
+
+  scheduleItems.forEach(item => {
+    const key = makeKey(item.day, item.time_slot);
+    const slotItems = getSummaryBySlot(item.day, item.time_slot);
+    const realCount = getUniqueAccountCount(slotItems);
+    const healerCount = getHealerCount(slotItems);
+    const highPowerCount = getHighPowerCount(slotItems);
+
+    slotMap.set(key, {
+      label: `${item.date || ""} ${item.day} ${item.time_slot}`.trim(),
+      realCount,
+      healerCount,
+      highPowerCount
+    });
+  });
+
+  const list = Array.from(slotMap.values());
+
+  list.sort((a, b) => {
+    if ((a.realCount >= 6 && a.healerCount > 0) !== (b.realCount >= 6 && b.healerCount > 0)) {
+      return (b.realCount >= 6 && b.healerCount > 0) - (a.realCount >= 6 && a.healerCount > 0);
+    }
+    if (a.realCount !== b.realCount) return b.realCount - a.realCount;
+    if (a.healerCount !== b.healerCount) return b.healerCount - a.healerCount;
+    return b.highPowerCount - a.highPowerCount;
+  });
+
+  return list[0] || null;
+}
+
+function getWeakTime() {
+  const slotMap = new Map();
+
+  scheduleItems.forEach(item => {
+    const key = makeKey(item.day, item.time_slot);
+    const slotItems = getSummaryBySlot(item.day, item.time_slot);
+    const realCount = getUniqueAccountCount(slotItems);
+    const healerCount = getHealerCount(slotItems);
+
+    slotMap.set(key, {
+      label: `${item.date || ""} ${item.day} ${item.time_slot}`.trim(),
+      realCount,
+      healerCount
+    });
+  });
+
+  const list = Array.from(slotMap.values());
+
+  list.sort((a, b) => {
+    if (a.realCount !== b.realCount) return a.realCount - b.realCount;
+    return a.healerCount - b.healerCount;
+  });
+
+  return list[0] || null;
+}
+
+/* =========================
+   상단 표시
+========================= */
+
+function updateSelectedCount() {
+  setText("selectedCountText", `${selectedMap.size}개`);
+}
+
+function updateTopInfo() {
+  setText("mainNameText", getMainName() || "-");
+  setText("selectedCharacterText", getSelectedCharacterName() || "-");
+  updateSelectedCount();
+}
+
+/* =========================
+   리스트 렌더
+========================= */
+
+function renderAvailabilityList() {
+  const target = document.getElementById("availabilityList");
+  if (!target) return;
+
+  if (!scheduleItems.length) {
+    target.innerHTML = `<div class="availability-empty">이번 주에 열린 일정이 없습니다.</div>`;
+    return;
+  }
+
+  target.innerHTML = scheduleItems.map(item => {
+    const slotItems = getSummaryBySlot(item.day, item.time_slot);
+    const charCount = slotItems.length;
+    const realCount = getUniqueAccountCount(slotItems);
+    const healerCount = getHealerCount(slotItems);
+    const highPowerCount = getHighPowerCount(slotItems);
+
+    const key = makeKey(item.day, item.time_slot);
+    const isSelected = selectedMap.has(key);
+    const expectedCount = isSelected ? realCount : realCount + 1;
+
+    const status = getStatusInfo(realCount, healerCount);
+
+    const lines = [
+      `<div class="availability-item-top">`,
+      `<div class="availability-time">${escapeHtml(item.date || "")} ${escapeHtml(item.day || "")} ${escapeHtml(item.time_slot || "")}</div>`,
+      `<div class="availability-status ${status.className}">${status.text}</div>`,
+      `</div>`,
+      `<div class="availability-meta">실인원 ${realCount}명 · 등록 ${charCount}개</div>`,
+      `<div class="availability-meta">치유 ${healerCount} · 400+ ${highPowerCount}</div>`
+    ];
+
+    if (item.note) {
+      lines.push(`<div class="availability-note">${escapeHtml(item.note)}</div>`);
+    }
+
+    if (isSelected) {
+      lines.push(`<div class="availability-foot selected">선택됨</div>`);
+    } else {
+      lines.push(`<div class="availability-foot">선택 시 ${expectedCount}명</div>`);
+    }
+
+    return `
+      <button
+        type="button"
+        class="availability-item ${isSelected ? "active" : ""}"
+        data-day="${escapeHtml(item.day || "")}"
+        data-time="${escapeHtml(item.time_slot || "")}"
+      >
+        ${lines.join("")}
+      </button>
+    `;
+  }).join("");
+
+  bindSlotEvents();
+}
+
+/* =========================
+   저장
+========================= */
 
 async function saveAvailability() {
   const accountId = getAccountId();
@@ -199,7 +380,7 @@ async function saveAvailability() {
   const characterName = getSelectedCharacterName();
 
   if (!accountId || !characterName) {
-    setMessage("캐릭터를 선택해주세요", true);
+    setMessage("캐릭터를 먼저 선택해주세요.", true);
     return;
   }
 
@@ -215,7 +396,7 @@ async function saveAvailability() {
     }));
 
   try {
-    setMessage("저장 중...");
+    setMessage("반영 중입니다...");
 
     const data = await callApi({
       action: "saveAvailability",
@@ -228,55 +409,135 @@ async function saveAvailability() {
     });
 
     if (!data.ok) {
-      setMessage(data.message || "저장 실패", true);
+      setMessage(data.message || "저장하지 못했습니다.", true);
       return;
     }
 
-    setMessage("저장 완료");
+    await loadSummary();
+    updateTopInfo();
+    renderAvailabilityList();
+    setMessage("반영되었습니다.");
   } catch (error) {
     console.error(error);
-    setMessage("저장 실패", true);
+    setMessage("저장 중 문제가 발생했습니다.", true);
   }
 }
 
-function resetSelection() {
-  selectedMap.clear();
-  renderScheduleGrid();
-  setMessage("선택 초기화 완료");
-}
+/* =========================
+   새로고침
+========================= */
 
-async function initPage() {
+async function refreshPage(showMessage = true) {
   try {
-    await loadWeekKey();
-    await loadRaidSchedule();
-    await loadCharacters();
+    if (showMessage) {
+      setMessage("지금 상태를 다시 불러오는 중입니다...");
+    }
 
-    if (characterItems.length > 0) {
-      await loadAvailability();
-    } else {
-      renderScheduleGrid();
+    await loadSummary();
+    await loadAvailability();
+    updateTopInfo();
+    renderAvailabilityList();
+
+    if (showMessage) {
+      setMessage("최신 상태로 반영되었습니다.");
     }
   } catch (error) {
     console.error(error);
-    setMessage(error.message || "초기 로딩 실패", true);
+    setMessage("새로고침에 실패했습니다.", true);
   }
 }
 
-document.getElementById("characterSelect").addEventListener("change", async () => {
+/* =========================
+   이벤트
+========================= */
+
+function bindSlotEvents() {
+  document.querySelectorAll(".availability-item").forEach(btn => {
+    btn.addEventListener("click", async () => {
+      const day = btn.dataset.day;
+      const time = btn.dataset.time;
+      const key = makeKey(day, time);
+
+      if (selectedMap.has(key)) {
+        selectedMap.delete(key);
+      } else {
+        selectedMap.add(key);
+      }
+
+      updateTopInfo();
+      renderAvailabilityList();
+      await saveAvailability();
+    });
+  });
+}
+
+function bindEvents() {
+  document.getElementById("characterSelect").addEventListener("change", async () => {
+    try {
+      setText("selectedCharacterText", getSelectedCharacterName() || "-");
+      setMessage("캐릭터 기준으로 다시 불러오는 중입니다...");
+      await loadAvailability();
+      updateTopInfo();
+      renderAvailabilityList();
+      setMessage("불러왔습니다.");
+    } catch (error) {
+      console.error(error);
+      setMessage("캐릭터 정보를 반영하지 못했습니다.", true);
+    }
+  });
+
+  document.getElementById("refreshButton").addEventListener("click", async () => {
+    await refreshPage(true);
+  });
+
+  document.getElementById("backButton").addEventListener("click", () => {
+    const mainName = encodeURIComponent(getMainName());
+    const accountId = encodeURIComponent(getAccountId());
+    location.href = `./main.html?mainName=${mainName}&accountId=${accountId}`;
+  });
+}
+
+/* =========================
+   초기화
+========================= */
+
+async function initPage() {
   try {
+    updateTopInfo();
+    setMessage("불러오는 중입니다...");
+
+    await loadWeekKey();
+    await loadCharacters();
+    await loadRaidSchedule();
+    await loadSummary();
     await loadAvailability();
+
+    updateTopInfo();
+    renderAvailabilityList();
+
+    const best = getBestTime();
+    const weak = getWeakTime();
+
+    if (!scheduleItems.length) {
+      setMessage("이번 주에 열린 일정이 없습니다.");
+    } else if (best && weak) {
+      setMessage(`추천 시간: ${best.label} / 부족한 시간: ${weak.label}`);
+    } else {
+      setMessage("시간을 선택하면 바로 반영됩니다.");
+    }
+
+    if (refreshTimer) {
+      clearInterval(refreshTimer);
+    }
+
+    refreshTimer = setInterval(() => {
+      refreshPage(false);
+    }, 30000);
   } catch (error) {
     console.error(error);
-    setMessage("시간 정보 불러오기 실패", true);
+    setMessage(error.message || "화면을 불러오지 못했습니다.", true);
   }
-});
+}
 
-document.getElementById("saveButton").addEventListener("click", saveAvailability);
-document.getElementById("resetButton").addEventListener("click", resetSelection);
-document.getElementById("backButton").addEventListener("click", () => {
-  const mainName = encodeURIComponent(getMainName());
-  const accountId = encodeURIComponent(getAccountId());
-  location.href = `./main.html?mainName=${mainName}&accountId=${accountId}`;
-});
-
+bindEvents();
 initPage();
