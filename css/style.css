@@ -54,7 +54,7 @@ body {
   background: var(--login-logo-url, url("../images/logo_main1.png")) center center / contain no-repeat;
   opacity: 0.5;
   z-index: 0;
-  transform: scale(1.00);
+  transform: scale(1.02);
   filter: blur(0.9px);
   animation: logoFloat 6s ease-in-out infinite;
 }
@@ -235,9 +235,11 @@ body {
 .copyright-text {
   margin: 14px 0 0;
   text-align: center;
-  color: rgba(255, 255, 255, 0.48);
+  color: rgba(255, 255, 255, 0.75);
   font-size: 11px;
   line-height: 1.6;
+  letter-spacing: 0.03em;
+  text-shadow: 0 0 6px rgba(0, 212, 255, 0.12);
 }
 
 /* 메인 화면 */
@@ -480,9 +482,10 @@ body {
     padding: 32px 16px 24px;
   }
 
-  .brand-title {
-    font-size: 30px;
-  }
+.login-card {
+  border-radius: 28px;
+  padding: 28px 20px 22px;
+}
 
   .login-card {
     border-radius: 24px;
