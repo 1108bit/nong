@@ -59,6 +59,16 @@ body {
   animation: logoFloat 12s ease-in-out infinite;
 }
 
+/* 태블릿 / 작은 창 */
+@media (max-width: 900px) {
+  .bg-logo {
+    background-position: center 25%;
+    background-size: 110%;
+    opacity: 0.09;
+  }
+}
+
+/* 모바일 */
 @media (max-width: 480px) {
   .bg-logo {
     background-position: center 15%;
