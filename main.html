@@ -1,193 +1,83 @@
-const API_URL = "https://script.google.com/macros/s/AKfycbwOlszRW-sCVG7WH8hlWcwULUqg44KNg2u3ASgp16itsVEZpfRtNoFGnkiB0-uqBIqnFA/exec";
-
-function getParams() {
-  return new URLSearchParams(location.search);
-}
-
-function getMainName() {
-  const params = getParams();
-  return params.get("mainName") || "";
-}
-
-function getAccountId() {
-  const params = getParams();
-  return params.get("accountId") || "";
-}
-
-function escapeHtml(value) {
-  return String(value || "")
-    .replaceAll("&", "&amp;")
-    .replaceAll("<", "&lt;")
-    .replaceAll(">", "&gt;")
-    .replaceAll('"', "&quot;")
-    .replaceAll("'", "&#39;");
-}
-
-async function callApi(params) {
-  const url = `${API_URL}?${new URLSearchParams(params).toString()}`;
-  const res = await fetch(url);
-  return await res.json();
-}
-
-function renderCharacters(items) {
-  const target = document.getElementById("characterList");
-
-  if (!items || items.length === 0) {
-    target.innerHTML = `
-      <div class="character-item">
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>노스텝백 메인</title>
+  <link rel="stylesheet" href="./css/style.css" />
+</head>
+<body>
+  <main class="page">
+    <div class="main-shell">
+      <header class="main-header">
         <div>
-          <div class="character-name">등록된 캐릭터가 없습니다</div>
-          <div class="character-meta">우측 버튼으로 캐릭터를 추가해주세요</div>
+          <div class="main-eyebrow">AION2</div>
+          <h1 class="main-page-title" id="mainTitle">레이드 대시보드</h1>
+          <p class="main-page-desc" id="mainDesc">이번 주 파티 현황과 캐릭터 상태를 확인하세요</p>
         </div>
-        <div class="character-badge off">비어있음</div>
-      </div>
-    `;
-    return;
-  }
+        <button class="btn btn-secondary header-btn" id="logoutButton">로그아웃</button>
+      </header>
 
-  target.innerHTML = items.map(item => {
-    const typeText = item.type || "-";
-    const classText = item.className || "클래스 미입력";
-    const powerText = item.powerValue || item.powerText || "-";
-    const badgeClass = String(item.useYn).toUpperCase() === "Y" ? "character-badge" : "character-badge off";
-    const badgeText = String(item.useYn).toUpperCase() === "Y" ? "참여" : "대기";
+      <section class="main-grid">
+        <article class="main-card">
+          <h2 class="section-title" id="sectionMyInfo">내 정보</h2>
+          <div class="info-list">
+            <div class="info-row">
+              <span class="info-label">본캐명</span>
+              <strong class="info-value" id="accountMainName">-</strong>
+            </div>
+            <div class="info-row">
+              <span class="info-label">등록 캐릭터</span>
+              <strong class="info-value" id="characterCount">0</strong>
+            </div>
+            <div class="info-row">
+              <span class="info-label">주간 레이드</span>
+              <strong class="info-value" id="weeklyRunCount">0 / 2</strong>
+            </div>
+          </div>
+        </article>
 
-    return `
-      <div class="character-item">
-        <div>
-          <div class="character-name">${escapeHtml(item.name)}</div>
-          <div class="character-meta">${escapeHtml(classText)} · ${escapeHtml(powerText)} · ${escapeHtml(typeText)}</div>
-        </div>
-        <div class="${badgeClass}">${badgeText}</div>
-      </div>
-    `;
-  }).join("");
-}
+        <article class="main-card">
+          <div class="card-head">
+            <h2 class="section-title" id="sectionCharacter">캐릭터</h2>
+            <button class="mini-btn" id="addCharacterButton">캐릭터 추가</button>
+          </div>
+          <div class="character-list" id="characterList">
+            <div class="character-item">
+              <div>
+                <div class="character-name">불러오는 중...</div>
+                <div class="character-meta">캐릭터 정보를 불러오고 있습니다</div>
+              </div>
+              <div class="character-badge off">대기</div>
+            </div>
+          </div>
+        </article>
 
-async function loadCharacters() {
-  const accountId = getAccountId();
+        <article class="main-card">
+          <h2 class="section-title" id="sectionHistory">진행 기록</h2>
+          <div class="history-list" id="historyList">
+            <div class="history-item">
+              <div>
+                <div class="history-time">아직 기록이 없습니다</div>
+                <div class="history-desc">추후 연결 예정입니다</div>
+              </div>
+              <div class="history-state plan">예정</div>
+            </div>
+          </div>
+        </article>
 
-  if (!accountId) return;
+        <article class="main-card">
+          <h2 class="section-title" id="sectionQuickMenu">빠른 메뉴</h2>
+          <div class="quick-menu">
+            <button class="btn btn-primary" id="goAvailabilityButton">시간 등록</button>
+            <button class="btn btn-secondary" id="goPartyButton">파티 보기</button>
+            <button class="btn btn-secondary" id="goHistoryButton">내 기록 보기</button>
+          </div>
+        </article>
+      </section>
+    </div>
+  </main>
 
-  try {
-    const data = await callApi({
-      action: "getCharacters",
-      accountId: accountId
-    });
-
-    if (!data.ok) return;
-
-    const items = data.items || [];
-    renderCharacters(items);
-    document.getElementById("characterCount").textContent = String(items.length);
-  } catch (error) {
-    console.error(error);
-  }
-}
-
-async function addCharacter() {
-  const accountId = getAccountId();
-
-  if (!accountId) {
-    alert("계정이 없습니다. 다시 로그인해주세요.");
-    return;
-  }
-
-  const name = prompt("캐릭터명을 입력해주세요");
-  if (!name || !name.trim()) return;
-
-  const className = prompt("클래스를 입력해주세요 (예: 수호성, 치유성)") || "";
-  const powerValue = prompt("전투력값을 숫자로만 입력해주세요 (예: 150, 365)") || "";
-  const type = prompt("본캐 또는 부캐를 입력해주세요", "부캐") || "부캐";
-
-  try {
-    const data = await callApi({
-      action: "addCharacter",
-      accountId: accountId,
-      name: name.trim(),
-      class: className.trim(),
-      powerValue: powerValue.trim(),
-      type: type.trim()
-    });
-
-    if (!data.ok) {
-      alert(data.message || "등록 실패");
-      return;
-    }
-
-    alert("등록 완료");
-    await loadMainData();
-  } catch (error) {
-    console.error(error);
-    alert("서버 오류. 다시 시도해주세요.");
-  }
-}
-
-async function initMainText() {
-  try {
-    const data = await callApi({ action: "init" });
-
-    if (!data.ok) return;
-
-    const text = data.text || {};
-
-    document.getElementById("mainTitle").textContent = text.main_title || "";
-    document.getElementById("mainDesc").textContent = text.main_desc || "";
-
-  } catch (e) {
-    console.error(e);
-  }
-}
-
-function initMainPage() {
-  const mainName = getMainName();
-
-  if (!mainName) {
-    location.href = "./index.html";
-    return;
-  }
-
-  document.getElementById("accountMainName").textContent = mainName;
-  document.getElementById("characterCount").textContent = "0";
-  document.getElementById("weeklyRunCount").textContent = "0 / 2";
-}
-
-document.getElementById("logoutButton").addEventListener("click", () => {
-  location.href = "./index.html";
-});
-
-document.getElementById("addCharacterButton").addEventListener("click", addCharacter);
-
-document.getElementById("goAvailabilityButton").addEventListener("click", () => {
-  alert("시간 등록 기능은 다음 단계에서 연결 예정");
-});
-
-document.getElementById("goPartyButton").addEventListener("click", () => {
-  alert("파티 보기 기능은 다음 단계에서 연결 예정");
-});
-
-document.getElementById("goHistoryButton").addEventListener("click", () => {
-  alert("내 기록 보기 기능은 다음 단계에서 연결 예정");
-});
-
-async function loadMainData() {
-  const accountId = getAccountId();
-  if (!accountId) return;
-
-  const data = await callApi({
-    action: "getMainData",
-    accountId: accountId
-  });
-
-  if (!data.ok) return;
-
-  renderCharacters(data.items);
-
-  document.getElementById("characterCount").textContent = data.count;
-  document.getElementById("weeklyRunCount").textContent = data.weeklyCount;
-}
-
-
-initMainPage();
-initMainText();
-loadMainData();
+  <script src="./js/main.js"></script>
+</body>
+</html>
