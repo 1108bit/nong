@@ -44,6 +44,16 @@ function initDateChips() {
   });
 }
 
+// 구글 시트의 ISO 8601 시간 오차(1899-12-30T...)를 완벽히 필터링하는 함수
+function formatDisplayTime(ts) {
+  if (!ts) return "";
+  if (ts.includes("T")) {
+    const m = ts.match(/T(\d{2}:\d{2})/);
+    if (m) return m[1];
+  }
+  return ts;
+}
+
 async function loadAdminSchedule() {
   const adminCode = getAdminCode();
   if (!adminCode) return movePage("index.html");
@@ -73,23 +83,25 @@ async function loadAdminSchedule() {
     const participants = summaryData.items.filter(s => s.day === i.day && s.time_slot === i.time_slot);
     const count = participants.length;
     const hasHealer = participants.some(p => p.className === "치유성");
-    const isRisk = count < 8 || !hasHealer;
+    
+    // 1명이라도 참여했는데 8명 미만이거나 치유성이 없을 때만 Risk(빨간 테두리) 표시
+    const isRisk = count > 0 && (count < 8 || !hasHealer); 
     const riskClass = isRisk ? "admin-card-risk" : "";
+    const timeFormatted = formatDisplayTime(i.time_slot);
 
     return `
       <div class="admin-card-item ${riskClass}">
         <div class="admin-card-top">
-          <div class="admin-card-time">${i.date} (${i.day}) ${i.time_slot}</div>
+          <div class="admin-card-time">${i.date} (${i.day}) ${timeFormatted}</div>
           <div class="admin-status-chip ${i.open_yn === 'Y' ? 'open' : 'closed'}">${i.open_yn === 'Y' ? '열림' : '닫힘'}</div>
         </div>
         <div class="admin-card-note">
-          인원: <strong style="color:${count < 8 ? '#fb7185' : '#a7f3d0'}">${count}명</strong> |
-          치유성: ${hasHealer ? "✅" : "❌"}
+          인원: <strong style="color:${count >= 8 ? '#a7f3d0' : (count > 0 ? '#fb7185' : 'var(--text-sub)')}">${count}명</strong> | 치유성: ${hasHealer ? "✅" : "❌"}
         </div>
         <div class="admin-card-note">${escapeHtml(i.note)}</div>
         <div class="admin-card-actions">
-          <button class="mini-btn edit-btn" data-date="${escapeHtml(i.date)}" data-day="${escapeHtml(i.day)}" data-time="${escapeHtml(i.time_slot)}" data-note="${escapeHtml(i.note)}">수정</button>
-          <button class="mini-btn danger delete-btn" data-date="${escapeHtml(i.date)}" data-day="${escapeHtml(i.day)}" data-time="${escapeHtml(i.time_slot)}">삭제</button>
+          <button class="mini-btn edit-btn" data-date="${escapeHtml(i.date)}" data-day="${escapeHtml(i.day)}" data-time="${escapeHtml(timeFormatted)}" data-note="${escapeHtml(i.note)}">수정</button>
+          <button class="mini-btn danger delete-btn" data-date="${escapeHtml(i.date)}" data-day="${escapeHtml(i.day)}" data-time="${escapeHtml(timeFormatted)}">삭제</button>
         </div>
       </div>
     `;
