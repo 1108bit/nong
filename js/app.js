@@ -69,3 +69,18 @@ if (adminSecretBtn) {
     }
   });
 }
+
+// =========================
+// 비밀번호 찾기 모달 로직
+// =========================
+const forgotBtn = getEl("forgotPasswordBtn");
+const helpModal = getEl("helpModal");
+
+function closeHelpModal() {
+  helpModal.classList.remove("show");
+  document.body.classList.remove("modal-open");
+}
+
+if (forgotBtn) forgotBtn.onclick = () => { helpModal.classList.add("show"); document.body.classList.add("modal-open"); };
+if (getEl("closeHelpModalBtn")) getEl("closeHelpModalBtn").onclick = closeHelpModal;
+if (getEl("confirmHelpModalBtn")) getEl("confirmHelpModalBtn").onclick = closeHelpModal;

@@ -112,7 +112,10 @@ async function openUserCharacterManager(targetAccountId) {
   getEl("userMessage").innerHTML = `
     ${targetAccountId}의 캐릭터 목록 (${data.items.length}개) <br>
     현재 권한: <strong>${roleText}</strong>
-    <button class="mini-btn" style="margin-left:12px;" onclick="toggleUserAdmin('${targetAccountId}')">권한 부여/해제</button>
+    <div style="margin-top: 8px; display: flex; gap: 8px;">
+      <button class="mini-btn" onclick="toggleUserAdmin('${targetAccountId}')">권한 변경</button>
+      <button class="mini-btn danger" onclick="resetUserPassword('${targetAccountId}')">비밀번호 초기화</button>
+    </div>
   `;
 
   const list = getEl("userCharacterList");
@@ -205,6 +208,13 @@ async function toggleUserAdmin(targetAccountId) {
   const res = await callApi({ action: "toggleAdminRole", adminCode: getAdminCode(), targetAccountId });
   alert(res.message);
   if (res.ok) openUserCharacterManager(targetAccountId); // UI 갱신
+}
+
+// 유저 비밀번호 강제 초기화
+async function resetUserPassword(targetAccountId) {
+  if(!confirm(`[${targetAccountId}] 유저의 비밀번호를 '0000'으로 초기화하시겠습니까?`)) return;
+  const res = await callApi({ action: "resetUserPasswordByAdmin", adminCode: getAdminCode(), targetAccountId });
+  alert(res.message);
 }
 
 // =========================

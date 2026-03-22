@@ -530,6 +530,25 @@ a {
   letter-spacing: -0.01em;
 }
 
+.forgot-password-link {
+  text-align: right;
+  margin-top: -8px;
+  margin-bottom: 18px;
+}
+
+.forgot-password-link span {
+  font-size: 12px;
+  color: var(--cyan-1);
+  cursor: pointer;
+  opacity: 0.7;
+  transition: opacity 0.2s ease, text-shadow 0.2s ease;
+}
+
+.forgot-password-link span:hover {
+  opacity: 1;
+  text-shadow: 0 0 8px rgba(67, 217, 255, 0.4);
+}
+
 .main-input,
 .character-select {
   width: 100%;

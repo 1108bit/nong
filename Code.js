@@ -1212,6 +1212,24 @@ function toggleAdminRole(adminCode, targetAccountId) {
   return { ok: false, message: '계정을 찾을 수 없습니다.' };
 }
 
+function resetUserPasswordByAdmin(adminCode, targetAccountId) {
+  validateAdminCode(adminCode);
+  const sheet = getSheet(SHEET_NAMES.ACCOUNTS);
+  const values = sheet.getDataRange().getValues();
+  const accountIdCol = values[0].map(v => String(v).trim()).indexOf('account_id');
+  const passwordCol = values[0].map(v => String(v).trim()).indexOf('password');
+
+  if (passwordCol === -1) return { ok: false, message: 'password 컬럼이 없습니다.' };
+
+  for (let i = 1; i < values.length; i++) {
+    if (normalizeCompareValue(values[i][accountIdCol]) === normalizeCompareValue(targetAccountId)) {
+      sheet.getRange(i + 1, passwordCol + 1).setValue('0000');
+      return { ok: true, message: '해당 유저의 비밀번호가 [0000]으로 초기화되었습니다.\n유저에게 로그인 후 비밀번호를 변경하라고 안내해 주세요.' };
+    }
+  }
+  return { ok: false, message: '계정을 찾을 수 없습니다.' };
+}
+
 /************************************************
  * 라우팅
  ************************************************/
@@ -1335,6 +1353,9 @@ function doGet(e) {
         
       case 'toggleAdminRole':
         return outputJson(toggleAdminRole(e.parameter.adminCode, e.parameter.targetAccountId));
+
+      case 'resetUserPasswordByAdmin':
+        return outputJson(resetUserPasswordByAdmin(e.parameter.adminCode, e.parameter.targetAccountId));
 
       default:
         return outputJson({
