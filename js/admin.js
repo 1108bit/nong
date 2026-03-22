@@ -205,7 +205,21 @@ getEl("checkSchemaButton").onclick = async () => {
     alert("DB 스키마 오류:\n" + (res.errors || []).join("\n"));
   }
 };
-getEl("backButton").onclick = () => movePage("main.html");
+
+const backBtn = getEl("backButton");
+if (getAccountId() === "MASTER_ADMIN") {
+  backBtn.textContent = "로그아웃";
+  backBtn.onclick = () => {
+    sessionStorage.clear();
+    localStorage.removeItem("autoAccountId");
+    localStorage.removeItem("autoMainName");
+    localStorage.removeItem("autoIsAdmin");
+    localStorage.removeItem("autoAdminCode");
+    location.href = "index.html";
+  };
+} else {
+  backBtn.onclick = () => movePage("main.html");
+}
 
 getEl("searchUserButton").onclick = async () => {
   const searchValue = getEl("userAccountIdInput").value.trim();
