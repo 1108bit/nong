@@ -1244,11 +1244,11 @@ a {
 
 .character-card {
   display: flex;
-  flex-direction: column;
-  align-items: stretch;
-  gap: 16px;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
 
-  padding: 16px;
+  padding: 18px 16px;
   border-radius: 20px;
 
   background:
@@ -1259,22 +1259,21 @@ a {
   box-shadow: 0 10px 24px rgba(0, 0, 0, 0.22);
 }
 
-/* 상단: 이름 및 버튼 */
-.character-card-top {
+/* 왼쪽: 이름 및 직업 */
+.character-left {
   display: flex;
-  align-items: center;
-  justify-content: space-between;
+  flex-direction: column;
+  gap: 8px;
 }
 
-.character-info {
+.character-sub {
   display: flex;
   align-items: center;
-  gap: 8px;
-  flex-wrap: wrap;
+  gap: 6px;
 }
 
 .character-name {
-  font-size: 16px;
+  font-size: 17px;
   font-weight: 900;
   letter-spacing: -0.02em;
 }
@@ -1306,30 +1305,21 @@ a {
   color: #cbd5e1;
 }
 
-/* 중앙: 전투력 */
-.character-card-center {
+/* 오른쪽: 전투력 및 버튼 */
+.character-right {
   display: flex;
   flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 4px;
-  padding: 8px 0;
-  background: rgba(14, 28, 44, 0.3);
-  border-radius: 12px;
-}
-
-.character-power-label {
-  font-size: 11px;
-  color: var(--text-muted);
-  font-weight: 700;
+  align-items: flex-end;
+  gap: 10px;
 }
 
 .character-power {
-  font-size: 18px;
+  font-size: 20px;
   font-weight: 900;
   color: #6cb9ff;
   text-shadow: 0 0 12px rgba(108, 185, 255, 0.4); /* 게임 UI 특유의 네온 글로우 효과 */
   letter-spacing: -0.02em;
+  line-height: 1;
 }
 
 .character-state {

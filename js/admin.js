@@ -121,19 +121,18 @@ async function openUserCharacterManager(targetAccountId) {
   const list = getEl("userCharacterList");
   list.innerHTML = data.items.map(c => `
     <div class="character-card">
-      <div class="character-card-top">
-        <div class="character-info">
-          <div class="character-name">${escapeHtml(c.name)}</div>
-          <span class="chip chip-type">${escapeHtml(c.type)}</span>
+      <div class="character-left">
+        <div class="character-name">${escapeHtml(c.name)}</div>
+        <div class="character-sub">
           <span class="chip chip-class ${escapeHtml(c.className)}">${escapeHtml(c.className)}</span>
+          <span class="chip chip-type">${escapeHtml(c.type)}</span>
         </div>
+      </div>
+      <div class="character-right">
+        <div class="character-power">${getPowerRange(c.power)}</div>
         <div class="character-actions">
           <button class="character-edit-btn" onclick="editUserCharacter('${escapeHtml(targetAccountId)}', '${escapeHtml(c.name)}', '${escapeHtml(c.className)}', '${escapeHtml(c.type)}', '${escapeHtml(c.power)}')">편집</button>
         </div>
-      </div>
-      <div class="character-card-center">
-        <div class="character-power-label">전투력 구간</div>
-        <div class="character-power">${getPowerRange(c.power)}</div>
       </div>
     </div>
   `).join("");
