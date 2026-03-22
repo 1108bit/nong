@@ -6,9 +6,6 @@ if (sessionStorage.getItem("isAdmin") !== "true" || !getAdminCode()) {
 
 // 날짜 칩 자동 생성 로직 (오늘부터 14일)
 function initDateChips() {
-  const group = getEl("dateChipGroup");
-  if (!group) return;
-  
   const days = ["일", "월", "화", "수", "목", "금", "토"];
   const today = new Date();
   let html = "";
@@ -28,20 +25,40 @@ function initDateChips() {
     const isSelected = i === 0 ? "selected" : "";
     
     html += `<button type="button" class="chip-btn ${isSelected}" data-date="${dateVal}" data-day="${dayStr}" style="white-space: nowrap; ${isWeekend}">${displayVal}</button>`;
-    
-    if (i === 0) {
-        getEl("dateInput").value = dateVal;
-        getEl("dayInput").value = dayStr;
-    }
   }
-  group.innerHTML = html;
   
-  group.addEventListener("click", e => {
-     const btn = e.target.closest(".chip-btn");
-     if(!btn) return;
-     getEl("dateInput").value = btn.dataset.date;
-     getEl("dayInput").value = btn.dataset.day;
-  });
+  // 1. 등록 폼용
+  const group1 = getEl("dateChipGroup");
+  if (group1) {
+    group1.innerHTML = html;
+    const firstBtn = group1.querySelector(".chip-btn");
+    if (firstBtn) {
+      getEl("dateInput").value = firstBtn.dataset.date;
+      getEl("dayInput").value = firstBtn.dataset.day;
+    }
+    group1.addEventListener("click", e => {
+       const btn = e.target.closest(".chip-btn");
+       if(!btn) return;
+       group1.querySelectorAll(".chip-btn").forEach(b => b.classList.remove("selected"));
+       btn.classList.add("selected");
+       getEl("dateInput").value = btn.dataset.date;
+       getEl("dayInput").value = btn.dataset.day;
+    });
+  }
+
+  // 2. 수정 모달용
+  const group2 = getEl("editDateChipGroup");
+  if (group2) {
+    group2.innerHTML = html;
+    group2.addEventListener("click", e => {
+       const btn = e.target.closest(".chip-btn");
+       if(!btn) return;
+       group2.querySelectorAll(".chip-btn").forEach(b => b.classList.remove("selected"));
+       btn.classList.add("selected");
+       getEl("editDateInput").value = btn.dataset.date;
+       getEl("editDayInput").value = btn.dataset.day;
+    });
+  }
 }
 
 // 구글 시트의 ISO 8601 시간 오차(1899-12-30T...)를 완벽히 필터링하는 함수

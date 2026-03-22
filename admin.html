@@ -154,6 +154,49 @@
           </div>
         </div>
       </div>
+
+      <!-- 일정 편집 모달 -->
+      <div class="modal-overlay" id="scheduleModal">
+        <div class="modal-sheet">
+          <div class="modal-head">
+            <h3 class="modal-title">일정 수정</h3>
+            <button class="modal-close-btn" id="closeScheduleModalBtn">닫기</button>
+          </div>
+          <div class="modal-form">
+            <input type="hidden" id="editOriginalDate" />
+            <input type="hidden" id="editOriginalDay" />
+            <input type="hidden" id="editOriginalTime" />
+            
+            <div class="form-group">
+              <label class="input-label">일자 변경</label>
+              <div class="chip-select-group horizontal-scroll-chips" id="editDateChipGroup"></div>
+              <input type="hidden" id="editDateInput" />
+              <input type="hidden" id="editDayInput" />
+            </div>
+            <div class="form-group">
+              <label class="input-label">시간 변경</label>
+              <div style="display: flex; gap: 10px; align-items: center;">
+                <input type="text" id="editTimeSlotInput" class="main-input" maxlength="5" style="width: 84px; flex-shrink: 0; text-align: center; font-weight: 900; font-size: 16px; padding: 0;" />
+                <div class="chip-select-group horizontal-scroll-chips" data-target="editTimeSlotInput" style="margin-top: 0;">
+                  <button type="button" class="chip-btn" data-value="20:00">20:00</button>
+                  <button type="button" class="chip-btn" data-value="21:00">21:00</button>
+                  <button type="button" class="chip-btn" data-value="21:30">21:30</button>
+                  <button type="button" class="chip-btn" data-value="22:00">22:00</button>
+                  <button type="button" class="chip-btn" data-value="23:00">23:00</button>
+                </div>
+              </div>
+            </div>
+            <div class="form-group">
+              <label class="input-label">메모 변경</label>
+              <input type="text" id="editNoteInput" class="main-input" autocomplete="off" />
+            </div>
+            <div class="admin-action-row" style="margin-top: 20px;">
+              <button class="btn btn-secondary" id="cancelScheduleModalBtn">취소</button>
+              <button class="btn btn-primary" id="submitScheduleModalBtn">수정 완료하기</button>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
   </main>
   <script src="./js/common.js?v=4"></script>
