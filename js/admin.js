@@ -463,7 +463,7 @@ document.querySelectorAll('.chip-select-group').forEach(group => {
     });
 });
 
-// 동적으로 생성된 HTML(innerHTML)의 인라인 이벤트를 위한 전역 스코프 노출
+// 동적으로 생성된 HTML(innerHTML)의 인라인 이벤트를 위한 전역 스코프 함수 노출
 window.toggleUserAdmin = toggleUserAdmin;
 window.resetUserPassword = resetUserPassword;
 window.editUserCharacter = editUserCharacter;
