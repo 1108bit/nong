@@ -363,6 +363,154 @@ function deleteCharacter(accountId, characterName) {
   };
 }
 
+function toggleCharacterType(accountId, characterName) {
+  accountId = normalizeValue(accountId);
+  characterName = normalizeValue(characterName);
+
+  if (!accountId) {
+    return { ok: false, message: 'accountId가 없습니다.' };
+  }
+
+  if (!characterName) {
+    return { ok: false, message: '캐릭터명이 없습니다.' };
+  }
+
+  const sheet = getSheet(SHEET_NAMES.CHARACTERS);
+  const values = sheet.getDataRange().getValues();
+  const headers = values[0].map(v => String(v).trim());
+
+  const accountIdCol = headers.indexOf('account_id');
+  const nameCol = headers.indexOf('name');
+  const typeCol = headers.indexOf('type');
+  const updatedAtCol = headers.indexOf('updated_at');
+
+  for (let i = 1; i < values.length; i++) {
+    const rowAccountId = normalizeCompareValue(values[i][accountIdCol]);
+    const rowName = normalizeCompareValue(values[i][nameCol]);
+
+    if (rowAccountId === normalizeCompareValue(accountId) &&
+        rowName === normalizeCompareValue(characterName)) {
+      
+      const currentType = normalizeValue(values[i][typeCol]);
+      const newType = currentType === '본캐' ? '부캐' : '본캐';
+      const updatedAt = nowText();
+
+      if (typeCol > -1) sheet.getRange(i + 1, typeCol + 1).setValue(newType);
+      if (updatedAtCol > -1) sheet.getRange(i + 1, updatedAtCol + 1).setValue(updatedAt);
+
+      // 본캐로 변경되면 계정의 main_name도 업데이트
+      if (newType === '본캐') {
+        updateAccountMainName(accountId, characterName);
+      }
+
+      return {
+        ok: true,
+        message: '타입이 변경되었습니다.',
+        newType: newType
+      };
+    }
+  }
+
+  return {
+    ok: false,
+    message: '변경할 캐릭터를 찾을 수 없습니다.'
+  };
+}
+
+function updateCharacter(e) {
+  const accountId = normalizeValue(e.parameter.accountId);
+  const originalName = normalizeValue(e.parameter.originalName);
+  const name = normalizeValue(e.parameter.name);
+  const className = normalizeValue(e.parameter.className || e.parameter.class);
+  const type = normalizeValue(e.parameter.type);
+  const power = normalizeValue(e.parameter.power);
+
+  if (!accountId) {
+    return { ok: false, message: 'accountId가 없습니다.' };
+  }
+
+  if (!originalName) {
+    return { ok: false, message: '원본 캐릭터명이 없습니다.' };
+  }
+
+  if (!name) {
+    return { ok: false, message: '캐릭터명이 없습니다.' };
+  }
+
+  const sheet = getSheet(SHEET_NAMES.CHARACTERS);
+  const values = sheet.getDataRange().getValues();
+  const headers = values[0].map(v => String(v).trim());
+
+  const accountIdCol = headers.indexOf('account_id');
+  const nameCol = headers.indexOf('name');
+  const classNameCol = headers.indexOf('class_name');
+  const typeCol = headers.indexOf('type');
+  const powerCol = headers.indexOf('power');
+  const updatedAtCol = headers.indexOf('updated_at');
+
+  for (let i = 1; i < values.length; i++) {
+    const rowAccountId = normalizeCompareValue(values[i][accountIdCol]);
+    const rowName = normalizeCompareValue(values[i][nameCol]);
+
+    if (rowAccountId === normalizeCompareValue(accountId) &&
+        rowName === normalizeCompareValue(originalName)) {
+      
+      const updatedAt = nowText();
+
+      if (nameCol > -1) sheet.getRange(i + 1, nameCol + 1).setValue(name);
+      if (classNameCol > -1) sheet.getRange(i + 1, classNameCol + 1).setValue(className);
+      if (typeCol > -1) sheet.getRange(i + 1, typeCol + 1).setValue(type);
+      if (powerCol > -1) sheet.getRange(i + 1, powerCol + 1).setValue(power);
+      if (updatedAtCol > -1) sheet.getRange(i + 1, updatedAtCol + 1).setValue(updatedAt);
+
+      // 본캐로 변경되면 계정의 main_name도 업데이트
+      if (type === '본캐') {
+        updateAccountMainName(accountId, name);
+      }
+
+      return {
+        ok: true,
+        message: '수정되었습니다.'
+      };
+    }
+  }
+
+  return {
+    ok: false,
+    message: '수정할 캐릭터를 찾을 수 없습니다.'
+  };
+}
+
+function updateAccountMainName(accountId, newMainName) {
+  accountId = normalizeValue(accountId);
+  newMainName = normalizeValue(newMainName);
+
+  if (!accountId || !newMainName) {
+    return;
+  }
+
+  const sheet = getSheet(SHEET_NAMES.ACCOUNTS);
+  const values = sheet.getDataRange().getValues();
+  const headers = values[0].map(v => String(v).trim());
+
+  const accountIdCol = headers.indexOf('account_id');
+  const mainNameCol = headers.indexOf('main_name');
+  const updatedAtCol = headers.indexOf('updated_at');
+
+  for (let i = 1; i < values.length; i++) {
+    const rowAccountId = normalizeCompareValue(values[i][accountIdCol]);
+
+    if (rowAccountId === normalizeCompareValue(accountId)) {
+      const updatedAt = nowText();
+
+      if (mainNameCol > -1) sheet.getRange(i + 1, mainNameCol + 1).setValue(newMainName);
+      if (updatedAtCol > -1) sheet.getRange(i + 1, updatedAtCol + 1).setValue(updatedAt);
+
+      break;
+    }
+  }
+}
+
 /************************************************
  * 주간 키
  ************************************************/
@@ -882,8 +1030,14 @@ function doGet(e) {
       case 'addCharacter':
         return outputJson(addCharacter(e));
 
+      case 'updateCharacter':
+        return outputJson(updateCharacter(e));
+
       case 'deleteCharacter':
         return outputJson(deleteCharacter(e.parameter.accountId, e.parameter.characterName));
+
+      case 'toggleCharacterType':
+        return outputJson(toggleCharacterType(e.parameter.accountId, e.parameter.characterName));
 
       case 'getCurrentWeekKey':
         return outputJson(getCurrentWeekKey());
