@@ -68,9 +68,9 @@ function renderCharacters(items) {
         
         <div class="character-right">
           <div class="character-actions">
-            <button class="character-edit-btn" title="편집" onclick="openEditModal('${escapeHtml(c.character_name)}')">✎</button>
-            <button class="character-toggle-btn" title="전환" onclick="toggleCharacterType('${escapeHtml(c.character_name)}')">⇄</button>
-            ${!isMainChar ? `<button class="character-delete-btn" title="삭제" onclick="confirmDelete('${escapeHtml(c.character_name)}')">✕</button>` : ''}
+            <button class="character-edit-btn" title="편집" data-name="${escapeHtml(c.character_name)}">✎</button>
+            <button class="character-toggle-btn" title="본캐/부캐 전환" data-name="${escapeHtml(c.character_name)}">⇄</button>
+            ${!isMainChar ? `<button class="character-delete-btn" title="삭제" data-name="${escapeHtml(c.character_name)}">✕</button>` : ''}
           </div>
         </div>
 
