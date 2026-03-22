@@ -298,29 +298,35 @@ function createAccount(sheet, mainName, password) {
 /************************************************
  * CHARACTERS
  ************************************************/
-function getCharacters(accountId) {
-  accountId = normalizeCompareValue(accountId);
+function getCharacters(accountIdOrMainName) {
+  const query = normalizeCompareValue(accountIdOrMainName);
 
-  if (!accountId) {
+  if (!query) {
     return {
       ok: false,
-      message: 'accountId가 없습니다.',
+      message: '검색어가 없습니다.',
       items: []
     };
   }
 
-  if (accountId === normalizeCompareValue('MASTER_ADMIN')) {
-    return { ok: true, items: [], adminYn: 'Y' };
+  if (query === normalizeCompareValue('MASTER_ADMIN')) {
+    return { ok: true, items: [], adminYn: 'Y', targetAccountId: 'MASTER_ADMIN', mainName: '👑 마스터' };
   }
 
   const rows = getRowsAsObjects(SHEET_NAMES.CHARACTERS);
   const accRows = getRowsAsObjects(SHEET_NAMES.ACCOUNTS);
   
-  const acc = accRows.find(r => normalizeCompareValue(r.account_id) === accountId);
-  const adminYn = acc ? (normalizeValue(acc.admin_yn).toUpperCase() === 'Y' ? 'Y' : 'N') : 'N';
+  let acc = accRows.find(r => normalizeCompareValue(r.account_id) === query);
+  if (!acc) acc = accRows.find(r => normalizeCompareValue(r.main_name) === query);
+
+  if (!acc) return { ok: false, message: '유저를 찾을 수 없습니다.', items: [] };
+
+  const targetAccountId = acc.account_id;
+  const mainName = acc.main_name;
+  const adminYn = acc.admin_yn ? (normalizeValue(acc.admin_yn).toUpperCase() === 'Y' ? 'Y' : 'N') : 'N';
 
   const items = rows
-    .filter(row => normalizeCompareValue(row.account_id) === accountId)
+    .filter(row => normalizeCompareValue(row.account_id) === normalizeCompareValue(targetAccountId))
     .filter(row => {
       const useYn = normalizeValue(row.use_yn).toUpperCase();
       return !useYn || useYn === 'Y';
@@ -337,7 +343,9 @@ function getCharacters(accountId) {
   return {
     ok: true,
     items,
-    adminYn
+    adminYn,
+    targetAccountId,
+    mainName
   };
 }
 
@@ -1216,6 +1224,7 @@ function toggleAdminRole(adminCode, targetAccountId, callerAccountId) {
       const currentRole = normalizeValue(values[i][adminYnCol]).toUpperCase();
       const newRole = currentRole === 'Y' ? 'N' : 'Y';
       sheet.getRange(i + 1, adminYnCol + 1).setValue(newRole);
+      SpreadsheetApp.flush();
       return { ok: true, message: `운영진 권한이 ${newRole === 'Y' ? '부여' : '해제'}되었습니다.`, newRole };
     }
   }
@@ -1234,6 +1243,7 @@ function resetUserPasswordByAdmin(adminCode, targetAccountId) {
   for (let i = 1; i < values.length; i++) {
     if (normalizeCompareValue(values[i][accountIdCol]) === normalizeCompareValue(targetAccountId)) {
       sheet.getRange(i + 1, passwordCol + 1).setValue('0000');
+      SpreadsheetApp.flush();
       return { ok: true, message: '해당 유저의 비밀번호가 [0000]으로 초기화되었습니다.\n유저에게 로그인 후 비밀번호를 변경하라고 안내해 주세요.' };
     }
   }

@@ -158,33 +158,35 @@ getEl("checkSchemaButton").onclick = async () => {
 getEl("backButton").onclick = () => movePage("main.html");
 
 getEl("searchUserButton").onclick = async () => {
-  const targetAccountId = getEl("userAccountIdInput").value.trim();
-  if (!targetAccountId) return alert("계정 ID를 입력하세요.");
-  await openUserCharacterManager(targetAccountId);
+  const searchValue = getEl("userAccountIdInput").value.trim();
+  if (!searchValue) return alert("유저 본캐명을 입력하세요.");
+  await openUserCharacterManager(searchValue);
 };
 
 initDateChips();
 loadAdminSchedule();
 
 // 특정 유저의 캐릭터 정보를 불러와서 편집 모달 띄우기
-async function openUserCharacterManager(targetAccountId) {
+async function openUserCharacterManager(searchValue) {
   const data = await callApi({ 
     action: "getCharacters", 
-    accountId: targetAccountId 
+    accountId: searchValue 
   });
   
   if (!data.ok) {
-    getEl("userMessage").textContent = "유저를 찾을 수 없습니다.";
+    getEl("userMessage").textContent = data.message || "유저를 찾을 수 없습니다.";
     getEl("userCharacterList").innerHTML = "";
     return;
   }
 
+  const targetAccountId = data.targetAccountId;
+  const targetMainName = data.mainName;
   const roleText = data.adminYn === 'Y' ? '<span style="color:var(--gold-1)">👑 운영진</span>' : '일반 유저';
   const isMaster = getAccountId() === 'MASTER_ADMIN';
-  const roleButtonHtml = isMaster ? `<button class="mini-btn" onclick="toggleUserAdmin('${targetAccountId}')">권한 변경</button>` : '';
+  const roleButtonHtml = isMaster ? `<button class="mini-btn" onclick="toggleUserAdmin('${targetAccountId}', '${searchValue}')">권한 변경</button>` : '';
 
   getEl("userMessage").innerHTML = `
-    ${targetAccountId}의 캐릭터 목록 (${data.items.length}개) <br>
+    [ ${escapeHtml(targetMainName)} ] 님의 캐릭터 목록 (${data.items.length}개) <br>
     현재 권한: <strong>${roleText}</strong>
     <div style="margin-top: 8px; display: flex; gap: 8px;">
       ${roleButtonHtml}
@@ -290,11 +292,11 @@ getEl("submitAdminCharacterButton").onclick = async () => {
 };
 
 // 유저 운영진 권한 토글
-async function toggleUserAdmin(targetAccountId) {
-  if(!confirm(`[${targetAccountId}] 계정의 운영진 권한을 변경하시겠습니까?`)) return;
+async function toggleUserAdmin(targetAccountId, searchValue) {
+  if(!confirm(`해당 유저의 운영진 권한을 변경하시겠습니까?`)) return;
   const res = await callApi({ action: "toggleAdminRole", adminCode: getAdminCode(), targetAccountId, callerAccountId: getAccountId() });
   alert(res.message);
-  if (res.ok) openUserCharacterManager(targetAccountId); // UI 갱신
+  if (res.ok) openUserCharacterManager(searchValue || targetAccountId); // UI 갱신
 }
 
 // 유저 비밀번호 강제 초기화
