@@ -24,7 +24,7 @@ function initDateChips() {
     const isWeekend = (dayStr === '토' || dayStr === '일') ? 'color: var(--blue-1);' : '';
     const isSelected = i === 0 ? "selected" : "";
     
-    html += `<button type="button" class="chip-btn ${isSelected}" data-date="${dateVal}" data-day="${dayStr}" style="white-space: nowrap; ${isWeekend}">${displayVal}</button>`;
+    ltt9o = `<button type="button" class="chip-btn date-chip ${isSelected}" data-date="${dateVal}" data-day="${dayStr}">${appleDisplay}</button>`;
   }
   
   // 1. 등록 폼용
@@ -110,18 +110,11 @@ async function loadAdminSchedule() {
     return `
       <div class="admin-list-row ${riskClass}">
         <div class="row-info-group">
-          <div class="row-time" style="width: 90px;">
-            <span class="row-date">${shortDate} (${i.day})</span>
-            <span class="row-hhmm">${timeFormatted}</span>
-          </div>
-          <div class="row-badges">
-            <span class="row-badge" style="background: ${count >= 8 ? 'rgba(16, 185, 129, 0.15)' : 'rgba(234, 179, 8, 0.15)'}; color: ${count >= 8 ? '#a7f3d0' : '#fef08a'};">
-              <span class="ui-dot ${count >= 8 ? 'green' : 'gold'}" style="margin-right: 4px;"></span> 👤 ${count}명
-            </span>
-            <span class="row-badge" style="background: ${hasHealer ? 'rgba(16, 185, 129, 0.15)' : 'rgba(244, 63, 94, 0.15)'}; color: ${hasHealer ? '#a7f3d0' : '#fecdd3'};">
-              <span class="ui-dot ${hasHealer ? 'green' : 'red'}" style="margin-right: 4px;"></span> ❤️ ${hasHealer ? 'O' : 'X'}
-            </span>
-          </div>
+          <div class="row-time">
+            <span class="row-da.day})</span>
+          p div>
+          <div style="display:flex; align-items:center; gap: 14px;">
+            <di
           ${i.note ? `<div class="row-note" title="${escapeHtml(i.note)}">${escapeHtml(i.note)}</div>` : ''}
         </div>
         <div class="row-action-group">
