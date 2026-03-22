@@ -19,7 +19,10 @@ async function loadMain() {
   `;
 
   const data = await callApi({ action: "getMainData", accountId });
-  if (!data.ok) return;
+  if (!data.ok) {
+    list.innerHTML = `<div class="character-empty" style="color: #fda4af;">에러: ${data.message || "데이터를 불러올 수 없습니다."}</div>`;
+    return;
+  }
 
   setText("accountMainName", data.mainName || "계정 없음");
   setText("characterCount", data.characters?.length || 0);
