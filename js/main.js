@@ -87,18 +87,21 @@ getEl("characterList").addEventListener("click", (e) => {
   const editBtn = e.target.closest(".character-edit-btn");
   if (editBtn) {
     const name = editBtn.getAttribute("data-name");
+    console.log("✏️ [수정 버튼 눌림]:", name);
     if (name) openEditModal(name);
     return;
   }
   const toggleBtn = e.target.closest(".character-toggle-btn");
   if (toggleBtn) {
     const name = toggleBtn.getAttribute("data-name");
+    console.log("🔄 [전환 버튼 눌림]:", name);
     if (name) toggleCharacterType(name);
     return;
   }
   const delBtn = e.target.closest(".character-delete-btn");
   if (delBtn) {
     const name = delBtn.getAttribute("data-name");
+    console.log("🗑️ [삭제 버튼 눌림]:", name);
     if (name) confirmDelete(name);
     return;
   }
