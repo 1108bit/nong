@@ -267,6 +267,22 @@ function editCharacter(charData) {
 
 // 캐릭터 타입 전환 함수 (본캐↔부캐)
 async function toggleCharacterType(characterName) {
+    // 현재 캐릭터 상태 확인
+    const targetChar = characters.find(c => c.character_name === characterName);
+    if (!targetChar) return;
+
+    const isCurrentlySub = targetChar.type === "부캐";
+    
+    // 전문적인 경고 메시지 구성
+    let confirmMsg = "";
+    if (isCurrentlySub) {
+        confirmMsg = `[ ${characterName} ] 캐릭터를 '본캐'로 지정하시겠습니까?\n\n⚠️ 시스템 안내: 본캐 지정 시 로그인 아이디가 변경되며, 다음 접속부터는  ${characterName} 로 로그인하셔야 합니다.`;
+    } else {
+        confirmMsg = `[ ${characterName} ] 캐릭터의 '본캐' 지정을 해제하시겠습니까?\n\n⚠️ 경고: 정상적인 레기온 관리를 위해 1개의 본캐가 필수로 요구됩니다. 해제 후 다른 캐릭터를 본캐로 지정해 주세요.`;
+    }
+
+    if (!confirm(confirmMsg)) return;
+
     const res = await callApi({
         action: "toggleCharacterType",
         accountId: getAccountId(),
@@ -274,7 +290,12 @@ async function toggleCharacterType(characterName) {
     });
 
     if (res.ok) {
-        alert(`'${characterName}' 캐릭터 타입이 변경되었습니다.`);
+        // 본캐로 성공적 전환 시 브라우저 내부 로그인 세션(URL 파라미터 방어) 동기화
+        if (res.newType === "본캐") {
+            sessionStorage.setItem("mainName", characterName);
+            if (localStorage.getItem("autoMainName")) localStorage.setItem("autoMainName", characterName);
+        }
+        alert(`'${characterName}' 캐릭터가 ${res.newType}로 설정되었습니다.`);
         setTimeout(loadMain, 300); // 타입 변경 후 대기 및 새로고침
     } else {
         alert(res.message || "타입 변경에 실패했습니다.");
