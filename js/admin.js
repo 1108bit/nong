@@ -137,17 +137,20 @@ async function loadAdminSchedule() {
 
     return `
       <div class="admin-list-row ${riskClass}">
-        <div class="row-info-group" style="cursor: pointer;" onclick="openPartyDetail('${escapeHtml(i.date)}', '${escapeHtml(i.day)}', '${escapeHtml(timeFormatted)}')">
-          <div class="row-time">
-            <span class="row-date">${shortDate} (${i.day})</span>
-            <span class="row-hhmm">${timeFormatted}</span>
-          </div>
+        <!-- 좌측: 날짜 및 시간 -->
+        <div class="row-time" style="cursor: pointer;" onclick="openPartyDetail('${escapeHtml(i.date)}', '${escapeHtml(i.day)}', '${escapeHtml(timeFormatted)}')">
+          <span class="row-date">${shortDate} (${i.day})</span>
+          <span class="row-hhmm">${timeFormatted}</span>
+        </div>
+        <!-- 중앙: 인원 및 치유성 인디케이터 -->
+        <div class="row-dots-group" style="cursor: pointer;" onclick="openPartyDetail('${escapeHtml(i.date)}', '${escapeHtml(i.day)}', '${escapeHtml(timeFormatted)}')">
           <div class="participant-dots" title="인원: ${count}명">
             ${Array(8).fill(0).map((_, idx) => `<div class="dot ${idx < count ? 'filled' : ''}"></div>`).join('')}
           </div>
-          <div class="dot ${hasHealer ? 'healer' : (count > 0 ? 'warn' : '')}" title="치유성: ${hasHealer ? 'O' : 'X'}" style="margin-left: 8px;"></div>
+          <div class="dot ${hasHealer ? 'healer' : (count > 0 ? 'warn' : '')}" title="치유성: ${hasHealer ? 'O' : 'X'}"></div>
           ${i.note ? `<div class="row-note" title="${escapeHtml(i.note)}">${escapeHtml(i.note)}</div>` : ''}
         </div>
+        <!-- 우측: 액션 버튼 -->
         <div class="row-action-group">
           <button class="icon-btn edit-btn" title="수정" data-date="${escapeHtml(i.date)}" data-day="${escapeHtml(i.day)}" data-time="${escapeHtml(timeFormatted)}" data-note="${escapeHtml(i.note)}">✏️</button>
           <button class="icon-btn delete-btn" title="삭제" data-date="${escapeHtml(i.date)}" data-day="${escapeHtml(i.day)}" data-time="${escapeHtml(timeFormatted)}">🗑️</button>

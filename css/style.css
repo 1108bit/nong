@@ -2434,14 +2434,17 @@ body.modal-open {
   }
 }
 
-/* 2. 일정 목록 가로형 리스트 강제 (어떤 상황에서도 줄바꿈 금지) */
-.admin-list-row, 
-.admin-card-item {
+/* =========================
+   긴급 복구: 등록된 일정 목록 가로 한 줄 강제 교정
+========================= */
+#scheduleList .admin-list-row, 
+#scheduleList .admin-card-item {
   display: flex !important;
   flex-direction: row !important; /* 가로 배치 강제 */
   align-items: center !important;
   justify-content: space-between !important;
   padding: 10px 16px !important;
+  height: auto !important;
   min-height: 60px !important;
   background: rgba(255, 255, 255, 0.03) !important;
   border-radius: 12px !important;
@@ -2449,11 +2452,43 @@ body.modal-open {
   gap: 15px !important;
 }
 
-/* 3. 인원 현황 점(Dot) 가로 배치 강제 */
-.participant-dots {
+/* 좌측 날짜/시간 영역 */
+#scheduleList .row-time,
+#scheduleList .admin-card-top {
+  margin: 0 !important;
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: flex-start !important;
+  justify-content: center !important;
+  min-width: 80px;
+}
+
+/* 중앙 인원 점(Dot) 영역 가로 정렬 */
+#scheduleList .row-dots-group {
+  display: flex !important;
+  flex-direction: row !important;
+  align-items: center !important;
+  gap: 12px !important;
+  flex: 1 !important;
+  overflow: hidden !important;
+}
+
+/* 3. 인원 현황 점(Dot) 캡슐화 강제 */
+#scheduleList .participant-dots {
   display: flex !important;
   flex-direction: row !important; /* 점(Dot) 가로 정렬 강제 */
+  align-items: center !important;
   gap: 4px !important;
+  margin: 0 !important;
+}
+
+/* 우측 수정/삭제 버튼 그룹 */
+#scheduleList .row-action-group,
+#scheduleList .admin-card-actions {
+  display: flex !important;
+  flex-direction: row !important;
+  gap: 8px !important;
+  margin: 0 !important;
 }
 
 /* 4. 애플 감성 가로 스크롤 & 칩 잘림 원천 차단 */
