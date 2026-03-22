@@ -1599,13 +1599,13 @@ body.modal-open {
 .horizontal-scroll-chips {
   flex-wrap: nowrap;
   overflow-x: auto;
-  padding: 14px 40px 14px 4px !important; /* 확대 시 상하 잘림을 완벽히 방지하는 넉넉한 패딩 */
+  padding: 14px 24px 14px 4px !important; /* 우측 여백을 24px로 줄여 모바일 공간 확보 */
   -webkit-overflow-scrolling: touch;
   scrollbar-width: none; /* Firefox */
   cursor: grab;
   /* 애플 스타일 우측 페이드아웃 마스크 효과 */
-  -webkit-mask-image: linear-gradient(90deg, #000 85%, transparent 100%);
-  mask-image: linear-gradient(90deg, #000 85%, transparent 100%);
+  -webkit-mask-image: linear-gradient(90deg, #000 90%, transparent 100%);
+  mask-image: linear-gradient(90deg, #000 90%, transparent 100%);
 }
 .horizontal-scroll-chips::-webkit-scrollbar {
   display: none; /* Chrome, Safari */
