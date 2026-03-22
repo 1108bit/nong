@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <meta name="theme-color" content="#06111d" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <title>NoStepBack - 전체 캐릭터 목록</title>
+  <link rel="stylesheet" href="./css/style.css" />
+</head>
+<body>
+  <div class="bg-logo"></div>
+  <div class="bg-dim"></div>
+  <main class="app-page">
+    <div class="main-shell">
+      <section class="main-header-hero">
+        <div class="main-hero-top">
+          <h1 class="main-page-title">전체 캐릭터 목록</h1>
+          <button class="btn btn-secondary" id="backButton">메인으로</button>
+        </div>
+      </section>
+      <section class="main-grid">
+        <article class="main-card" style="grid-column: 1 / -1;">
+          <div class="card-head"><h2 class="section-title">가입된 레기온 멤버 현황</h2></div>
+          <div class="page-message" id="pageMessage">데이터를 불러오는 중입니다...</div>
+          <div id="allCharactersTableContainer"></div>
+        </article>
+      </section>
+    </div>
+  </main>
+  <script src="./js/common.js?v=4"></script>
+  <script src="./js/all-characters.js?v=4"></script>
+</body>
+</html>

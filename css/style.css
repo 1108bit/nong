@@ -2346,3 +2346,64 @@ body.modal-open {
   0% { transform: rotate(0deg); }
   100% { transform: rotate(360deg); }
 }
+
+/* =========================
+   전체 캐릭터 목록 테이블
+========================= */
+.table-wrapper {
+  width: 100%;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  border-radius: var(--radius-md);
+  background: rgba(16, 31, 48, 0.4);
+  border: 1px solid var(--line-1);
+}
+
+.char-table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+  min-width: 500px;
+}
+
+.char-table th,
+.char-table td {
+  padding: 14px 16px;
+  font-size: 13px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.char-table th {
+  background: rgba(0, 0, 0, 0.2);
+  color: var(--text-sub);
+  font-weight: 800;
+  cursor: pointer;
+  white-space: nowrap;
+  user-select: none;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+
+.char-table th:hover {
+  color: var(--text-main);
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.char-table tbody tr {
+  transition: background 0.15s ease;
+}
+
+.char-table tbody tr:hover {
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.sort-icon {
+  margin-left: 6px;
+  font-size: 11px;
+  opacity: 0.4;
+  vertical-align: middle;
+}
+
+.sort-icon.active {
+  opacity: 1;
+  color: var(--cyan-1);
+}

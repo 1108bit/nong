@@ -362,6 +362,33 @@ function getCharacters(accountIdOrMainName) {
   };
 }
 
+function getAllCharacters() {
+  const charRows = getRowsAsObjects(SHEET_NAMES.CHARACTERS);
+  const accRows = getRowsAsObjects(SHEET_NAMES.ACCOUNTS);
+
+  const accMap = {};
+  accRows.forEach(acc => {
+    accMap[normalizeCompareValue(acc.account_id)] = acc.main_name || '';
+  });
+
+  const items = charRows
+    .filter(row => {
+      const useYn = normalizeValue(row.use_yn).toUpperCase();
+      return !useYn || useYn === 'Y';
+    })
+    .map(row => ({
+      characterId: row.character_id || '',
+      accountId: row.account_id || '',
+      mainName: accMap[normalizeCompareValue(row.account_id)] || '알수없음',
+      name: row.name || '',
+      className: row.class_name || '',
+      type: row.type || '',
+      power: Number(row.power || 0)
+    }));
+
+  return { ok: true, items };
+}
+
 function addCharacter(e) {
   const accountId = normalizeValue(e.parameter.accountId);
   const name = normalizeValue(e.parameter.name);
@@ -1294,6 +1321,9 @@ function doGet(e) {
 
       case 'getCharacters':
         return outputJson(getCharacters(e.parameter.accountId));
+
+      case 'getAllCharacters':
+        return outputJson(getAllCharacters());
 
       case 'addCharacter':
         return outputJson(addCharacter(e));

@@ -356,6 +356,7 @@ document.querySelectorAll('.chip-select-group').forEach(group => {
 // 버튼 연결
 getEl("goAvailabilityButton").onclick = () => movePage("availability.html");
 getEl("goPartyButton").onclick = () => movePage("party.html");
+getEl("goAllCharactersButton").onclick = () => movePage("all-characters.html");
 getEl("logoutButton").onclick = () => {
     // 로그아웃 시 sessionStorage 정리
     sessionStorage.clear();
