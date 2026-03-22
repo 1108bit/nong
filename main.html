@@ -99,27 +99,32 @@
             </div>
             <input type="hidden" id="modalCharacterClass" value="검성" />
           </div>
-          <div class="modal-grid">
-            <div class="form-group">
-              <label class="input-label">타입</label>
-              <div class="chip-select-group" data-target="modalCharacterType">
-                <button type="button" class="chip-btn chip-type main" data-value="본캐" id="chipTypeMain">본캐</button>
-                <button type="button" class="chip-btn chip-type sub selected" data-value="부캐" id="chipTypeSub">부캐</button>
-              </div>
-              <input type="hidden" id="modalCharacterType" value="부캐" />
+          
+          <div class="form-group">
+            <label class="input-label">타입</label>
+            <div class="chip-select-group" data-target="modalCharacterType">
+              <button type="button" class="chip-btn chip-type main" data-value="본캐" id="chipTypeMain">본캐</button>
+              <button type="button" class="chip-btn chip-type sub selected" data-value="부캐" id="chipTypeSub">부캐</button>
             </div>
-            <div class="form-group">
-              <label class="input-label">전투력</label>
-              <select id="modalCharacterPower" class="character-select">
-                <option value="0">100 미만</option>
-                <option value="100">100 이상</option><option value="150">150 이상</option>
-                <option value="200">200 이상</option><option value="250">250 이상</option>
-                <option value="300">300 이상</option><option value="350">350 이상</option>
-                <option value="400" selected>400 이상</option><option value="450">450 이상</option>
-                <option value="500">500 이상</option>
-              </select>
-            </div>
+            <input type="hidden" id="modalCharacterType" value="부캐" />
           </div>
+          <div class="form-group">
+            <label class="input-label">전투력</label>
+            <div class="chip-select-group" data-target="modalCharacterPower">
+              <button type="button" class="chip-btn" data-value="0">100K 미만</button>
+              <button type="button" class="chip-btn" data-value="100">100K ~ 150K</button>
+              <button type="button" class="chip-btn" data-value="150">150K ~ 200K</button>
+              <button type="button" class="chip-btn" data-value="200">200K ~ 250K</button>
+              <button type="button" class="chip-btn" data-value="250">250K ~ 300K</button>
+              <button type="button" class="chip-btn" data-value="300">300K ~ 350K</button>
+              <button type="button" class="chip-btn" data-value="350">350K ~ 400K</button>
+              <button type="button" class="chip-btn selected" data-value="400">400K ~ 450K</button>
+              <button type="button" class="chip-btn" data-value="450">450K ~ 500K</button>
+              <button type="button" class="chip-btn" data-value="500">500K 이상</button>
+            </div>
+            <input type="hidden" id="modalCharacterPower" value="400" />
+          </div>
+          
           <div class="modal-action-row">
             <button class="btn btn-secondary" id="cancelCharacterButton">취소</button>
             <button class="btn btn-primary" id="submitCharacterButton">등록하기</button>

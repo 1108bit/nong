@@ -64,12 +64,12 @@ function movePage(url) {
   location.href = url;
 }
 
-// 숫자를 전투력 구간 텍스트로 변환하는 함수 ("100 ~ 150")
+// 숫자를 전투력 구간 텍스트로 변환하는 함수 ("100K ~ 150K")
 function getPowerRange(power) {
   const p = Number(power) || 0;
-  if (p < 100) return "100 미만";
-  if (p >= 500) return "500 이상";
+  if (p < 100) return "100K 미만";
+  if (p >= 500) return "500K 이상";
   const start = Math.floor(p / 50) * 50;
   const end = start + 50;
-  return `${start} ~ ${end}`;
+  return `${start}K ~ ${end}K`;
 }

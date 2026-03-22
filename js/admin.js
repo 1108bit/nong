@@ -152,6 +152,9 @@ function editUserCharacter(accountId, originalName, className, type, power) {
       b.classList.toggle("selected", b.dataset.value === type);
   });
   getEl("adminModalCharacterPower").value = power;
+  document.querySelectorAll(`[data-target="adminModalCharacterPower"] .chip-btn`).forEach(b => {
+      b.classList.toggle("selected", b.dataset.value == power);
+  });
 
   getEl("adminCharacterModal").classList.add("show");
   document.body.classList.add("modal-open");

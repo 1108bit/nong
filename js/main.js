@@ -253,6 +253,10 @@ function editCharacter(charData) {
     document.querySelectorAll(`[data-target="modalCharacterClass"] .chip-btn`).forEach(b => {
         b.classList.toggle("selected", b.dataset.value === charData.className);
     });
+    
+    document.querySelectorAll(`[data-target="modalCharacterPower"] .chip-btn`).forEach(b => {
+        b.classList.toggle("selected", b.dataset.value == charData.power);
+    });
 
     // 편집 모드 표시
     getEl("characterModal").dataset.mode = "edit";
@@ -312,6 +316,9 @@ function closeModal() {
     // 칩 초기화
     document.querySelectorAll(`[data-target="modalCharacterClass"] .chip-btn`).forEach(b => {
         b.classList.toggle("selected", b.dataset.value === "검성");
+    });
+    document.querySelectorAll(`[data-target="modalCharacterPower"] .chip-btn`).forEach(b => {
+        b.classList.toggle("selected", b.dataset.value === "400");
     });
     const chipMain = getEl("chipTypeMain");
     const chipSub = getEl("chipTypeSub");
