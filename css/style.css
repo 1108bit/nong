@@ -2415,3 +2415,40 @@ body.modal-open {
   opacity: 1;
   color: var(--cyan-1);
 }
+
+/* =========================
+   긴급: UI 잘림 방지 및 모던 레이아웃 적용
+========================= */
+.horizontal-scroll-chips {
+  display: flex !important;
+  flex-direction: row !important;
+  flex-wrap: nowrap !important;
+  overflow-x: auto !important;
+  padding: 15px 5px !important; /* 상하 여백을 넉넉히 주어 scale 시 안 잘리게 함 */
+  gap: 8px !important;
+}
+
+.chip-btn {
+  flex-shrink: 0 !important;
+  white-space: nowrap !important;
+}
+
+.chip-btn.selected {
+  transform: scale(1.1) !important;
+  z-index: 10 !important;
+  border-color: var(--cyan-1) !important;
+  box-shadow: 0 0 12px rgba(67, 217, 255, 0.4) !important;
+}
+
+.admin-form-grid {
+  display: grid !important;
+  grid-template-columns: 1fr 1fr !important;
+  gap: 15px !important;
+}
+
+/* 모바일 화면에서는 다시 1단으로 풀어서 가독성 확보 */
+@media (max-width: 600px) {
+  .admin-form-grid {
+    grid-template-columns: 1fr !important;
+  }
+}
