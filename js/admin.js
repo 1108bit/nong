@@ -89,37 +89,6 @@ function initTimeChips() {
   if (group2) group2.innerHTML = html;
 }
 
-// 달력 및 시간 입력창 변경 이벤트 연동
-const calPicker = getEl("calendarPicker");
-if (calPicker) {
-  calPicker.onchange = (e) => {
-    const val = e.target.value; // YYYY-MM-DD
-    if (!val) return;
-    const d = new Date(val);
-    const days = ["일", "월", "화", "수", "목", "금", "토"];
-    getEl("dateInput").value = val;
-    getEl("dayInput").value = days[d.getDay()];
-    document.querySelectorAll("#dateChipGroup .chip-btn").forEach(b => {
-      b.classList.toggle("selected", b.dataset.date === val);
-    });
-  };
-}
-
-const editCalPicker = getEl("editCalendarPicker");
-if (editCalPicker) {
-  editCalPicker.onchange = (e) => {
-    const val = e.target.value;
-    if (!val) return;
-    const d = new Date(val);
-    const days = ["일", "월", "화", "수", "목", "금", "토"];
-    getEl("editDateInput").value = val;
-    getEl("editDayInput").value = days[d.getDay()];
-    document.querySelectorAll("#editDateChipGroup .chip-btn").forEach(b => {
-      b.classList.toggle("selected", b.dataset.date === val);
-    });
-  };
-}
-
 // 구글 시트의 ISO 8601 시간 오차(1899-12-30T...)를 완벽히 필터링하는 함수
 function formatDisplayTime(ts) {
   if (!ts) return "";
@@ -247,9 +216,6 @@ function editSchedule(date, day, time, note) {
   getEl("dayInput").value = day;
   getEl("timeSlotInput").value = time;
   getEl("noteInput").value = note;
-  
-  const editCal = getEl("editCalendarPicker");
-  if (editCal) editCal.value = date;
 
   // 칩 시각적 연동
   const dateGroup = getEl("dateChipGroup");
