@@ -33,9 +33,13 @@ async function loadPartySummary() {
     </button>
   `).join("");
   
-  // 버튼 클릭 이벤트 리스너 추가
+  // 버튼 클릭 이벤트 리스너 추가 및 Active 상태 시각화
   document.querySelectorAll(".party-slot-btn").forEach(btn => {
-    btn.onclick = () => showComposition(btn.dataset.day, btn.dataset.time);
+    btn.onclick = () => {
+      document.querySelectorAll(".party-slot-btn").forEach(b => b.classList.remove("active"));
+      btn.classList.add("active");
+      showComposition(btn.dataset.day, btn.dataset.time);
+    };
   });
 }
 

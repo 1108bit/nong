@@ -420,7 +420,7 @@ if (adminSecretBtn) {
       if (res.ok) {
         sessionStorage.setItem("isAdmin", "true");
         sessionStorage.setItem("adminCode", code);
-        location.href = `./main.html?mainName=${encodeURIComponent('👑 마스터')}&accountId=MASTER_ADMIN`;
+        location.href = `./admin.html?mainName=${encodeURIComponent('👑 마스터')}&accountId=MASTER_ADMIN`;
       } else {
         alert("관리자 코드가 일치하지 않습니다.");
       }
