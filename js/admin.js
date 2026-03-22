@@ -57,6 +57,12 @@ async function loadAdminSchedule() {
   if (!summaryData.ok) return alert("참여 현황을 가져오는데 실패했습니다.");
 
   const list = getEl("scheduleList");
+  
+  if (!scheduleData.items || scheduleData.items.length === 0) {
+    list.innerHTML = `<div class="admin-empty-state">📅 등록된 일정이 없습니다.<br>위에서 새 일정을 등록해 주세요.</div>`;
+    return;
+  }
+  
   list.innerHTML = scheduleData.items.map(i => {
     const participants = summaryData.items.filter(s => s.day === i.day && s.time_slot === i.time_slot);
     const count = participants.length;
@@ -186,9 +192,11 @@ async function openUserCharacterManager(searchValue) {
   const roleButtonHtml = isMaster ? `<button class="mini-btn" onclick="toggleUserAdmin('${targetAccountId}', '${searchValue}')">권한 변경</button>` : '';
 
   getEl("userMessage").innerHTML = `
-    [ ${escapeHtml(targetMainName)} ] 님의 캐릭터 목록 (${data.items.length}개) <br>
-    현재 권한: <strong>${roleText}</strong>
-    <div style="margin-top: 8px; display: flex; gap: 8px;">
+    <div style="font-size: 15px; font-weight: 800; color: var(--text-main);">[ ${escapeHtml(targetMainName)} ] 님의 정보</div>
+    <div style="margin-top: 6px; font-size: 13px; color: var(--text-sub);">
+      현재 권한: <strong>${roleText}</strong> | 등록 캐릭터: ${data.items.length}개
+    </div>
+    <div style="margin-top: 12px; display: flex; gap: 8px;">
       ${roleButtonHtml}
       <button class="mini-btn danger" onclick="resetUserPassword('${targetAccountId}')">비밀번호 초기화</button>
     </div>

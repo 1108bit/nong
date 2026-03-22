@@ -1147,6 +1147,29 @@ a {
   color: var(--cyan-2);
 }
 
+.user-search-result-box {
+  padding: 16px;
+  border-radius: 18px;
+  background: rgba(16, 31, 48, 0.5);
+  border: 1px solid rgba(138, 188, 233, 0.12);
+  margin-top: 16px;
+}
+
+.user-info-text {
+  margin-bottom: 16px;
+}
+
+.admin-empty-state {
+  text-align: center;
+  padding: 32px 16px;
+  border-radius: 16px;
+  background: rgba(20, 36, 54, 0.42);
+  border: 1px dashed rgba(141, 189, 235, 0.12);
+  color: var(--text-muted);
+  font-size: 13px;
+  line-height: 1.6;
+}
+
 .page-message.error {
   color: #fecdd3;
   background: rgba(60, 16, 27, 0.42);
@@ -1972,8 +1995,13 @@ body.modal-open {
 }
 
 .mini-btn.danger {
-  background: rgba(244, 63, 94, 0.2);
-  color: #fecdd3;
+  background: rgba(244, 63, 94, 0.25);
+  color: #ffb3c1;
+  border: 1px solid rgba(244, 63, 94, 0.3);
+}
+
+.mini-btn.danger:hover {
+  background: rgba(244, 63, 94, 0.4);
 }
 
 /* =========================

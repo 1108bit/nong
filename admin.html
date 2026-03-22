@@ -15,8 +15,7 @@
         <div class="main-hero-top">
           <h1 class="main-page-title">일정 관리</h1>
           <div>
-            <button class="btn btn-primary" id="checkSchemaButton">DB 상태 점검</button>
-            <button class="btn btn-secondary" id="backButton">메인으로</button>
+            <button class="btn btn-secondary" id="backButton" style="padding: 0 16px; min-height: 40px; border-radius: 12px; font-size: 13px;">← 메인으로</button>
           </div>
         </div>
       </section>
@@ -32,15 +31,16 @@
             </div>
             <div class="form-group" style="grid-column: 1 / -1;">
               <label class="input-label">시간 선택</label>
-              <div class="chip-select-group" data-target="timeSlotInput" style="margin-bottom: 8px;">
-                <button type="button" class="chip-btn" data-value="20:00">20:00</button>
-                <button type="button" class="chip-btn selected" data-value="21:00">21:00</button>
-                <button type="button" class="chip-btn" data-value="21:30">21:30</button>
-                <button type="button" class="chip-btn" data-value="22:00">22:00</button>
-                <button type="button" class="chip-btn" data-value="23:00">23:00</button>
-                <button type="button" class="chip-btn" data-value="24:00">24:00</button>
+              <div style="display: flex; gap: 10px; align-items: center;">
+                <input type="time" id="timeSlotInput" class="main-input" value="21:00" style="color-scheme: dark; width: 130px; flex-shrink: 0;" />
+                <div class="chip-select-group horizontal-scroll-chips" data-target="timeSlotInput" style="margin-top: 0;">
+                  <button type="button" class="chip-btn" data-value="20:00">20:00</button>
+                  <button type="button" class="chip-btn selected" data-value="21:00">21:00</button>
+                  <button type="button" class="chip-btn" data-value="21:30">21:30</button>
+                  <button type="button" class="chip-btn" data-value="22:00">22:00</button>
+                  <button type="button" class="chip-btn" data-value="23:00">23:00</button>
+                </div>
               </div>
-              <input type="time" id="timeSlotInput" class="main-input" value="21:00" style="color-scheme: dark;" />
             </div>
             <div class="form-group" style="grid-column: 1 / -1;"><label class="input-label">메모</label><input type="text" id="noteInput" class="main-input" placeholder="예: 본캐 위주" /></div>
           </div>
@@ -55,13 +55,16 @@
           <div class="card-head"><h2 class="section-title">유저 캐릭터 관리</h2></div>
           <div class="form-group">
             <label class="input-label">유저 검색 (본캐명)</label>
-            <input type="text" id="userAccountIdInput" class="main-input" placeholder="예: 농[젠카]" />
+            <div style="display: flex; gap: 8px;">
+              <input type="text" id="userAccountIdInput" class="main-input" placeholder="예: 농[젠카]" />
+              <button class="btn btn-primary" id="searchUserButton" style="flex-shrink: 0; min-width: 90px;">검색</button>
+            </div>
           </div>
-          <div class="admin-action-row">
-            <button class="btn btn-primary" id="searchUserButton">유저 검색</button>
+          
+          <div id="userSearchResultArea" class="user-search-result-box" style="display: none;">
+            <div class="user-info-text" id="userMessage"></div>
+            <div class="admin-list" id="userCharacterList"></div>
           </div>
-          <div class="page-message" id="userMessage">계정 ID를 입력하고 검색하세요.</div>
-          <div class="admin-list" id="userCharacterList"></div>
         </article>
 
         <article class="main-card admin-card-full">
@@ -70,7 +73,11 @@
         </article>
 
       <article class="main-card admin-card-full" id="securitySettingsCard">
-        <div class="card-head"><h2 class="section-title">보안 설정</h2></div>
+        <div class="card-head"><h2 class="section-title">시스템 및 보안 설정</h2></div>
+        <div class="form-group" style="margin-bottom: 24px; padding-bottom: 24px; border-bottom: 1px solid rgba(138, 188, 233, 0.1);">
+          <label class="input-label">데이터베이스 관리</label>
+          <button class="btn btn-secondary" id="checkSchemaButton" style="width: 100%;">DB 상태 점검</button>
+        </div>
         <div class="form-group">
           <label class="input-label">현재 관리자 코드</label>
           <input type="password" id="oldAdminCodeInput" class="main-input" placeholder="현재 코드를 입력하세요" />

@@ -1212,6 +1212,14 @@ function toggleAdminRole(adminCode, targetAccountId, callerAccountId) {
   validateAdminCode(adminCode);
   if (callerAccountId !== 'MASTER_ADMIN') return { ok: false, message: '마스터 계정만 접근 가능합니다.' };
 
+  if (normalizeCompareValue(targetAccountId) === normalizeCompareValue(callerAccountId)) {
+    return { ok: false, message: '자기 자신의 권한은 변경할 수 없습니다.' };
+  }
+  
+  if (normalizeCompareValue(targetAccountId) === normalizeCompareValue('MASTER_ADMIN')) {
+    return { ok: false, message: '마스터 계정의 권한은 변경할 수 없습니다.' };
+  }
+
   const sheet = getSheet(SHEET_NAMES.ACCOUNTS);
   const values = sheet.getDataRange().getValues();
   const accountIdCol = values[0].map(v => String(v).trim()).indexOf('account_id');
