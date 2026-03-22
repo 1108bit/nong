@@ -24,7 +24,8 @@ function initDateChips() {
     const isWeekend = (dayStr === '토' || dayStr === '일') ? 'color: var(--blue-1);' : '';
     const isSelected = i === 0 ? "selected" : "";
     
-    ltt9o = `<button type="button" class="chip-btn date-chip ${isSelected}" data-date="${dateVal}" data-day="${dayStr}">${appleDisplay}</button>`;
+    const appleDisplay = `<span style="font-size:11px; opacity:0.6; font-weight:700; ${isWeekend}">${dayStr}</span><span style="font-size:16px; font-weight:900; margin-top:4px;">${dd}</span>`;
+    html += `<button type="button" class="chip-btn date-chip ${isSelected}" data-date="${dateVal}" data-day="${dayStr}">${appleDisplay}</button>`;
   }
   
   // 1. 등록 폼용
@@ -111,10 +112,18 @@ async function loadAdminSchedule() {
       <div class="admin-list-row ${riskClass}">
         <div class="row-info-group">
           <div class="row-time">
-            <span class="row-da.day})</span>
-          p div>
+            <span class="row-date">${shortDate} (${i.day})</span>
+            <span class="row-hhmm">${timeFormatted}</span>
+          </div>
           <div style="display:flex; align-items:center; gap: 14px;">
-            <di
+            <div class="participant-dots" title="인원: ${count}명">
+              ${Array(8).fill(0).map((_, idx) => `<div class="dot ${idx < count ? 'filled' : ''}"></div>`).join('')}
+            </div>
+            <div class="participant-dots" title="치유성: ${hasHealer ? 'O' : 'X'}">
+              <span style="font-size:11px; color:var(--text-muted); font-weight:700; margin-right:2px;">치유</span>
+              <div class="dot ${hasHealer ? 'healer' : (count > 0 ? 'warn' : '')}"></div>
+            </div>
+          </div>
           ${i.note ? `<div class="row-note" title="${escapeHtml(i.note)}">${escapeHtml(i.note)}</div>` : ''}
         </div>
         <div class="row-action-group">

@@ -2341,3 +2341,8 @@ body.modal-open {
 .dot.filled { background: var(--cyan-1); box-shadow: 0 0 6px rgba(67, 217, 255, 0.4); }
 .dot.healer { background: var(--gold-1); box-shadow: 0 0 6px rgba(246, 211, 122, 0.4); }
 .dot.warn { background: var(--red-1); box-shadow: 0 0 6px rgba(251, 113, 133, 0.4); }
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
