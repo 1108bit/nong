@@ -2456,21 +2456,55 @@ body.modal-open {
   gap: 4px !important;
 }
 
-/* 4. 칩 하단 여백 확보로 잘림 현상 원천 차단 */
-#dateChipGroup, .chip-select-group,
+/* 4. 애플 감성 가로 스크롤 & 칩 잘림 원천 차단 */
+.chip-select-group, #dateChipGroup, #editDateChipGroup, #timeChipGroup, #editTimeChipGroup,
 .horizontal-scroll-chips {
   display: flex !important;
-  flex-direction: row !important;
-  padding: 10px 5px 15px !important; /* 칩 하단 잘림 방지 */
-  overflow: visible !important; /* Scale 애니메이션 시 잘림 원천 차단 */
-  overflow-x: auto !important; 
+  flex-wrap: nowrap !important;
+  overflow-x: auto !important;
+  overflow-y: visible !important; /* scale 효과 시 잘림 방지 핵심 */
+  padding: 15px 8px !important;    /* 위아래 여백을 15px 이상 확보하여 그림자 보호 */
+  gap: 12px !important;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
   white-space: nowrap !important;
-  gap: 8px !important;
+}
+
+.horizontal-scroll-chips::-webkit-scrollbar {
+  display: none !important;
+}
+
+.chip-btn {
+  flex: 0 0 auto !important;
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  justify-content: center !important;
+  min-width: 56px !important;
+  height: 64px !important; /* 세로로 긴 애플 캘린더 스타일 */
+  border-radius: 16px !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+  background: rgba(255, 255, 255, 0.05) !important;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+  color: var(--text-muted) !important;
 }
 
 .chip-btn:active, .main-button:active {
   transform: scale(0.94) !important;
   transition: transform 0.1s ease;
+}
+
+.chip-btn.selected {
+  background: #ffffff !important;
+  color: #000000 !important;
+  transform: scale(1.1) translateY(-2px) !important; /* 위로 살짝 띄우는 프리미엄 효과 */
+  box-shadow: 0 8px 20px rgba(255, 255, 255, 0.3) !important;
+  z-index: 10 !important;
+  border-color: transparent !important;
+}
+.chip-btn.selected span {
+  color: #000000 !important;
+  opacity: 1 !important;
 }
 
 /* 5. 드래그 앤 드롭 상호작용 */

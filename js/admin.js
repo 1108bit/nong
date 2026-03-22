@@ -62,23 +62,25 @@ function initDateChips() {
   }
 }
 
-// 시간 칩 동적 생성 로직 (낮 12:00 ~ 자정 00:00)
+// 시간 칩 동적 생성 로직 (09:00 ~ 24:00, 30분 단위)
 function initTimeChips() {
   let html = "";
-  for (let h = 12; h <= 24; h++) {
-    let m = "00"; // 1시간 단위
-    
-    let displayH = h;
-    let ampm = "오전";
-    if (h >= 12 && h < 24) { ampm = "오후"; displayH = h === 12 ? 12 : h - 12; }
-    else if (h === 24) { ampm = "오전"; displayH = 12; }
-    
-    const valueH = h === 24 ? "00" : String(h).padStart(2, '0');
-    const dateVal = `${valueH}:${m}`;
-    const isSelected = dateVal === "21:00" ? "selected" : "";
-    
-    const appleDisplay = `<span style="font-size:11px; opacity:0.6; font-weight:700;">${ampm}</span><span style="font-size:16px; font-weight:900; margin-top:4px;">${displayH}:${m}</span>`;
-    html += `<button type="button" class="chip-btn date-chip ${isSelected}" data-value="${dateVal}">${appleDisplay}</button>`;
+  for (let h = 9; h <= 24; h++) {
+    for (let m of ["00", "30"]) {
+      if (h === 24 && m === "30") continue;
+      
+      let displayH = h;
+      let ampm = "오전";
+      if (h >= 12 && h < 24) { ampm = "오후"; displayH = h === 12 ? 12 : h - 12; }
+      else if (h === 24) { ampm = "오전"; displayH = 12; }
+      
+      const valueH = h === 24 ? "00" : String(h).padStart(2, '0');
+      const dateVal = `${valueH}:${m}`;
+      const isSelected = dateVal === "21:00" ? "selected" : "";
+      
+      const appleDisplay = `<span style="font-size:11px; font-weight:700;">${ampm}</span><span style="font-size:16px; font-weight:900; margin-top:4px;">${displayH}:${m}</span>`;
+      html += `<button type="button" class="chip-btn date-chip ${isSelected}" data-value="${dateVal}">${appleDisplay}</button>`;
+    }
   }
   
   const group1 = getEl("timeChipGroup");
@@ -86,41 +88,6 @@ function initTimeChips() {
   const group2 = getEl("editTimeChipGroup");
   if (group2) group2.innerHTML = html;
 }
-
-const editCalPicker = getEl("editCalendarPicker");
-if (editCalPicker) {
-  editCalPicker.onchange = (e) => {
-    const val = e.target.value;
-    if (!val) return;
-    const d = new Date(val);
-    const days = ["일", "월", "화", "수", "목", "금", "토"];
-    getEl("editDateInput").value = val;
-    getEl("editDayInput").value = days[d.getDay()];
-    document.querySelectorAll("#editDateChipGroup .chip-btn").forEach(b => {
-      b.classList.toggle("selected", b.dataset.date === val);
-    });
-  };
-}
-
-// 시간 입력창 정각 보정 및 칩 연동 로직
-function syncTimeInputToChip(inputId, groupSelector) {
-  const inputEl = getEl(inputId);
-  if (inputEl) {
-    inputEl.addEventListener("change", (e) => {
-      if (!e.target.value) return;
-      let [h, m] = e.target.value.split(":");
-      m = "00"; // 1시간 단위 강제 정각 고정
-      e.target.value = `${h}:${m}`;
-      
-      const timeGroup = document.querySelector(groupSelector);
-      if (timeGroup) {
-        timeGroup.querySelectorAll(".chip-btn").forEach(b => b.classList.toggle("selected", b.dataset.value === `${h}:${m}`));
-      }
-    });
-  }
-}
-syncTimeInputToChip("timeSlotInput", `[data-target="timeSlotInput"]`);
-syncTimeInputToChip("editTimeSlotInput", `[data-target="editTimeSlotInput"]`);
 
 // 구글 시트의 ISO 8601 시간 오차(1899-12-30T...)를 완벽히 필터링하는 함수
 function formatDisplayTime(ts) {
