@@ -126,10 +126,10 @@ async function openUserCharacterManager(targetAccountId) {
         <div class="character-sub">
           <span class="chip chip-class ${escapeHtml(c.className)}">${escapeHtml(c.className)}</span>
           <span class="chip chip-type">${escapeHtml(c.type)}</span>
+          <div class="character-power" style="margin-left: 4px;">${getPowerRange(c.power)}</div>
         </div>
       </div>
       <div class="character-right">
-        <div class="character-power">${getPowerRange(c.power)}</div>
         <div class="character-actions">
           <button class="character-edit-btn" title="편집" onclick="editUserCharacter('${escapeHtml(targetAccountId)}', '${escapeHtml(c.name)}', '${escapeHtml(c.className)}', '${escapeHtml(c.type)}', '${escapeHtml(c.power)}')">✎</button>
         </div>

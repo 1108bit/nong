@@ -62,11 +62,11 @@ function renderCharacters(items) {
           <div class="character-sub">
             <span class="chip chip-class ${escapeHtml(c.className)}">${escapeHtml(c.className)}</span>
             <span class="chip chip-type ${isMainChar ? 'main' : 'sub'}">${escapeHtml(c.type)}</span>
+            <div class="character-power" style="margin-left: 4px;">${pRange}</div>
           </div>
         </div>
         
         <div class="character-right">
-          <div class="character-power">${pRange}</div>
           <div class="character-actions">
             <button class="character-edit-btn" title="편집" onclick="openEditModal('${escapeHtml(c.character_name)}')">✎</button>
             <button class="character-toggle-btn" title="전환" onclick="toggleCharacterType('${escapeHtml(c.character_name)}')">⇄</button>
