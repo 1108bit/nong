@@ -82,6 +82,25 @@ function renderCharacters(items) {
   applyTouchPop();
 }
 
+// 이벤트 위임 처리 (수정, 전환, 삭제 버튼 안정성 100% 보장)
+getEl("characterList").addEventListener("click", (e) => {
+  const editBtn = e.target.closest(".character-edit-btn");
+  if (editBtn) {
+    openEditModal(editBtn.dataset.name);
+    return;
+  }
+  const toggleBtn = e.target.closest(".character-toggle-btn");
+  if (toggleBtn) {
+    toggleCharacterType(toggleBtn.dataset.name);
+    return;
+  }
+  const delBtn = e.target.closest(".character-delete-btn");
+  if (delBtn) {
+    confirmDelete(delBtn.dataset.name);
+    return;
+  }
+});
+
 // 모달 열기 로직 개선
 getEl("addCharacterButton").addEventListener("click", () => {
     const nameInput = getEl("modalCharacterName");
@@ -222,13 +241,13 @@ async function confirmDelete(characterName) {
 function editCharacter(charData) {
     // 모달 열기
     const nameInput = getEl("modalCharacterName");
-    const typeSelect = getEl("modalCharacterType");
-    const powerSelect = getEl("modalCharacterPower");
+    const typeInput = getEl("modalCharacterType");
+    const powerInput = getEl("modalCharacterPower");
 
     // 기존 데이터 채우기
     nameInput.value = charData.character_name;
-    typeSelect.value = charData.type;
-    powerSelect.value = charData.power;
+    typeInput.value = charData.type;
+    powerInput.value = charData.power;
     
     getEl("modalCharacterClass").value = charData.className;
     document.querySelectorAll(`[data-target="modalCharacterClass"] .chip-btn`).forEach(b => {
