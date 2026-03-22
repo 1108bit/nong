@@ -17,10 +17,12 @@ if errorlevel 1 (
     exit /b 1
 )
 
-REM 2. 배포
+REM 2. 버전 생성 및 기존 배포 업데이트 (기존 URL 유지)
 echo.
-echo [o] 배포 중...
-call clasp deploy
+echo [o] 새로운 버전 생성 중...
+call clasp version "Auto Update"
+echo [o] 배포 업데이트 중...
+call clasp deploy -i AKfycbwOlszRW-sCVG7WH8hlWcwULUqg44KNg2u3ASgp16itsVEZpfRtNoFGnkiB0-uqBIqnFA
 
 if errorlevel 1 (
     echo.
