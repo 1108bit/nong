@@ -47,26 +47,26 @@
               <div class="card-head"><h2 class="section-title">새 일정 등록</h2></div>
               <div class="admin-form-grid">
                 <div class="form-group" style="margin-bottom: 0;">
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
-                  <label class="input-label" style="margin: 0;">일자 선택</label>
-                  <input type="date" id="calendarPicker" style="display: none;" />
-                  <button type="button" id="openCalendar" class="mini-btn">📅 직접 선택</button>
-                </div>
+                  <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                    <label class="input-label" style="margin: 0;">일자 선택</label>
+                    <div style="position: relative;">
+                      <button type="button" class="mini-btn">📅 직접 선택</button>
+                      <input type="date" id="calendarPicker" style="position: absolute; right: 0; top: 0; width: 100%; height: 100%; opacity: 0; cursor: pointer;" />
+                    </div>
+                  </div>
                   <div class="chip-select-group horizontal-scroll-chips" id="dateChipGroup" style="margin-top: 0;"></div>
                   <input type="hidden" id="dateInput" />
                   <input type="hidden" id="dayInput" />
                 </div>
                 <div class="form-group" style="margin-bottom: 0;">
-                  <label class="input-label">시간 선택</label>
-                  <div class="chip-select-group horizontal-scroll-chips" data-target="timeSlotInput" style="margin-top: 0;">
-                    <button type="button" class="chip-btn date-chip selected" data-value="21:00"><span style="font-size:11px; opacity:0.6; font-weight:700;">오후</span><span style="font-size:16px; font-weight:900; margin-top:4px;">9:00</span></button>
-                    <button type="button" class="chip-btn date-chip" data-value="22:00"><span style="font-size:11px; opacity:0.6; font-weight:700;">오후</span><span style="font-size:16px; font-weight:900; margin-top:4px;">10:00</span></button>
-                    <button type="button" class="chip-btn date-chip" data-value="23:00"><span style="font-size:11px; opacity:0.6; font-weight:700;">오후</span><span style="font-size:16px; font-weight:900; margin-top:4px;">11:00</span></button>
+                  <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                    <label class="input-label" style="margin: 0;">시간 선택</label>
+                    <div style="position: relative;">
+                      <button type="button" class="mini-btn">⏰ 직접 선택</button>
+                      <input type="time" id="timeSlotInput" value="21:00" step="1800" style="position: absolute; right: 0; top: 0; width: 100%; height: 100%; opacity: 0; cursor: pointer;" />
+                    </div>
                   </div>
-                  <div style="display: flex; align-items: center; background: rgba(255,255,255,0.05); border-radius: 12px; padding: 0 12px; height: 38px; border: 1px solid rgba(255,255,255,0.08); margin-top: 8px;">
-                    <span style="font-size: 14px; margin-right: 6px; opacity: 0.8;">⏰</span>
-                    <input type="time" id="timeSlotInput" value="21:00" step="1800" style="background: transparent; border: none; color: var(--text-main); font-weight: 800; font-size: 15px; outline: none; color-scheme: dark; font-family: inherit; width: 100%;" />
-                  </div>
+                  <div class="chip-select-group horizontal-scroll-chips" id="timeChipGroup" data-target="timeSlotInput" style="margin-top: 0;"></div>
                 </div>
                 <div class="form-group" style="grid-column: 1 / -1;">
                   <label class="input-label">메모 (선택)</label>
@@ -186,22 +186,26 @@
             
             <div class="admin-form-grid">
               <div class="form-group" style="margin-bottom: 0;">
-                <label class="input-label">일자 변경</label>
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                  <label class="input-label" style="margin: 0;">일자 변경</label>
+                  <div style="position: relative;">
+                    <button type="button" class="mini-btn">📅 직접 선택</button>
+                    <input type="date" id="editCalendarPicker" style="position: absolute; right: 0; top: 0; width: 100%; height: 100%; opacity: 0; cursor: pointer;" />
+                  </div>
+                </div>
                 <div class="chip-select-group horizontal-scroll-chips" id="editDateChipGroup" style="margin-top: 0;"></div>
                 <input type="hidden" id="editDateInput" />
                 <input type="hidden" id="editDayInput" />
               </div>
               <div class="form-group" style="margin-bottom: 0;">
-                <label class="input-label">시간 변경</label>
-                <div class="chip-select-group horizontal-scroll-chips" data-target="editTimeSlotInput" style="margin-top: 0;">
-                  <button type="button" class="chip-btn date-chip selected" data-value="21:00"><span style="font-size:11px; opacity:0.6; font-weight:700;">오후</span><span style="font-size:16px; font-weight:900; margin-top:4px;">9:00</span></button>
-                  <button type="button" class="chip-btn date-chip" data-value="22:00"><span style="font-size:11px; opacity:0.6; font-weight:700;">오후</span><span style="font-size:16px; font-weight:900; margin-top:4px;">10:00</span></button>
-                  <button type="button" class="chip-btn date-chip" data-value="23:00"><span style="font-size:11px; opacity:0.6; font-weight:700;">오후</span><span style="font-size:16px; font-weight:900; margin-top:4px;">11:00</span></button>
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                  <label class="input-label" style="margin: 0;">시간 변경</label>
+                  <div style="position: relative;">
+                    <button type="button" class="mini-btn">⏰ 직접 선택</button>
+                    <input type="time" id="editTimeSlotInput" value="21:00" step="1800" style="position: absolute; right: 0; top: 0; width: 100%; height: 100%; opacity: 0; cursor: pointer;" />
+                  </div>
                 </div>
-                <div style="display: flex; align-items: center; background: rgba(255,255,255,0.05); border-radius: 12px; padding: 0 12px; height: 38px; border: 1px solid rgba(255,255,255,0.08); margin-top: 8px;">
-                  <span style="font-size: 14px; margin-right: 6px; opacity: 0.8;">⏰</span>
-                    <input type="time" id="editTimeSlotInput" value="21:00" step="1800" style="background: transparent; border: none; color: var(--text-main); font-weight: 800; font-size: 15px; outline: none; color-scheme: dark; font-family: inherit; width: 100%;" />
-                </div>
+                <div class="chip-select-group horizontal-scroll-chips" id="editTimeChipGroup" data-target="editTimeSlotInput" style="margin-top: 0;"></div>
               </div>
               <div class="form-group" style="grid-column: 1 / -1;">
                 <label class="input-label">메모 변경</label>

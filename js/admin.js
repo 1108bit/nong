@@ -62,13 +62,36 @@ function initDateChips() {
   }
 }
 
-// 달력 아이콘 클릭 시 실제 input[type=date] 팝업 호출 (모바일/PC 네이티브 호환)
-const openCalBtn = getEl("openCalendar");
+// 시간 칩 동적 생성 로직 (낮 12:00 ~ 자정 00:00)
+function initTimeChips() {
+  let html = "";
+  for (let h = 12; h <= 24; h++) {
+    for (let m of ["00", "30"]) {
+      if (h === 24 && m === "30") continue; // 24:30은 존재하지 않으므로 건너뜀
+      
+      let displayH = h;
+      let ampm = "오전";
+      if (h >= 12 && h < 24) { ampm = "오후"; displayH = h === 12 ? 12 : h - 12; }
+      else if (h === 24) { ampm = "오전"; displayH = 12; }
+      
+      const valueH = h === 24 ? "00" : String(h).padStart(2, '0');
+      const dateVal = `${valueH}:${m}`;
+      const isSelected = dateVal === "21:00" ? "selected" : "";
+      
+      const appleDisplay = `<span style="font-size:11px; opacity:0.6; font-weight:700;">${ampm}</span><span style="font-size:16px; font-weight:900; margin-top:4px;">${displayH}:${m}</span>`;
+      html += `<button type="button" class="chip-btn date-chip ${isSelected}" data-value="${dateVal}">${appleDisplay}</button>`;
+    }
+  }
+  
+  const group1 = getEl("timeChipGroup");
+  if (group1) group1.innerHTML = html;
+  const group2 = getEl("editTimeChipGroup");
+  if (group2) group2.innerHTML = html;
+}
+
+// 달력 및 시간 입력창 변경 이벤트 연동
 const calPicker = getEl("calendarPicker");
 if (openCalBtn && calPicker) {
-  openCalBtn.onclick = () => {
-    if (typeof calPicker.showPicker === 'function') calPicker.showPicker();
-  };
   calPicker.onchange = (e) => {
     const val = e.target.value; // YYYY-MM-DD
     if (!val) return;
@@ -76,8 +99,22 @@ if (openCalBtn && calPicker) {
     const days = ["일", "월", "화", "수", "목", "금", "토"];
     getEl("dateInput").value = val;
     getEl("dayInput").value = days[d.getDay()];
-    // 선택된 날짜와 일치하는 칩이 있다면 강조, 없으면 모두 해제
     document.querySelectorAll("#dateChipGroup .chip-btn").forEach(b => {
+      b.classList.toggle("selected", b.dataset.date === val);
+    });
+  };
+}
+
+const editCalPicker = getEl("editCalendarPicker");
+if (editCalPicker) {
+  editCalPicker.onchange = (e) => {
+    const val = e.target.value;
+    if (!val) return;
+    const d = new Date(val);
+    const days = ["일", "월", "화", "수", "목", "금", "토"];
+    getEl("editDateInput").value = val;
+    getEl("editDayInput").value = days[d.getDay()];
+    document.querySelectorAll("#editDateChipGroup .chip-btn").forEach(b => {
       b.classList.toggle("selected", b.dataset.date === val);
     });
   };
@@ -260,6 +297,7 @@ getEl("searchUserButton").onclick = async () => {
 };
 
 initDateChips();
+initTimeChips();
 loadAdminSchedule();
 
 // 특정 유저의 캐릭터 정보를 불러와서 편집 모달 띄우기
