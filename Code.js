@@ -952,6 +952,7 @@ function saveAvailability(accountId, mainName, characterName, type, weekKey, slo
   }
 
   if (!slotList.length) {
+    SpreadsheetApp.flush(); // 모두 해제했을 경우 즉시 시트 저장
     return {
       ok: true,
       message: '저장되었습니다.',
@@ -979,6 +980,7 @@ function saveAvailability(accountId, mainName, characterName, type, weekKey, slo
   });
 
   sheet.getRange(sheet.getLastRow() + 1, 1, newRows.length, headers.length).setValues(newRows);
+  SpreadsheetApp.flush(); // 새 일정 덮어쓴 후 즉시 시트 저장
 
   return {
     ok: true,
