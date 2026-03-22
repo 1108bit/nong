@@ -1,3 +1,6 @@
+// js/main.js
+let hasMainCharacter = false; // 현재 본캐 등록 여부
+
 async function loadMain() {
   const accountId = getAccountId();
   if (!accountId) return location.href = "index.html";
@@ -5,12 +8,12 @@ async function loadMain() {
   const data = await callApi({ action: "getMainData", accountId });
   if (!data.ok) return;
 
-  // 상단 정보 세팅
-  setText("accountMainName", data.mainName || getMainName());
+  setText("accountMainName", data.mainName || LOGIN_MAIN_NAME);
   setText("characterCount", data.characters?.length || 0);
-  setText("selectedCount", `${data.selectedCount || 0}개`);
   
-  // 캐릭터 카드 출력
+  // 등록된 캐릭터 중 '본캐'가 있는지 확인
+  hasMainCharacter = data.characters?.some(c => c.type === "본캐");
+
   const list = getEl("characterList");
   if (!data.characters?.length) {
     list.innerHTML = `<div class="character-empty">등록된 캐릭터가 없습니다</div>`;
@@ -34,34 +37,66 @@ async function loadMain() {
   applyTouchPop();
 }
 
-// 모달 제어
-const modal = getEl("characterModal");
+// 모달 열기 로직 개선
 getEl("addCharacterButton").onclick = () => {
-    modal.classList.add("show");
+    const nameInput = getEl("modalCharacterName");
+    const typeSelect = getEl("modalCharacterType");
+
+    if (!hasMainCharacter) {
+        // 본캐가 없는 경우: 로그인한 닉네임 고정, 타입 '본캐' 고정
+        nameInput.value = LOGIN_MAIN_NAME;
+        nameInput.readOnly = true; // 수정 불가
+        typeSelect.value = "본캐";
+        typeSelect.disabled = true; // 선택 불가
+        alert("최초 1회 본캐 정보를 먼저 등록해야 합니다.");
+    } else {
+        // 본캐가 있는 경우: 부캐 입력 모드
+        nameInput.value = "";
+        nameInput.readOnly = false;
+        typeSelect.value = "부캐";
+        typeSelect.disabled = false;
+        
+        // 부캐 추가 시 '본캐' 선택 못하게 옵션 숨기기 (선택 사항)
+        Array.from(typeSelect.options).forEach(opt => {
+            if(opt.value === "본캐") opt.disabled = true;
+        });
+    }
+
+    getEl("characterModal").classList.add("show");
     document.body.classList.add("modal-open");
 };
-getEl("closeCharacterModalButton").onclick = closeModal;
-getEl("cancelCharacterButton").onclick = closeModal;
 
-function closeModal() {
-    modal.classList.remove("show");
-    document.body.classList.remove("modal-open");
-}
-
+// 캐릭터 등록 실행
 getEl("submitCharacterButton").onclick = async () => {
     const name = getEl("modalCharacterName").value.trim();
     const className = getEl("modalCharacterClass").value;
+    const type = getEl("modalCharacterType").value;
+    const power = getEl("modalCharacterPower").value;
+
     if(!name || !className) return alert("이름과 클래스를 입력해주세요.");
 
     const res = await callApi({
         action: "addCharacter",
         accountId: getAccountId(),
-        name, className,
-        type: getEl("modalCharacterType").value,
-        power: getEl("modalCharacterPower").value
+        name, className, type, power
     });
-    if(res.ok) { closeModal(); loadMain(); }
+
+    if(res.ok) {
+        getEl("characterModal").classList.remove("show");
+        document.body.classList.remove("modal-open");
+        loadMain();
+    } else {
+        alert(res.message);
+    }
 };
+
+function closeModal() {
+    getEl("characterModal").classList.remove("show");
+    document.body.classList.remove("modal-open");
+}
+
+getEl("closeCharacterModalButton").onclick = closeModal;
+getEl("cancelCharacterButton").onclick = closeModal;
 
 // 버튼 연결
 getEl("goAvailabilityButton").onclick = () => movePage("availability.html");
