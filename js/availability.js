@@ -4,6 +4,16 @@ async function initAvailability() {
   const accountId = getAccountId();
   const characterName = getMainName();
 
+  // 로딩 중 스켈레톤 UI 표시
+  const target = getEl("availabilityList");
+  if (target) {
+    target.innerHTML = `
+      <div class="availability-item skeleton" style="height:102px; margin-bottom:10px;"></div>
+      <div class="availability-item skeleton" style="height:102px; margin-bottom:10px;"></div>
+      <div class="availability-item skeleton" style="height:102px; margin-bottom:10px;"></div>
+    `;
+  }
+
   const [schedule, mySelection] = await Promise.all([
     callApi({ action: "getRaidSchedule" }),
     callApi({ action: "getAvailability", accountId, characterName })
@@ -41,23 +51,43 @@ getEl("availabilityList").addEventListener("click", (e) => {
 
 async function toggleTime(day, time) {
   const key = `${day}__${time}`;
-  if (selectedMap.has(key)) selectedMap.delete(key);
-  else selectedMap.add(key);
+  
+  // 1. 낙관적 UI 업데이트 (API 응답을 기다리지 않고 화면부터 즉각 변경)
+  const btn = document.querySelector(`.availability-item[data-day="${day}"][data-time="${time}"]`);
+  if (selectedMap.has(key)) {
+    selectedMap.delete(key);
+    if (btn) {
+      btn.classList.remove("active");
+      btn.querySelector(".availability-foot").textContent = "미선택";
+    }
+  } else {
+    selectedMap.add(key);
+    if (btn) {
+      btn.classList.add("active");
+      btn.querySelector(".availability-foot").textContent = "선택됨";
+    }
+  }
 
   const slotList = Array.from(selectedMap).map(s => {
     const [d, t] = s.split("__");
     return { day: d, time_slot: t };
   });
 
-  await callApi({
+  // 2. 백그라운드에서 서버 동기화 (await 없이 백그라운드 실행)
+  callApi({
     action: "saveAvailability",
     accountId: getAccountId(),
     mainName: getMainName(),
     characterName: getMainName(),
     type: "본캐",
     slotList: JSON.stringify(slotList)
+  }).then(res => {
+    // 3. 실패했을 경우에만 경고 후 원래 상태로 복구
+    if (!res.ok) {
+      alert("저장에 실패했습니다. 상태를 다시 동기화합니다.");
+      initAvailability(); 
+    }
   });
-  initAvailability();
 }
 
 getEl("backButton").onclick = () => movePage("main.html");

@@ -2,8 +2,18 @@
 let selectedSlot = null;
 
 async function loadPartySummary() {
-  const data = await callApi({ action: "getAvailabilitySummary" });
   const target = getEl("summaryGrid");
+  
+  // 로딩 중 스켈레톤 UI 표시
+  if (target) {
+    target.innerHTML = `
+      <div class="party-slot-btn skeleton" style="height:82px; margin-bottom:10px;"></div>
+      <div class="party-slot-btn skeleton" style="height:82px; margin-bottom:10px;"></div>
+      <div class="party-slot-btn skeleton" style="height:82px; margin-bottom:10px;"></div>
+    `;
+  }
+
+  const data = await callApi({ action: "getAvailabilitySummary" });
   
   if (!data.ok || !data.items.length) {
     target.innerHTML = `<div class="availability-empty">집계 데이터가 없습니다.</div>`;
@@ -25,6 +35,16 @@ async function loadPartySummary() {
 }
 
 async function showComposition(day, time) {
+    // 파티 구성 분석 중 스켈레톤 UI 표시
+    const skeletonHtml = `
+        <div class="party-member-card skeleton" style="height:74px; margin-bottom:8px;"></div>
+        <div class="party-member-card skeleton" style="height:74px; margin-bottom:8px;"></div>
+    `;
+    getEl("party1List").innerHTML = skeletonHtml;
+    getEl("party2List").innerHTML = skeletonHtml;
+    getEl("party1Badges").innerHTML = `<span class="party-stat-chip skeleton" style="width:60px; height:26px;"></span>`;
+    getEl("party2Badges").innerHTML = `<span class="party-stat-chip skeleton" style="width:60px; height:26px;"></span>`;
+
     const res = await callApi({ action: "getPartyComposition", day, time_slot: time });
     if(!res.ok) return alert(res.message);
 
