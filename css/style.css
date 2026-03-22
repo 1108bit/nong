@@ -434,6 +434,12 @@ a {
    입력
 ========================= */
 
+.admin-card-risk {
+  border: 1px solid rgba(251, 113, 133, 0.5) !important;
+  background: linear-gradient(180deg, rgba(30, 10, 15, 0.9) 0%, rgba(14, 28, 44, 0.92) 100%) !important;
+}
+
+
 .form-group {
   margin-bottom: 16px;
   text-align: left;

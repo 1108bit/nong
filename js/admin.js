@@ -2,23 +2,40 @@ async function loadAdminSchedule() {
   const adminCode = getAdminCode();
   if (!adminCode) return movePage("admin-login.html");
 
-  const data = await callApi({ action: "getRaidScheduleAdmin", adminCode });
-  if (!data.ok) return movePage("admin-login.html");
+  const [scheduleData, summaryData] = await Promise.all([
+    callApi({ action: "getRaidScheduleAdmin", adminCode }),
+    callApi({ action: "getAvailabilitySummary" })
+  ]);
+
+  if (!scheduleData.ok) return movePage("admin-login.html");
+  if (!summaryData.ok) return alert("참여 현황을 가져오는데 실패했습니다.");
 
   const list = getEl("scheduleList");
-  list.innerHTML = data.items.map(i => `
-    <div class="admin-card-item">
-      <div class="admin-card-top">
-        <div class="admin-card-time">${i.date} (${i.day}) ${i.time_slot}</div>
-        <div class="admin-status-chip ${i.open_yn === 'Y' ? 'open' : 'closed'}">${i.open_yn === 'Y' ? '열림' : '닫힘'}</div>
+  list.innerHTML = scheduleData.items.map(i => {
+    const participants = summaryData.items.filter(s => s.day === i.day && s.time_slot === i.time_slot);
+    const count = participants.length;
+    const hasHealer = participants.some(p => p.className === "치유성");
+    const isRisk = count < 8 || !hasHealer;
+    const riskClass = isRisk ? "admin-card-risk" : "";
+
+    return `
+      <div class="admin-card-item ${riskClass}">
+        <div class="admin-card-top">
+          <div class="admin-card-time">${i.date} (${i.day}) ${i.time_slot}</div>
+          <div class="admin-status-chip ${i.open_yn === 'Y' ? 'open' : 'closed'}">${i.open_yn === 'Y' ? '열림' : '닫힘'}</div>
+        </div>
+        <div class="admin-card-note">
+          인원: <strong style="color:${count < 8 ? '#fb7185' : '#a7f3d0'}">${count}명</strong> |
+          치유성: ${hasHealer ? "✅" : "❌"}
+        </div>
+        <div class="admin-card-note">${escapeHtml(i.note)}</div>
+        <div class="admin-card-actions">
+          <button class="mini-btn edit-btn" data-date="${escapeHtml(i.date)}" data-day="${escapeHtml(i.day)}" data-time="${escapeHtml(i.time_slot)}" data-note="${escapeHtml(i.note)}">수정</button>
+          <button class="mini-btn danger delete-btn" data-date="${escapeHtml(i.date)}" data-day="${escapeHtml(i.day)}" data-time="${escapeHtml(i.time_slot)}">삭제</button>
+        </div>
       </div>
-      <div class="admin-card-note">${escapeHtml(i.note)}</div>
-      <div class="admin-card-actions">
-        <button class="mini-btn edit-btn" data-date="${escapeHtml(i.date)}" data-day="${escapeHtml(i.day)}" data-time="${escapeHtml(i.time_slot)}" data-note="${escapeHtml(i.note)}">수정</button>
-        <button class="mini-btn danger delete-btn" data-date="${escapeHtml(i.date)}" data-day="${escapeHtml(i.day)}" data-time="${escapeHtml(i.time_slot)}">삭제</button>
-      </div>
-    </div>
-  `).join("");
+    `;
+  }).join("");
   
   // 버튼 클릭 이벤트 리스너 추가
   document.querySelectorAll(".edit-btn").forEach(btn => {
