@@ -87,31 +87,36 @@
           </div>
           <div class="form-group">
             <label class="input-label">클래스</label>
-            <select id="modalCharacterClass" class="character-select">
-              <option value="검성">검성</option><option value="수호성">수호성</option>
-              <option value="살성">살성</option><option value="궁성">궁성</option>
-              <option value="마도성">마도성</option><option value="정령성">정령성</option>
-              <option value="치유성">치유성</option><option value="호법성">호법성</option>
-            </select>
+            <div class="chip-select-group" data-target="modalCharacterClass">
+              <button type="button" class="chip-btn chip-class 검성 selected" data-value="검성">검성</button>
+              <button type="button" class="chip-btn chip-class 수호성" data-value="수호성">수호성</button>
+              <button type="button" class="chip-btn chip-class 살성" data-value="살성">살성</button>
+              <button type="button" class="chip-btn chip-class 궁성" data-value="궁성">궁성</button>
+              <button type="button" class="chip-btn chip-class 마도성" data-value="마도성">마도성</button>
+              <button type="button" class="chip-btn chip-class 정령성" data-value="정령성">정령성</button>
+              <button type="button" class="chip-btn chip-class 치유성" data-value="치유성">치유성</button>
+              <button type="button" class="chip-btn chip-class 호법성" data-value="호법성">호법성</button>
+            </div>
+            <input type="hidden" id="modalCharacterClass" value="검성" />
           </div>
           <div class="modal-grid">
             <div class="form-group">
               <label class="input-label">타입</label>
-              <select id="modalCharacterType" class="character-select"><option value="본캐">본캐</option><option value="부캐" selected>부캐</option></select>
+              <div class="chip-select-group" data-target="modalCharacterType">
+                <button type="button" class="chip-btn chip-type main" data-value="본캐" id="chipTypeMain">본캐</button>
+                <button type="button" class="chip-btn chip-type sub selected" data-value="부캐" id="chipTypeSub">부캐</button>
+              </div>
+              <input type="hidden" id="modalCharacterType" value="부캐" />
             </div>
             <div class="form-group">
               <label class="input-label">전투력</label>
               <select id="modalCharacterPower" class="character-select">
-                <option value="100">100</option>
-                <option value="200">200</option>
-                <option value="300">300</option>
-                <option value="400">400</option>
-                <option value="500">500</option>
-                <option value="600">600</option>
-                <option value="700">700</option>
-                <option value="800">800</option>
-                <option value="900">900</option>
-                <option value="1000">1000</option>
+                <option value="0">100 미만</option>
+                <option value="100">100 이상</option><option value="150">150 이상</option>
+                <option value="200">200 이상</option><option value="250">250 이상</option>
+                <option value="300">300 이상</option><option value="350">350 이상</option>
+                <option value="400" selected>400 이상</option><option value="450">450 이상</option>
+                <option value="500">500 이상</option>
               </select>
             </div>
           </div>

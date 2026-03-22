@@ -1522,6 +1522,43 @@ body.modal-open {
   margin-top: 10px;
 }
 
+/* =========================
+   칩(뱃지) 선택 그룹
+========================= */
+
+.chip-select-group {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 6px;
+}
+
+.chip-btn {
+  cursor: pointer;
+  opacity: 0.4;
+  filter: grayscale(0.8);
+  transition: all 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  border-width: 1px;
+  border-style: solid;
+  padding: 8px 14px;
+  font-size: 13px;
+  border-radius: 12px;
+}
+
+.chip-btn.selected {
+  opacity: 1;
+  filter: grayscale(0);
+  transform: scale(1.08);
+  box-shadow: 0 6px 14px rgba(0, 0, 0, 0.25);
+}
+
+.chip-btn:disabled {
+  cursor: not-allowed;
+  opacity: 0.15;
+  transform: none;
+  box-shadow: none;
+}
+
 @media (min-width: 768px) {
   .bottom-action-bar {
     left: 50%;

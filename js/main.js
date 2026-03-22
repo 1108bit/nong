@@ -48,31 +48,38 @@ function renderCharacters(items) {
     return;
   }
 
+  // 데이터 규격 일치 확인
   list.innerHTML = items.map(c => {
-    const isMainChar = c.type === CHARACTER_TYPES.MAIN;
+    // c.type, c.className 등이 정확히 입력되어야 색상이 나옵니다.
+    const isMainChar = (c.type === '본캐');
     const pRange = getPowerRange(c.power);
     
     return `
-      <div class="character-card ${isMainChar ? 'main-char-card' : ''}" data-character-name="${escapeHtml(c.character_name)}">
-        <div class="character-card-top">
-          <div class="character-info">
-            <div class="character-name">${escapeHtml(c.character_name)}</div>
-            <span class="chip chip-type ${isMainChar ? 'main' : 'sub'}">${escapeHtml(c.type)}</span>
+      <div class="character-card ${isMainChar ? 'main-char-card' : ''}">
+        
+        <div class="character-left">
+          <div class="character-name">${escapeHtml(c.character_name)}</div>
+          <div class="character-sub">
             <span class="chip chip-class ${escapeHtml(c.className)}">${escapeHtml(c.className)}</span>
+            <span class="chip chip-type ${isMainChar ? 'main' : 'sub'}">${escapeHtml(c.type)}</span>
           </div>
+        </div>
+        
+        <div class="character-right">
+          <div class="character-power">${pRange}</div>
           <div class="character-actions">
             <button class="character-edit-btn" title="편집" onclick="openEditModal('${escapeHtml(c.character_name)}')">✎</button>
-            <button class="character-toggle-btn" title="본캐/부캐 전환" onclick="toggleCharacterType('${escapeHtml(c.character_name)}')">⇄</button>
+            <button class="character-toggle-btn" title="전환" onclick="toggleCharacterType('${escapeHtml(c.character_name)}')">⇄</button>
             ${!isMainChar ? `<button class="character-delete-btn" title="삭제" onclick="confirmDelete('${escapeHtml(c.character_name)}')">✕</button>` : ''}
           </div>
         </div>
-        <div class="character-card-center">
-          <div class="character-power-label">전투력 구간</div>
-          <div class="character-power">${pRange}</div>
-        </div>
+
       </div>
     `;
   }).join("");
+
+  // 애니메이션 효과 적용
+  applyTouchPop();
 }
 
 // 모달 열기 로직 개선
@@ -173,13 +180,7 @@ async function submitCharacter() {
   btn.style.opacity = "1";
 
   if(res.ok) {
-    getEl("characterModal").classList.remove("show");
-    document.body.classList.remove("modal-open");
-    // 모드 초기화
-    getEl("characterModal").dataset.mode = "";
-    getEl("characterModal").dataset.originalName = "";
-    getEl("modalTitle").textContent = "캐릭터 추가";
-    getEl("submitCharacterButton").textContent = "등록하기";
+    closeModal(); // 모달 닫기 및 입력창 완전 초기화
     loadMain();
   } else {
     alert(res.message || "처리에 실패했습니다.");
@@ -226,14 +227,17 @@ function editCharacter(charData) {
     // 모달 열기
     const nameInput = getEl("modalCharacterName");
     const typeSelect = getEl("modalCharacterType");
-    const classSelect = getEl("modalCharacterClass");
     const powerSelect = getEl("modalCharacterPower");
 
     // 기존 데이터 채우기
     nameInput.value = charData.character_name;
     typeSelect.value = charData.type;
-    classSelect.value = charData.className;
     powerSelect.value = charData.power;
+    
+    getEl("modalCharacterClass").value = charData.className;
+    document.querySelectorAll(`[data-target="modalCharacterClass"] .chip-btn`).forEach(b => {
+        b.classList.toggle("selected", b.dataset.value === charData.className);
+    });
 
     // 편집 모드 표시
     getEl("characterModal").dataset.mode = "edit";
@@ -244,7 +248,15 @@ function editCharacter(charData) {
     // 본캐 편집 제한
     const isMainChar = charData.type === "본캐";
     nameInput.readOnly = isMainChar; // 본캐는 이름 변경 불가
-    typeSelect.disabled = isMainChar; // 본캐는 타입 변경 불가
+    
+    const chipMain = getEl("chipTypeMain");
+    const chipSub = getEl("chipTypeSub");
+    if (chipMain && chipSub) {
+        chipMain.classList.toggle("selected", isMainChar);
+        chipSub.classList.toggle("selected", !isMainChar);
+        chipMain.disabled = true;
+        chipSub.disabled = true;
+    }
 
     getEl("characterModal").classList.add("show");
     document.body.classList.add("modal-open");
@@ -281,30 +293,38 @@ function closeModal() {
     getEl("modalCharacterPower").value = "400";
     // 필드 잠금 해제
     getEl("modalCharacterName").readOnly = false;
-    getEl("modalCharacterType").disabled = false;
     
-    // 타입 옵션 비활성화 해제 (부캐 추가 모달 닫고 다시 열 때 선택 불가 버그 방지)
-    Array.from(getEl("modalCharacterType").options).forEach(opt => opt.disabled = false);
+    // 칩 초기화
+    document.querySelectorAll(`[data-target="modalCharacterClass"] .chip-btn`).forEach(b => {
+        b.classList.toggle("selected", b.dataset.value === "검성");
+    });
+    const chipMain = getEl("chipTypeMain");
+    const chipSub = getEl("chipTypeSub");
+    if (chipMain && chipSub) {
+        chipMain.classList.remove("selected");
+        chipSub.classList.add("selected");
+        chipMain.disabled = false;
+        chipSub.disabled = false;
+    }
 }
 
 getEl("closeCharacterModalButton").onclick = closeModal;
 getEl("cancelCharacterButton").onclick = closeModal;
-getEl("modalCharacterPower").oninput = (e) => {
-    const power = e.target.value;
-    const rangeText = getPowerRange(power); // 50단위 구간 계산
-    
-    // 안내 문구를 띄울 요소를 찾거나 생성합니다.
-    let hintEl = getEl("powerRangeHint");
-    if (!hintEl) {
-        hintEl = document.createElement("div");
-        hintEl.id = "powerRangeHint";
-        hintEl.className = "input-hint"; // CSS로 스타일링 가능
-        getEl("modalCharacterPower").after(hintEl);
-    }
-    
-    hintEl.textContent = `현재 구간: ${rangeText}`;
-    hintEl.style.color = "#6cb9ff"; // 포인트 컬러 적용
-};
+
+// 칩 버튼 클릭 이벤트 위임
+document.querySelectorAll('.chip-select-group').forEach(group => {
+    group.addEventListener('click', e => {
+        const btn = e.target.closest('.chip-btn');
+        if (!btn || btn.disabled) return;
+        
+        group.querySelectorAll('.chip-btn').forEach(b => b.classList.remove('selected'));
+        btn.classList.add('selected');
+        
+        const hiddenId = group.dataset.target;
+        if (hiddenId) getEl(hiddenId).value = btn.dataset.value;
+    });
+});
+
 // 버튼 연결
 getEl("goAvailabilityButton").onclick = () => movePage("availability.html");
 getEl("goPartyButton").onclick = () => movePage("party.html");

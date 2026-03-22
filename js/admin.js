@@ -145,7 +145,13 @@ function editUserCharacter(accountId, originalName, className, type, power) {
   getEl("adminModalOriginalName").value = originalName;
   getEl("adminModalCharacterName").value = originalName;
   getEl("adminModalCharacterClass").value = className;
+  document.querySelectorAll(`[data-target="adminModalCharacterClass"] .chip-btn`).forEach(b => {
+      b.classList.toggle("selected", b.dataset.value === className);
+  });
   getEl("adminModalCharacterType").value = type;
+  document.querySelectorAll(`[data-target="adminModalCharacterType"] .chip-btn`).forEach(b => {
+      b.classList.toggle("selected", b.dataset.value === type);
+  });
   getEl("adminModalCharacterPower").value = power;
 
   getEl("adminCharacterModal").classList.add("show");
@@ -252,3 +258,17 @@ if (changeAdminCodeBtn) {
     }
   };
 }
+
+// 칩 버튼 클릭 이벤트 위임 (관리자용)
+document.querySelectorAll('.chip-select-group').forEach(group => {
+    group.addEventListener('click', e => {
+        const btn = e.target.closest('.chip-btn');
+        if (!btn || btn.disabled) return;
+        
+        group.querySelectorAll('.chip-btn').forEach(b => b.classList.remove('selected'));
+        btn.classList.add('selected');
+        
+        const hiddenId = group.dataset.target;
+        if (hiddenId) getEl(hiddenId).value = btn.dataset.value;
+    });
+});
