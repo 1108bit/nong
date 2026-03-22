@@ -15,7 +15,8 @@ async function callApi(params) {
 // URL 정보 추출 (accountId, mainName 등)
 function getParams() { return new URLSearchParams(location.search); }
 function getAccountId() { return getParams().get("accountId") || ""; }
-function getMainName() { return decodeURIComponent(getParams().get("mainName") || ""); }function getAdminCode() { return sessionStorage.getItem("adminCode") || ""; }
+function getMainName() { return decodeURIComponent(getParams().get("mainName") || ""); }
+function getAdminCode() { return sessionStorage.getItem("adminCode") || ""; }
 // 요소 선택 및 텍스트 설정
 function getEl(id) { return document.getElementById(id); }
 function setText(id, value) { 
