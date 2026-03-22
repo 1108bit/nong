@@ -91,7 +91,7 @@ function initTimeChips() {
 
 // 달력 및 시간 입력창 변경 이벤트 연동
 const calPicker = getEl("calendarPicker");
-if (openCalBtn && calPicker) {
+if (calPicker) {
   calPicker.onchange = (e) => {
     const val = e.target.value; // YYYY-MM-DD
     if (!val) return;
@@ -247,6 +247,9 @@ function editSchedule(date, day, time, note) {
   getEl("dayInput").value = day;
   getEl("timeSlotInput").value = time;
   getEl("noteInput").value = note;
+  
+  const editCal = getEl("editCalendarPicker");
+  if (editCal) editCal.value = date;
 
   // 칩 시각적 연동
   const dateGroup = getEl("dateChipGroup");
