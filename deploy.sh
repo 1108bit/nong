@@ -23,4 +23,4 @@ if [ $? -ne 0 ]; then
 fi
 
 echo "✅ 배포 완료!"
-echo "🎉 앱 바로가기: https://script.google.com/macros/d/AKfycbwOlszRW-sCVG7WH8hlWcwULUqg44KNg2u3ASgp16itsVEZpfRtNoFGnkiB0-uqBIqnFA/usercallable"
+echo "🎉 앱 바로가기: https://script.google.com/macros/s/AKfycbyjacDcYbHOm94Meq7dvqyOOP24QRoXZLq9yRMkRiOZevvkY0a4cx9Lz7wvrgtH0fgoTg/exec"
