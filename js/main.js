@@ -71,9 +71,9 @@ function renderCharacters(items) {
         
         <div class="character-right">
           <div class="character-actions">
-            <button class="character-edit-btn" title="편집" data-name="${escapeHtml(c.character_name)}">✎</button>
-            <button class="character-toggle-btn" title="본캐/부캐 전환" data-name="${escapeHtml(c.character_name)}">⇄</button>
-            ${!isMainChar ? `<button class="character-delete-btn" title="삭제" data-name="${escapeHtml(c.character_name)}">✕</button>` : ''}
+            <button class="character-edit-btn" title="편집" onclick="openEditModal('${escapeHtml(c.character_name)}')">✎</button>
+            <button class="character-toggle-btn" title="본캐/부캐 전환" onclick="toggleCharacterType('${escapeHtml(c.character_name)}')">⇄</button>
+            ${!isMainChar ? `<button class="character-delete-btn" title="삭제" onclick="confirmDelete('${escapeHtml(c.character_name)}')">✕</button>` : ''}
           </div>
         </div>
 
@@ -84,31 +84,6 @@ function renderCharacters(items) {
   // 애니메이션 효과 적용
   applyTouchPop();
 }
-
-// 이벤트 위임 처리 (수정, 전환, 삭제 버튼 안정성 100% 보장)
-getEl("characterList").addEventListener("click", (e) => {
-  const editBtn = e.target.closest(".character-edit-btn");
-  if (editBtn) {
-    const name = editBtn.getAttribute("data-name");
-    console.log("✏️ [수정 버튼 눌림]:", name);
-    if (name) openEditModal(name);
-    return;
-  }
-  const toggleBtn = e.target.closest(".character-toggle-btn");
-  if (toggleBtn) {
-    const name = toggleBtn.getAttribute("data-name");
-    console.log("🔄 [전환 버튼 눌림]:", name);
-    if (name) toggleCharacterType(name);
-    return;
-  }
-  const delBtn = e.target.closest(".character-delete-btn");
-  if (delBtn) {
-    const name = delBtn.getAttribute("data-name");
-    console.log("🗑️ [삭제 버튼 눌림]:", name);
-    if (name) confirmDelete(name);
-    return;
-  }
-});
 
 // 모달 열기 로직 개선
 getEl("addCharacterButton").addEventListener("click", () => {
