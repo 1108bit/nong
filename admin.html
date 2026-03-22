@@ -24,6 +24,22 @@
         <!-- 좌측 패널 (컨트롤 패널 - 30%) -->
         <div class="admin-panel-left">
           <article class="main-card">
+            <div class="card-head"><h2 class="section-title">유저 캐릭터 관리</h2></div>
+            <div class="form-group">
+            <label class="input-label">유저 검색 (본캐명)</label>
+            <div style="display: flex; gap: 8px; align-items: center;">
+              <input type="text" id="userAccountIdInput" class="main-input" placeholder="예: 농[젠카]" autocomplete="off" style="flex: 1; height: 52px;" />
+              <button class="btn btn-primary" id="searchUserButton" style="flex-shrink: 0; width: 90px; height: 52px; min-height: 52px; padding: 0;">검색</button>
+            </div>
+          </div>
+          
+          <div id="userSearchResultArea" class="user-search-result-box" style="display: none;">
+            <div class="user-info-text" id="userMessage"></div>
+            <div class="admin-list" id="userCharacterList"></div>
+          </div>
+          </article>
+
+          <article class="main-card">
             <div class="card-head"><h2 class="section-title">새 일정 등록</h2></div>
             <!-- 등록 폼을 1열로 세로 배치 -->
             <div class="admin-form-grid" style="grid-template-columns: 1fr;">
@@ -56,42 +72,6 @@
               <button class="btn btn-primary" id="saveButton" style="width: 100%;">일정 저장</button>
             </div>
           </article>
-
-          <article class="main-card">
-            <div class="card-head"><h2 class="section-title">유저 캐릭터 관리</h2></div>
-            <div class="form-group">
-            <label class="input-label">유저 검색 (본캐명)</label>
-            <div style="display: flex; gap: 8px; align-items: center;">
-              <input type="text" id="userAccountIdInput" class="main-input" placeholder="예: 농[젠카]" autocomplete="off" style="flex: 1; height: 52px;" />
-              <button class="btn btn-primary" id="searchUserButton" style="flex-shrink: 0; width: 90px; height: 52px; min-height: 52px; padding: 0;">검색</button>
-            </div>
-          </div>
-          
-          <div id="userSearchResultArea" class="user-search-result-box" style="display: none;">
-            <div class="user-info-text" id="userMessage"></div>
-            <div class="admin-list" id="userCharacterList"></div>
-          </div>
-          </article>
-
-          <article class="main-card" id="securitySettingsCard">
-            <div class="card-head"><h2 class="section-title">시스템 및 보안 설정</h2></div>
-            <div class="form-group" style="margin-bottom: 24px; padding-bottom: 24px; border-bottom: 1px solid rgba(138, 188, 233, 0.1);">
-          <label class="input-label">데이터베이스 관리</label>
-          <button class="btn btn-secondary" id="checkSchemaButton" style="width: auto; padding: 0 24px;">DB 상태 점검</button>
-        </div>
-        <div style="max-width: 380px;">
-          <div class="form-group">
-            <label class="input-label">현재 관리자 코드</label>
-            <input type="password" id="oldAdminCodeInput" class="main-input" autocomplete="new-password" />
-          </div>
-          <div class="form-group">
-            <label class="input-label">새 관리자 코드</label>
-            <input type="password" id="newAdminCodeInput" class="main-input" autocomplete="new-password" />
-          </div>
-          <div class="admin-action-row" style="margin-top: 20px;">
-            <button class="btn btn-primary" id="changeAdminCodeButton" style="width: 100%;">코드 변경</button>
-          </div>
-          </article>
         </div>
 
         <!-- 우측 패널 (데이터 뷰어 - 70%) -->
@@ -99,6 +79,27 @@
           <article class="main-card schedule-card-full">
             <div class="card-head"><h2 class="section-title">등록된 일정 목록</h2></div>
             <div class="admin-list" id="scheduleList"></div>
+          </article>
+
+          <article class="main-card" id="securitySettingsCard">
+            <div class="card-head"><h2 class="section-title">시스템 및 보안 설정</h2></div>
+            <div class="form-group" style="margin-bottom: 24px; padding-bottom: 24px; border-bottom: 1px solid rgba(138, 188, 233, 0.1);">
+              <label class="input-label">데이터베이스 관리</label>
+              <button class="btn btn-secondary" id="checkSchemaButton" style="width: auto; padding: 0 24px;">DB 상태 점검</button>
+            </div>
+            <div style="max-width: 380px;">
+              <div class="form-group">
+                <label class="input-label">현재 관리자 코드</label>
+                <input type="password" id="oldAdminCodeInput" class="main-input" autocomplete="new-password" />
+              </div>
+              <div class="form-group">
+                <label class="input-label">새 관리자 코드</label>
+                <input type="password" id="newAdminCodeInput" class="main-input" autocomplete="new-password" />
+              </div>
+              <div class="admin-action-row" style="margin-top: 20px;">
+                <button class="btn btn-primary" id="changeAdminCodeButton" style="width: 100%;">코드 변경</button>
+              </div>
+            </div>
           </article>
         </div>
 
