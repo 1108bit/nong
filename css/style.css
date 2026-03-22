@@ -906,26 +906,20 @@ a {
 .availability-item,
 .party-slot-btn {
   width: 100%;
-  position: relative;
-  overflow: hidden;
   text-align: left;
-  border: 1px solid rgba(139, 188, 233, 0.12);
-  background:
-    linear-gradient(180deg, rgba(16, 31, 48, 0.94) 0%, rgba(21, 39, 58, 0.96) 100%);
-  border-radius: 18px;
-  padding: 15px 14px 14px;
+  border: 1px solid transparent;
+  background: rgba(255, 255, 255, 0.03);
+  border-radius: 12px;
+  padding: 14px 16px;
   color: var(--text-main);
-  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.18);
+  box-shadow: none;
+  margin-bottom: 8px;
+  transition: transform 0.1s ease, background 0.1s ease;
 }
 
-.availability-item::before,
-.party-slot-btn::before {
-  content: "";
-  position: absolute;
-  inset: 0 0 auto 0;
-  height: 2px;
-  background: linear-gradient(90deg, transparent, rgba(103, 232, 249, 0.22), transparent);
-  pointer-events: none;
+.availability-item:hover,
+.party-slot-btn:hover {
+  background: rgba(255, 255, 255, 0.06);
 }
 
 .availability-item.active,
@@ -937,21 +931,7 @@ a {
 }
 
 .availability-item.active::after {
-  content: "✓";
-  position: absolute;
-  top: 14px;
-  right: 14px;
-  width: 24px;
-  height: 24px;
-  border-radius: 999px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: linear-gradient(180deg, #34d399 0%, #10b981 100%);
-  color: #ffffff;
-  font-size: 13px;
-  font-weight: 900;
-  box-shadow: 0 8px 16px rgba(16, 185, 129, 0.24);
+  display: none;
 }
 
 .availability-item-top {
@@ -1310,18 +1290,16 @@ a {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 8px;
-
   padding: 12px 14px;
-  border-radius: 16px;
-  flex-wrap: wrap; /* 화면이 좁을 때 줄바꿈 허용 */
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.03);
+  border: none;
+  margin-bottom: 8px;
+  transition: transform 0.1s ease, background 0.1s ease;
+}
 
-  background:
-    linear-gradient(180deg, rgba(20, 36, 54, 0.9) 0%, rgba(25, 43, 62, 0.96) 100%);
-
-  border: 1px solid rgba(140, 189, 235, 0.12);
-
-  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.22);
+.character-card:hover {
+  background: rgba(255, 255, 255, 0.06);
 }
 
 /* 왼쪽: 이름 및 직업 */

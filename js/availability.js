@@ -30,11 +30,17 @@ function renderList(items) {
   target.innerHTML = items.map(i => {
     const key = `${i.day}__${i.time_slot}`;
     const isSelected = selectedMap.has(key);
+    const shortDate = i.date && i.date.length >= 10 ? i.date.substring(5).replace('-', '.') : i.date;
     return `
       <button class="availability-item ${isSelected ? 'active' : ''}" data-day="${escapeHtml(i.day)}" data-time="${escapeHtml(i.time_slot)}">
-        <div class="availability-time">${escapeHtml(i.date)} ${escapeHtml(i.day)} ${escapeHtml(i.time_slot)}</div>
-        <div class="availability-note">${escapeHtml(i.note)}</div>
-        <div class="availability-foot">${isSelected ? '선택됨' : '미선택'}</div>
+        <div style="display:flex; justify-content:space-between; align-items:center;">
+          <div class="row-time" style="flex-direction:row; align-items:center; width:auto; gap:6px;">
+            <span class="row-date">${shortDate} (${escapeHtml(i.day)})</span>
+            <span class="row-hhmm">${escapeHtml(i.time_slot)}</span>
+          </div>
+          <span style="font-size:13px; font-weight:800; color: ${isSelected ? 'var(--cyan-1)' : 'var(--text-muted)'};">${isSelected ? '✓ 참여' : '미선택'}</span>
+        </div>
+        ${i.note ? `<div class="row-note" style="margin-top:6px; max-width:100%; white-space:normal;">${escapeHtml(i.note)}</div>` : ''}
       </button>
     `;
   }).join("");
@@ -58,13 +64,15 @@ async function toggleTime(day, time) {
     selectedMap.delete(key);
     if (btn) {
       btn.classList.remove("active");
-      btn.querySelector(".availability-foot").textContent = "미선택";
+      btn.querySelector("span[style*='font-weight']").innerHTML = "미선택";
+      btn.querySelector("span[style*='font-weight']").style.color = "var(--text-muted)";
     }
   } else {
     selectedMap.add(key);
     if (btn) {
       btn.classList.add("active");
-      btn.querySelector(".availability-foot").textContent = "선택됨";
+      btn.querySelector("span[style*='font-weight']").innerHTML = "✓ 참여";
+      btn.querySelector("span[style*='font-weight']").style.color = "var(--cyan-1)";
     }
   }
 

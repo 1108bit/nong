@@ -23,8 +23,13 @@ async function loadPartySummary() {
   // 시간대별 버튼 생성
   target.innerHTML = data.items.map(i => `
     <button type="button" class="party-slot-btn" data-day="${escapeHtml(i.day)}" data-time="${escapeHtml(i.time_slot)}">
-      <div class="party-slot-time">${escapeHtml(i.day)} ${escapeHtml(i.time_slot)}</div>
-      <div class="party-slot-foot">조합 상세 보기 ➔</div>
+      <div style="display:flex; justify-content:space-between; align-items:center;">
+        <div class="row-time" style="flex-direction:row; align-items:center; width:auto; gap:6px;">
+          <span class="row-date">${escapeHtml(i.day)}요일</span>
+          <span class="row-hhmm">${escapeHtml(i.time_slot)}</span>
+        </div>
+        <span style="font-size:12px; color:var(--text-muted); font-weight:600;">상세 보기 ➔</span>
+      </div>
     </button>
   `).join("");
   
@@ -74,7 +79,7 @@ function renderParty(id, list) {
         const classNameEscaped = escapeHtml(m.className);
 
         return `
-            <div class="character-card" style="margin-bottom: 8px;">
+            <div class="character-card" style="padding: 10px 14px;">
                 <div class="character-left">
                     <div class="character-name">${escapeHtml(m.character_name)}</div>
                     <div class="character-sub">
