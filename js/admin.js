@@ -62,25 +62,23 @@ function initDateChips() {
   }
 }
 
-// 시간 칩 동적 생성 로직 (09:00 ~ 24:00, 30분 단위)
+// 시간 칩 동적 생성 로직 (09:00 ~ 24:00, 1시간(정각) 단위 복구)
 function initTimeChips() {
   let html = "";
   for (let h = 9; h <= 24; h++) {
-    for (let m of ["00", "30"]) {
-      if (h === 24 && m === "30") continue;
-      
-      let displayH = h;
-      let ampm = "오전";
-      if (h >= 12 && h < 24) { ampm = "오후"; displayH = h === 12 ? 12 : h - 12; }
-      else if (h === 24) { ampm = "오전"; displayH = 12; }
-      
-      const valueH = h === 24 ? "00" : String(h).padStart(2, '0');
-      const dateVal = `${valueH}:${m}`;
-      const isSelected = dateVal === "21:00" ? "selected" : "";
-      
-      const appleDisplay = `<span style="font-size:11px; font-weight:700;">${ampm}</span><span style="font-size:16px; font-weight:900; margin-top:4px;">${displayH}:${m}</span>`;
-      html += `<button type="button" class="chip-btn date-chip ${isSelected}" data-value="${dateVal}">${appleDisplay}</button>`;
-    }
+    let m = "00"; // 1시간 단위 강제
+    
+    let displayH = h;
+    let ampm = "오전";
+    if (h >= 12 && h < 24) { ampm = "오후"; displayH = h === 12 ? 12 : h - 12; }
+    else if (h === 24) { ampm = "오전"; displayH = 12; }
+    
+    const valueH = h === 24 ? "00" : String(h).padStart(2, '0');
+    const dateVal = `${valueH}:${m}`;
+    const isSelected = dateVal === "21:00" ? "selected" : "";
+    
+    const appleDisplay = `<span style="font-size:11px; font-weight:700;">${ampm}</span><span style="font-size:16px; font-weight:900; margin-top:4px;">${displayH}:${m}</span>`;
+    html += `<button type="button" class="chip-btn date-chip ${isSelected}" data-value="${dateVal}">${appleDisplay}</button>`;
   }
   
   const group1 = getEl("timeChipGroup");
@@ -214,25 +212,81 @@ async function deleteSchedule(date, day, time) {
 }
 
 function editSchedule(date, day, time, note) {
-  getEl("dateInput").value = date;
-  getEl("dayInput").value = day;
-  getEl("timeSlotInput").value = time;
-  getEl("noteInput").value = note;
+  // 원본 데이터 저장 (날짜/시간 변경 시 기존 일정 삭제용)
+  getEl("editOriginalDate").value = date;
+  getEl("editOriginalDay").value = day;
+  getEl("editOriginalTime").value = time;
+
+  getEl("editDateInput").value = date;
+  getEl("editDayInput").value = day;
+  getEl("editTimeSlotInput").value = time;
+  getEl("editNoteInput").value = note;
 
   // 칩 시각적 연동
-  const dateGroup = getEl("dateChipGroup");
-  if (dateGroup) dateGroup.querySelectorAll(".chip-btn").forEach(b => b.classList.toggle("selected", b.dataset.date === date));
+  const dateGroup = getEl("editDateChipGroup");
+  if (dateGroup) {
+    dateGroup.querySelectorAll(".chip-btn").forEach(b => b.classList.toggle("selected", b.dataset.date === date));
+  }
   
-  const timeGroup = document.querySelector(`[data-target="timeSlotInput"]`);
-  if (timeGroup) timeGroup.querySelectorAll(".chip-btn").forEach(b => b.classList.toggle("selected", b.dataset.value === time));
+  const timeGroup = getEl("editTimeChipGroup");
+  if (timeGroup) {
+    timeGroup.querySelectorAll(".chip-btn").forEach(b => b.classList.toggle("selected", b.dataset.value === time));
+  }
 
-  window.scrollTo(0, 0);
+  getEl("scheduleModal").classList.add("show");
+  document.body.classList.add("modal-open");
+  
+  // 모달이 열릴 때 스크롤 너비 재계산(인디케이터 위치 갱신)
+  setTimeout(() => {
+    getEl("editDateChipGroup")?.dispatchEvent(new Event('scroll'));
+    getEl("editTimeChipGroup")?.dispatchEvent(new Event('scroll'));
+  }, 10);
 }
 
-getEl("timeSlotInput").addEventListener("input", (e) => {
-   const timeGroup = document.querySelector(`[data-target="timeSlotInput"]`);
-   if (timeGroup) timeGroup.querySelectorAll(".chip-btn").forEach(b => b.classList.toggle("selected", b.dataset.value === e.target.value));
-});
+function closeScheduleModal() {
+  getEl("scheduleModal").classList.remove("show");
+  document.body.classList.remove("modal-open");
+}
+if(getEl("closeScheduleModalBtn")) getEl("closeScheduleModalBtn").onclick = closeScheduleModal;
+if(getEl("cancelScheduleModalBtn")) getEl("cancelScheduleModalBtn").onclick = closeScheduleModal;
+
+// 일정 수정 완료 로직
+if(getEl("submitScheduleModalBtn")) {
+  getEl("submitScheduleModalBtn").onclick = async () => {
+    const btn = getEl("submitScheduleModalBtn");
+    btn.disabled = true;
+    btn.innerHTML = `<span style="display:inline-block; animation: spin 1s linear infinite;">⏳</span> 처리 중...`;
+
+    const oDate = getEl("editOriginalDate").value;
+    const oDay = getEl("editOriginalDay").value;
+    const oTime = getEl("editOriginalTime").value;
+    const nDate = getEl("editDateInput").value;
+    const nDay = getEl("editDayInput").value;
+    const nTime = getEl("editTimeSlotInput").value;
+    const nNote = getEl("editNoteInput").value;
+
+    // 일자나 시간이 변경된 경우 기존 데이터를 지우고 새 데이터를 생성하여 덮어씌움 방지
+    if (oDate !== nDate || oTime !== nTime) {
+        await callApi({ action: "deleteRaidSchedule", adminCode: getAdminCode(), date: oDate, day: oDay, timeSlot: oTime });
+    }
+
+    const res = await callApi({
+      action: "saveRaidSchedule", adminCode: getAdminCode(),
+      date: nDate, day: nDay, timeSlot: nTime, note: nNote, openYn: "Y", status: "OPEN"
+    });
+
+    btn.disabled = false;
+    btn.textContent = "수정 완료하기";
+
+    if (res.ok) {
+       alert("일정이 성공적으로 수정되었습니다.");
+       closeScheduleModal();
+       loadAdminSchedule();
+    } else {
+       alert(res.message || "수정에 실패했습니다.");
+    }
+  };
+}
 
 getEl("saveButton").onclick = saveSchedule;
 getEl("checkSchemaButton").onclick = async () => {
