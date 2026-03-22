@@ -71,18 +71,16 @@ function renderParty(id, list) {
     target.innerHTML = list.map(m => {
         const pValue = Number(m.power_value || m.power) || 0;
         const pRange = getPowerRange(pValue);
-        const roleClass = m.className === '치유성' ? 'heal' : 'normal';
+        const classNameEscaped = escapeHtml(m.className);
 
         return `
-            <div class="party-member-card">
-                <div class="party-member-left">
-                    <div class="party-name">${escapeHtml(m.character_name)}</div>
-                    <div class="party-member-chips">
-                        <span class="party-chip ${roleClass}">${escapeHtml(m.className)}</span>
+            <div class="character-card" style="margin-bottom: 8px;">
+                <div class="character-left">
+                    <div class="character-name">${escapeHtml(m.character_name)}</div>
+                    <div class="character-sub">
+                        <span class="chip chip-class ${classNameEscaped}">${classNameEscaped}</span>
+                        <div class="character-power" style="margin-left: 4px;">${pRange}</div>
                     </div>
-                </div>
-                <div class="party-member-right">
-                    <div class="party-power">${pRange}</div> <div class="party-power-label">전투력 구간</div>
                 </div>
             </div>
         `;
