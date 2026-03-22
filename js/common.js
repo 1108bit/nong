@@ -4,9 +4,11 @@ const API_URL = "https://script.google.com/macros/s/AKfycbxPSyOJIS4vhKbvUI6iYB3J
 async function callApi(params) {
   try {
     console.log(`➡️ [API 요청] ${params.action} :`, params);
-    params.t = new Date().getTime(); // 브라우저 캐싱 방지용 타임스탬프 추가
-    const url = `${API_URL}?${new URLSearchParams(params).toString()}`;
-    const res = await fetch(url);
+    // GET 대신 POST 방식을 사용하여 캐시 차단 및 CORS 에러 영구 해결
+    const res = await fetch(API_URL, {
+      method: 'POST',
+      body: new URLSearchParams(params)
+    });
     if (!res.ok) {
       console.error(`❌ [API HTTP 오류] (${res.status}):`, res.statusText);
       return { ok: false, message: `서버 오류 (${res.status})` };
