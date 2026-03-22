@@ -16,7 +16,7 @@ async function callApi(params) {
     return data;
   } catch (e) {
     console.error("❌ [API 연결 실패]:", e);
-    return { ok: false, message: "서버 연결에 실패했습니다." };
+    return { ok: false, message: `통신 차단됨: ${e.message}` };
   }
 }
 
