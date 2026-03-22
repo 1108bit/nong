@@ -15,6 +15,23 @@ const SHEET_NAMES = {
 };
 
 /************************************************
+ * 상수
+ ************************************************/
+const ROLE = {
+  HEALER: '치유성',
+  TANK: '수호성',
+  DPS_MELEE: '검성',
+  DPS_RANGE: '살성',
+  ARCHER: '궁성',
+  MAGE: '마도성',
+  SPIRIT: '정령성',
+  BUFFER: '호법성'
+};
+
+const PARTY_SIZE = 4;
+const WEEKS_START_DAY = 3; // 수요일
+
+/************************************************
  * 공통
  ************************************************/
 function outputJson(data) {
@@ -307,6 +324,45 @@ function addCharacter(e) {
   };
 }
 
+function deleteCharacter(accountId, characterName) {
+  accountId = normalizeValue(accountId);
+  characterName = normalizeValue(characterName);
+
+  if (!accountId) {
+    return { ok: false, message: 'accountId가 없습니다.' };
+  }
+
+  if (!characterName) {
+    return { ok: false, message: '캐릭터명이 없습니다.' };
+  }
+
+  const sheet = getSheet(SHEET_NAMES.CHARACTERS);
+  const values = sheet.getDataRange().getValues();
+  const headers = values[0].map(v => String(v).trim());
+
+  const accountIdCol = headers.indexOf('account_id');
+  const nameCol = headers.indexOf('name');
+
+  for (let i = values.length - 1; i >= 1; i--) {
+    const rowAccountId = normalizeCompareValue(values[i][accountIdCol]);
+    const rowName = normalizeCompareValue(values[i][nameCol]);
+
+    if (rowAccountId === normalizeCompareValue(accountId) &&
+        rowName === normalizeCompareValue(characterName)) {
+      sheet.deleteRow(i + 1);
+      return {
+        ok: true,
+        message: '삭제되었습니다.'
+      };
+    }
+  }
+
+  return {
+    ok: false,
+    message: '삭제할 캐릭터를 찾을 수 없습니다.'
+  };
+}
+
 /************************************************
  * 주간 키
  ************************************************/
@@ -537,7 +593,15 @@ function saveAvailability(accountId, mainName, characterName, type, weekKey, slo
   const values = sheet.getDataRange().getValues();
   const headers = values[0].map(v => String(v).trim());
 
-  const slotList = JSON.parse(slotListText || '[]');
+  let slotList = [];
+  try {
+    slotList = JSON.parse(slotListText || '[]');
+  } catch (err) {
+    return {
+      ok: false,
+      message: '시간 정보 형식이 잘못되었습니다.'
+    };
+  }
 
   const weekKeyCol = headers.indexOf('week_key');
   const accountIdCol = headers.indexOf('account_id');
@@ -626,7 +690,6 @@ function getAvailabilitySummary(weekKey) {
       day: row.day || '',
       time_slot: row.time_slot || '',
       status: row.status || 'SELECTED',
-      class: character ? (character.class_name || '') : '',
       className: character ? (character.class_name || '') : '',
       power: character ? (character.power || '') : '',
       power_value: character ? Number(character.power || 0) : 0
@@ -659,7 +722,7 @@ function getMainData(accountId) {
     .map(row => ({
       character_id: row.character_id || '',
       character_name: row.name || '',
-      class: row.class_name || '',
+      className: row.class_name || '',
       power: row.power || '',
       type: row.type || '',
       use_yn: row.use_yn || 'Y'
@@ -689,10 +752,12 @@ function getMainData(accountId) {
  * PARTY
  ************************************************/
 function getPartyComposition(weekKey, day, timeSlot) {
+  // 해당 시간대 참여자 조회
   const summary = getAvailabilitySummary(weekKey).items
     .filter(item => normalizeValue(item.day) === normalizeValue(day))
     .filter(item => normalizeValue(item.time_slot) === normalizeValue(timeSlot));
 
+  // 계정별 최고 전투력 캐릭터만 선택
   const byAccount = {};
   summary.forEach(item => {
     const key = normalizeValue(item.account_id);
@@ -714,27 +779,29 @@ function getPartyComposition(weekKey, day, timeSlot) {
 
   const candidates = Object.keys(byAccount).map(key => byAccount[key]);
 
+  // 정렬: 치유성 우선, 다음은 전투력 높은순
   candidates.sort((a, b) => {
-    const aHeal = a.class === '치유성' ? 1 : 0;
-    const bHeal = b.class === '치유성' ? 1 : 0;
+    const aHeal = a.className === ROLE.HEALER ? 1 : 0;
+    const bHeal = b.className === ROLE.HEALER ? 1 : 0;
     if (aHeal !== bHeal) return bHeal - aHeal;
     return Number(b.power_value || 0) - Number(a.power_value || 0);
   });
 
+  // 파티 분배: 균등하게 배분, 최대 4명씩
   const party1 = [];
   const party2 = [];
 
   candidates.forEach(item => {
     if (party1.length <= party2.length) {
-      if (party1.length < 4) {
+      if (party1.length < PARTY_SIZE) {
         party1.push(item);
-      } else if (party2.length < 4) {
+      } else if (party2.length < PARTY_SIZE) {
         party2.push(item);
       }
     } else {
-      if (party2.length < 4) {
+      if (party2.length < PARTY_SIZE) {
         party2.push(item);
-      } else if (party1.length < 4) {
+      } else if (party1.length < PARTY_SIZE) {
         party1.push(item);
       }
     }
@@ -742,8 +809,8 @@ function getPartyComposition(weekKey, day, timeSlot) {
 
   const totalCount = party1.length + party2.length;
   const highPowerCount = candidates.filter(i => Number(i.power_value || 0) >= 400).length;
-  const hasHeal = candidates.some(i => i.class === '치유성');
-  const party2HasHeal = party2.some(i => i.class === '치유성');
+  const hasHeal = candidates.some(i => i.className === ROLE.HEALER);
+  const party2HasHeal = party2.some(i => i.className === ROLE.HEALER);
 
   return {
     ok: true,
@@ -814,6 +881,9 @@ function doGet(e) {
 
       case 'addCharacter':
         return outputJson(addCharacter(e));
+
+      case 'deleteCharacter':
+        return outputJson(deleteCharacter(e.parameter.accountId, e.parameter.characterName));
 
       case 'getCurrentWeekKey':
         return outputJson(getCurrentWeekKey());

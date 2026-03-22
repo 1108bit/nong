@@ -51,6 +51,7 @@ async function toggleTime(day, time) {
     accountId: getAccountId(),
     mainName: getMainName(),
     characterName: getMainName(),
+    type: "본캐",
     slotList: JSON.stringify(slotList)
   });
   initAvailability();

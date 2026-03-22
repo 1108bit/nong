@@ -32,7 +32,7 @@ async function loadAdminSchedule() {
 async function saveSchedule() {
   const res = await callApi({
     action: "saveRaidSchedule",
-    adminCode,
+    adminCode: getAdminCode(),
     date: getEl("dateInput").value,
     day: getEl("dayInput").value,
     timeSlot: getEl("timeSlotInput").value,
@@ -44,7 +44,7 @@ async function saveSchedule() {
 
 async function deleteSchedule(date, day, time) {
   if(!confirm("정말 삭제하시겠습니까?")) return;
-  const res = await callApi({ action: "deleteRaidSchedule", adminCode, date, day, timeSlot: time });
+  const res = await callApi({ action: "deleteRaidSchedule", adminCode: getAdminCode(), date, day, timeSlot: time });
   if(res.ok) loadAdminSchedule();
 }
 

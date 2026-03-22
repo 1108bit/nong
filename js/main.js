@@ -8,8 +8,9 @@ async function loadMain() {
   const data = await callApi({ action: "getMainData", accountId });
   if (!data.ok) return;
 
-  setText("accountMainName", data.mainName || LOGIN_MAIN_NAME);
+  setText("accountMainName", data.mainName || "계정 없음");
   setText("characterCount", data.characters?.length || 0);
+  setText("selectedCount", (data.selectedCount || 0) + "개");
   
   // 등록된 캐릭터 중 '본캐'가 있는지 확인
   hasMainCharacter = data.characters?.some(c => c.type === "본캐");
@@ -34,9 +35,9 @@ function renderCharacters(items) {
     return `
       <div class="character-card" data-char-index="${idx}">
         <div class="character-left">
-          <div class="character-name">${escapeHtml(c.character_name || c.name)}</div>
+          <div class="character-name">${escapeHtml(c.character_name)}</div>
           <div class="character-sub">
-            <span class="chip chip-class">${escapeHtml(c.class || c.className)}</span>
+            <span class="chip chip-class">${escapeHtml(c.class)}</span>
             <span class="chip chip-type">${escapeHtml(c.type)}</span>
           </div>
         </div>
@@ -45,7 +46,7 @@ function renderCharacters(items) {
           <div class="character-state ${c.use_yn === 'Y' ? 'on' : 'off'}">
             ${c.use_yn === 'Y' ? '사용중' : '미사용'}
           </div>
-          <button class="character-delete-btn" data-char-name="${escapeHtml(c.character_name || c.name)}" data-is-main="${isMainChar}" title="캐릭터 삭제">✕</button>
+          <button class="character-delete-btn" data-char-name="${escapeHtml(c.character_name)}" data-is-main="${isMainChar}" title="캐릭터 삭제">✕</button>
         </div>
       </div>
     `;

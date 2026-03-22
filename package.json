@@ -1,0 +1,19 @@
+{
+  "name": "nostepback",
+  "version": "1.0.0",
+  "description": "AION2 Guild Raid Planner - NoStepBack",
+  "scripts": {
+    "push": "clasp push",
+    "deploy": "clasp deploy",
+    "build": "npm run push && npm run deploy",
+    "push:watch": "clasp push --watch"
+  },
+  "keywords": [
+    "aion",
+    "raid",
+    "planner",
+    "guild"
+  ],
+  "author": "",
+  "license": "MIT"
+}

@@ -5,6 +5,10 @@ async function callApi(params) {
   try {
     const url = `${API_URL}?${new URLSearchParams(params).toString()}`;
     const res = await fetch(url);
+    if (!res.ok) {
+      console.error(`API 오류 (${res.status}):`, res.statusText);
+      return { ok: false, message: `서버 오류 (${res.status})` };
+    }
     return await res.json();
   } catch (e) {
     console.error("연결 오류:", e);

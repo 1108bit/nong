@@ -32,10 +32,6 @@ async function showComposition(day, time) {
     renderParty("party1List", res.party1 || []);
     renderParty("party2List", res.party2 || []);
     
-    // 상태 정보 업데이트
-    setText("statusTime", `${day} ${time}`);
-    setText("statusPicked", `${res.totalCount}명`);
-    
     // 배지 업데이트 (인원, 치유 등)
     renderBadges("party1Badges", res.party1 || []);
     renderBadges("party2Badges", res.party2 || []);
@@ -50,15 +46,15 @@ function renderParty(id, list) {
 
     target.innerHTML = list.map(m => {
         const pValue = Number(m.power_value || m.power) || 0;
-        const pRange = getPowerRange(pValue); // 전투력 구간 계산
-        const roleClass = m.class === '치유성' ? 'heal' : 'normal';
+        const pRange = getPowerRange(pValue);
+        const roleClass = m.className === '치유성' ? 'heal' : 'normal';
 
         return `
             <div class="party-member-card">
                 <div class="party-member-left">
-                    <div class="party-name">${escapeHtml(m.character_name || m.name)}</div>
+                    <div class="party-name">${escapeHtml(m.character_name)}</div>
                     <div class="party-member-chips">
-                        <span class="party-chip ${roleClass}">${escapeHtml(m.class || m.className)}</span>
+                        <span class="party-chip ${roleClass}">${escapeHtml(m.className)}</span>
                     </div>
                 </div>
                 <div class="party-member-right">
@@ -72,7 +68,7 @@ function renderParty(id, list) {
 function renderBadges(id, list) {
     const target = getEl(id);
     if (!target) return;
-    const healerCount = list.filter(m => (m.class || m.className) === '치유성').length;
+    const healerCount = list.filter(m => m.className === '치유성').length;
     target.innerHTML = `
         <span class="party-stat-chip">인원 ${list.length}</span>
         <span class="party-stat-chip">치유 ${healerCount}</span>
