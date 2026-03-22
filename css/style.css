@@ -2417,38 +2417,30 @@ body.modal-open {
 }
 
 /* =========================
-   긴급: UI 잘림 방지 및 모던 레이아웃 적용
+   강제 레이아웃 교정 코드 (가로 정렬 & 잘림 방지)
 ========================= */
-.horizontal-scroll-chips {
+/* 등록된 일정 목록 슬림화 및 가로 정렬 강제 */
+.admin-list-row, 
+.admin-card-item {
   display: flex !important;
-  flex-direction: row !important;
-  flex-wrap: nowrap !important;
-  overflow-x: auto !important;
-  padding: 15px 5px !important; /* 상하 여백을 넉넉히 주어 scale 시 안 잘리게 함 */
-  gap: 8px !important;
-}
-
-.chip-btn {
-  flex-shrink: 0 !important;
-  white-space: nowrap !important;
-}
-
-.chip-btn.selected {
-  transform: scale(1.1) !important;
-  z-index: 10 !important;
-  border-color: var(--cyan-1) !important;
-  box-shadow: 0 0 12px rgba(67, 217, 255, 0.4) !important;
-}
-
-.admin-form-grid {
-  display: grid !important;
-  grid-template-columns: 1fr 1fr !important;
+  flex-direction: row !important; /* 가로 배치 강제 */
+  align-items: center !important;
+  justify-content: space-between !important;
+  padding: 10px 16px !important;
+  min-height: 60px !important;
   gap: 15px !important;
 }
 
-/* 모바일 화면에서는 다시 1단으로 풀어서 가독성 확보 */
-@media (max-width: 600px) {
-  .admin-form-grid {
-    grid-template-columns: 1fr !important;
-  }
+.participant-dots {
+  display: flex !important;
+  flex-direction: row !important; /* 점(Dot) 가로 정렬 강제 */
+  gap: 4px !important;
+}
+
+#dateChipGroup, .chip-select-group {
+  display: flex !important;
+  flex-direction: row !important;
+  padding-bottom: 15px !important; /* 칩 하단 잘림 원천 차단 */
+  overflow-x: auto !important;
+  white-space: nowrap !important;
 }
