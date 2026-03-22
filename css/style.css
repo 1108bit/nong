@@ -1599,7 +1599,7 @@ body.modal-open {
 .horizontal-scroll-chips {
   flex-wrap: nowrap;
   overflow-x: auto;
-  padding: 8px 40px 14px 4px !important; /* 마스크 효과를 위해 우측 여백을 40px로 넉넉히 확보 */
+  padding: 14px 40px 14px 4px !important; /* 확대 시 상하 잘림을 완벽히 방지하는 넉넉한 패딩 */
   -webkit-overflow-scrolling: touch;
   scrollbar-width: none; /* Firefox */
   cursor: grab;
@@ -1641,7 +1641,7 @@ body.modal-open {
   transform: scale(1.05) !important;
   border: 1px solid rgba(67, 217, 255, 0.4) !important;
   box-shadow: none !important; /* 과도한 네온 제거 */
-  z-index: 5;
+  z-index: 10;
   color: #fff;
   font-weight: 800;
 }
