@@ -2473,7 +2473,19 @@ body.modal-open {
   transition: transform 0.1s ease;
 }
 
-/* 5. 스크롤 제어 */
+/* 5. 드래그 앤 드롭 상호작용 */
+.drop-zone {
+  transition: background 0.2s ease, border-color 0.2s ease;
+}
+.drop-zone.drag-over {
+  background: rgba(67, 217, 255, 0.15) !important;
+  border-color: var(--cyan-2) !important;
+}
+.draggable-char:active {
+  cursor: grabbing !important;
+}
+
+/* 6. 스크롤 제어 */
 .slim-scroll-list {
   max-height: 560px;
   overflow-y: auto;

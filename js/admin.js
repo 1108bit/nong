@@ -496,4 +496,36 @@ window.editUserCharacter = editUserCharacter;
 window.editSchedule = editSchedule;
 window.deleteSchedule = deleteSchedule;
 
+// =========================
+// 드래그 앤 드롭 함수 전역 노출
+// =========================
+window.handleDragStart = function(e) {
+  e.dataTransfer.setData("text/plain", e.target.id);
+  setTimeout(() => { e.target.style.opacity = "0.4"; }, 0);
+};
+window.handleDragEnd = function(e) {
+  e.target.style.opacity = "1";
+};
+window.handleDragOver = function(e) {
+  e.preventDefault(); // 드롭 허용 (필수)
+  const zone = e.target.closest('.drop-zone');
+  if (zone) zone.classList.add('drag-over');
+};
+window.handleDragLeave = function(e) {
+  const zone = e.target.closest('.drop-zone');
+  if (zone) zone.classList.remove('drag-over');
+};
+window.handleDrop = function(e) {
+  e.preventDefault();
+  const zone = e.target.closest('.drop-zone');
+  if (zone) {
+    zone.classList.remove('drag-over');
+    const id = e.dataTransfer.getData("text/plain");
+    const draggableElement = document.getElementById(id);
+    if (draggableElement) {
+      zone.appendChild(draggableElement);
+    }
+  }
+};
+
 applyDragScroll();
