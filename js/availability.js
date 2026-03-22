@@ -14,23 +14,28 @@ async function initAvailability() {
     `;
   }
 
-  const [schedule, mySelection] = await Promise.all([
+  const [schedule, mySelection, summaryData] = await Promise.all([
     callApi({ action: "getRaidSchedule" }),
-    callApi({ action: "getAvailability", accountId, characterName })
+    callApi({ action: "getAvailability", accountId, characterName }),
+    callApi({ action: "getAvailabilitySummary" })
   ]);
 
   selectedMap.clear();
   mySelection.items?.forEach(i => selectedMap.add(`${i.day}__${i.time_slot}`));
   
-  renderList(schedule.items || []);
+  const summaryItems = summaryData.items || [];
+  renderList(schedule.items || [], summaryItems);
 }
 
-function renderList(items) {
+function renderList(items, summaryItems) {
   const target = getEl("availabilityList");
   target.innerHTML = items.map(i => {
     const key = `${i.day}__${i.time_slot}`;
     const isSelected = selectedMap.has(key);
     const shortDate = i.date && i.date.length >= 10 ? i.date.substring(5).replace('-', '.') : i.date;
+    
+    const participantsCount = summaryItems.filter(s => s.day === i.day && s.time_slot === i.time_slot).length;
+
     return `
       <button class="availability-item ${isSelected ? 'active' : ''}" data-day="${escapeHtml(i.day)}" data-time="${escapeHtml(i.time_slot)}">
         <div style="display:flex; justify-content:space-between; align-items:center;">
@@ -38,7 +43,12 @@ function renderList(items) {
             <span class="row-date">${shortDate} (${escapeHtml(i.day)})</span>
             <span class="row-hhmm">${escapeHtml(i.time_slot)}</span>
           </div>
-          <span class="status-text" style="font-size:13px; font-weight:800; color: ${isSelected ? 'var(--cyan-1)' : 'var(--text-muted)'};">${isSelected ? '✓ 참여' : '미선택'}</span>
+          <div style="display:flex; align-items:center; gap:10px;">
+            <span class="participant-count" style="font-size:12px; font-weight:600; color:var(--text-sub); display:flex; align-items:center; gap:4px;">
+              <span class="ui-dot ${participantsCount >= 8 ? 'green' : 'gold'}"></span>${participantsCount}명 참여
+            </span>
+            <span class="status-text" style="font-size:13px; font-weight:800; color: ${isSelected ? 'var(--cyan-1)' : 'var(--text-muted)'};">${isSelected ? '✓ 참여' : '미선택'}</span>
+          </div>
         </div>
         ${i.note ? `<div class="row-note" style="margin-top:6px; max-width:100%; white-space:normal;">${escapeHtml(i.note)}</div>` : ''}
       </button>
@@ -66,6 +76,13 @@ async function toggleTime(day, time) {
       btn.classList.remove("active");
       btn.querySelector(".status-text").innerHTML = "미선택";
       btn.querySelector(".status-text").style.color = "var(--text-muted)";
+      
+      const countEl = btn.querySelector(".participant-count");
+      if (countEl) {
+        let currentCount = parseInt(countEl.textContent.replace(/[^0-9]/g, '')) || 0;
+        currentCount = Math.max(0, currentCount - 1);
+        countEl.innerHTML = `<span class="ui-dot ${currentCount >= 8 ? 'green' : 'gold'}"></span>${currentCount}명 참여`;
+      }
     }
   } else {
     selectedMap.add(key);
@@ -73,6 +90,13 @@ async function toggleTime(day, time) {
       btn.classList.add("active");
       btn.querySelector(".status-text").innerHTML = "✓ 참여";
       btn.querySelector(".status-text").style.color = "var(--cyan-1)";
+
+      const countEl = btn.querySelector(".participant-count");
+      if (countEl) {
+        let currentCount = parseInt(countEl.textContent.replace(/[^0-9]/g, '')) || 0;
+        currentCount += 1;
+        countEl.innerHTML = `<span class="ui-dot ${currentCount >= 8 ? 'green' : 'gold'}"></span>${currentCount}명 참여`;
+      }
     }
   }
 
