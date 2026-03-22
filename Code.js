@@ -183,6 +183,7 @@ function validateDatabaseSchema() {
   }
 
   return {
+    ok: true,
     isValid: report.length === 0,
     errors: report
   };
@@ -446,12 +447,13 @@ function deleteCharacter(accountId, characterName) {
   const sheet = getSheet(SHEET_NAMES.CHARACTERS);
   const values = sheet.getDataRange().getValues();
   const headers = values[0].map(v => String(v).trim());
-  const colMap = getColumnMap(headers);
+  const accountIdCol = headers.indexOf('account_id');
+  const nameCol = headers.indexOf('name');
 
 
   for (let i = values.length - 1; i >= 1; i--) {
-    const rowAccountId = normalizeCompareValue(values[i][colMap.account_id]);
-    const rowName = normalizeCompareValue(values[i][colMap.name]);
+    const rowAccountId = normalizeCompareValue(values[i][accountIdCol]);
+    const rowName = normalizeCompareValue(values[i][nameCol]);
 
     if (rowAccountId === normalizeCompareValue(accountId) &&
         rowName === normalizeCompareValue(characterName)) {

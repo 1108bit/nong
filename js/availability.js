@@ -38,7 +38,7 @@ function renderList(items) {
             <span class="row-date">${shortDate} (${escapeHtml(i.day)})</span>
             <span class="row-hhmm">${escapeHtml(i.time_slot)}</span>
           </div>
-          <span style="font-size:13px; font-weight:800; color: ${isSelected ? 'var(--cyan-1)' : 'var(--text-muted)'};">${isSelected ? '✓ 참여' : '미선택'}</span>
+          <span class="status-text" style="font-size:13px; font-weight:800; color: ${isSelected ? 'var(--cyan-1)' : 'var(--text-muted)'};">${isSelected ? '✓ 참여' : '미선택'}</span>
         </div>
         ${i.note ? `<div class="row-note" style="margin-top:6px; max-width:100%; white-space:normal;">${escapeHtml(i.note)}</div>` : ''}
       </button>
@@ -64,15 +64,15 @@ async function toggleTime(day, time) {
     selectedMap.delete(key);
     if (btn) {
       btn.classList.remove("active");
-      btn.querySelector("span[style*='font-weight']").innerHTML = "미선택";
-      btn.querySelector("span[style*='font-weight']").style.color = "var(--text-muted)";
+      btn.querySelector(".status-text").innerHTML = "미선택";
+      btn.querySelector(".status-text").style.color = "var(--text-muted)";
     }
   } else {
     selectedMap.add(key);
     if (btn) {
       btn.classList.add("active");
-      btn.querySelector("span[style*='font-weight']").innerHTML = "✓ 참여";
-      btn.querySelector("span[style*='font-weight']").style.color = "var(--cyan-1)";
+      btn.querySelector(".status-text").innerHTML = "✓ 참여";
+      btn.querySelector(".status-text").style.color = "var(--cyan-1)";
     }
   }
 
