@@ -187,7 +187,9 @@ async function openUserCharacterManager(searchValue) {
 
   const targetAccountId = data.targetAccountId;
   const targetMainName = data.mainName;
-  const roleText = data.adminYn === 'Y' ? '<span style="color:var(--gold-1)">👑 운영진</span>' : '일반 유저';
+  const roleText = data.adminYn === 'Y' 
+    ? '<span class="availability-status crowded">👑 운영진</span>' 
+    : '<span class="availability-status normal">👤 일반 유저</span>';
   const isMaster = getAccountId() === 'MASTER_ADMIN';
   const roleButtonHtml = isMaster ? `<button class="mini-btn" onclick="toggleUserAdmin('${targetAccountId}', '${searchValue}')">권한 변경</button>` : '';
 

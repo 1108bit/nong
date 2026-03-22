@@ -137,7 +137,7 @@ a {
 .party-grid,
 .admin-grid {
   display: grid;
-  gap: 14px;
+  gap: 18px; /* 여백의 미: 기존 14px -> 18px로 확장하여 시원한 느낌 부여 */
 }
 
 .availability-card-full,
@@ -929,10 +929,10 @@ a {
 
 .availability-item.active,
 .party-slot-btn.active {
-  border-color: rgba(67, 217, 255, 0.42);
-  box-shadow:
-    0 0 0 1px rgba(67, 217, 255, 0.14),
-    0 16px 28px rgba(24, 144, 255, 0.18);
+  transform: scale(1.02) !important;
+  border-color: var(--cyan-1) !important;
+  box-shadow: 0 0 15px rgba(67, 217, 255, 0.4), var(--shadow-2) !important;
+  z-index: 5;
 }
 
 .availability-item.active::after {
@@ -1369,8 +1369,8 @@ a {
 
 .character-power {
   font-size: 14px;
-  font-weight: 900;
-  color: #6cb9ff;
+  font-weight: 900 !important;
+  color: var(--cyan-2) !important;
   text-shadow: 0 0 8px rgba(108, 185, 255, 0.4);
   letter-spacing: -0.02em;
   line-height: 1;
@@ -1613,8 +1613,10 @@ body.modal-open {
 .chip-btn.selected {
   opacity: 1;
   filter: grayscale(0);
-  transform: scale(1.08);
-  box-shadow: 0 6px 14px rgba(0, 0, 0, 0.25);
+  transform: scale(1.05) !important;
+  border-color: var(--cyan-1) !important;
+  box-shadow: 0 0 15px rgba(67, 217, 255, 0.4), 0 6px 14px rgba(0, 0, 0, 0.25) !important;
+  z-index: 5;
 }
 
 .chip-btn:disabled {
@@ -1955,7 +1957,8 @@ body.modal-open {
 
 .admin-card-time {
   font-size: 15px;
-  font-weight: 900;
+  font-weight: 900 !important;
+  color: var(--cyan-2) !important;
 }
 
 .admin-card-meta {
@@ -2046,7 +2049,8 @@ body.modal-open {
 .party-slot-btn:active,
 .character-card:active,
 .admin-card-item:active {
-  transform: scale(0.985);
+  transform: scale(0.96) !important;
+  transition: transform 0.1s ease !important; /* 쫀득하고 빠른 클릭 반응 */
 }
 
 .touch-pop {
@@ -2172,6 +2176,15 @@ body.modal-open {
 
 .page-message.error {
   color: #fecdd3;
+}
+
+/* 관리자 페이지 유저 검색 결과 박스 가독성 향상 */
+#userCharacterList {
+  background: rgba(10, 24, 38, 0.4);
+  border-radius: var(--radius-md);
+  padding: 12px;
+  border: 1px solid var(--line-1);
+  margin-top: 10px;
 }
 
 /* =========================
