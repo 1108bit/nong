@@ -163,3 +163,38 @@ function editUserCharacter(accountId, originalName, className, type, power) {
     }
   });
 }
+
+// =========================
+// 보안 설정: 관리자 코드 변경 로직
+// =========================
+const changeAdminCodeBtn = getEl("changeAdminCodeButton");
+if (changeAdminCodeBtn) {
+  changeAdminCodeBtn.onclick = async () => {
+    const oldCode = getEl("oldAdminCodeInput").value.trim();
+    const newCode = getEl("newAdminCodeInput").value.trim();
+    
+    if (!oldCode) return alert("현재 관리자 코드를 입력해주세요.");
+    if (!newCode) return alert("새 관리자 코드를 입력해주세요.");
+    if (!confirm("관리자 코드를 변경하시겠습니까?")) return;
+
+    changeAdminCodeBtn.disabled = true;
+    changeAdminCodeBtn.textContent = "변경 중...";
+
+    const res = await callApi({
+      action: "updateAdminCodeSetting",
+      adminCode: oldCode, // 기존 세션값 대신 사용자가 직접 입력한 '현재 코드'를 검증용으로 전송
+      newAdminCode: newCode
+    });
+
+    changeAdminCodeBtn.disabled = false;
+    changeAdminCodeBtn.textContent = "코드 변경";
+
+    alert(res.message); // 성공 또는 검증 실패(기존 코드 불일치 등) 메시지 출력
+    
+    if (res.ok) {
+      sessionStorage.setItem("adminCode", newCode); 
+      getEl("oldAdminCodeInput").value = "";
+      getEl("newAdminCodeInput").value = "";
+    }
+  };
+}

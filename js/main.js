@@ -320,7 +320,19 @@ if (bottomAddBtn) {
 }
 
 // =========================
-// 관리자 이스터에그 (5번 연속 터치)
+// 관리자 권한 버튼 노출 로직
+// =========================
+const isAdmin = sessionStorage.getItem("isAdmin") === "true";
+if (isAdmin) {
+  const adminBtn = getEl("goAdminButton");
+  if (adminBtn) {
+    adminBtn.style.display = "flex";
+    adminBtn.onclick = () => movePage("admin.html"); // 비밀번호 입력 없이 다이렉트 이동
+  }
+}
+
+// =========================
+// 관리자 이스터에그 (3번 연속 터치)
 // =========================
 let adminClickCount = 0;
 let adminClickTimer = null;

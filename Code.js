@@ -187,8 +187,9 @@ function handleInit() {
 /************************************************
  * ACCOUNTS
  ************************************************/
-function login(mainName) {
+function login(mainName, password) {
   mainName = normalizeValue(mainName);
+  password = normalizeValue(password);
 
   if (!mainName) {
     return {
@@ -196,12 +197,25 @@ function login(mainName) {
       message: '본캐명을 입력해주세요.'
     };
   }
+  if (!password) return { ok: false, message: '비밀번호를 입력해주세요.' };
+
+  // [최고 관리자(마스터) 전용 계정]
+  if (mainName === '관리자' && password === '1108') {
+    const settings = getKeyValueMap(SHEET_NAMES.SETTINGS);
+    return {
+      ok: true,
+      accountId: '관리자',
+      mainName: '👑 마스터',
+      isAdmin: true,
+      adminCode: settings.ADMIN_CODE
+    };
+  }
 
   const sheet = getSheet(SHEET_NAMES.ACCOUNTS);
   const values = sheet.getDataRange().getValues();
 
   if (values.length < 2) {
-    return createAccount(sheet, mainName);
+    return createAccount(sheet, mainName, password);
   }
 
   const headers = values[0].map(v => String(v).trim());
@@ -210,6 +224,8 @@ function login(mainName) {
   const mainNameCol = headers.indexOf('main_name');
   const useYnCol = headers.indexOf('use_yn');
   const createdAtCol = headers.indexOf('created_at');
+  const adminYnCol = headers.indexOf('admin_yn');
+  const passwordCol = headers.indexOf('password');
 
   if (accountIdCol === -1 || mainNameCol === -1) {
     throw new Error('ACCOUNTS 헤더를 확인해주세요.');
@@ -218,6 +234,8 @@ function login(mainName) {
   for (let i = 1; i < values.length; i++) {
     const rowMainName = normalizeValue(values[i][mainNameCol]);
     const rowUseYn = useYnCol > -1 ? normalizeValue(values[i][useYnCol]).toUpperCase() : 'Y';
+    const rowAdminYn = adminYnCol > -1 ? normalizeValue(values[i][adminYnCol]).toUpperCase() : 'N';
+    const rowPassword = passwordCol > -1 ? normalizeValue(values[i][passwordCol]) : '';
 
     if (rowMainName !== mainName) continue;
 
@@ -227,24 +245,45 @@ function login(mainName) {
         message: '사용할 수 없는 계정입니다.'
       };
     }
+    
+    // 비밀번호 검증 로직
+    if (passwordCol > -1) {
+      if (rowPassword && rowPassword !== password) {
+        return { ok: false, message: '비밀번호가 일치하지 않습니다.' };
+      }
+      // 기존 유저인데 비밀번호가 등록되어 있지 않은 경우, 이번에 입력한 값으로 초기 세팅
+      if (!rowPassword) {
+        sheet.getRange(i + 1, passwordCol + 1).setValue(password);
+      }
+    }
 
-    return {
+    let response = {
       ok: true,
       accountId: values[i][accountIdCol],
-      mainName: rowMainName
+      mainName: rowMainName,
+      isAdmin: rowAdminYn === 'Y'
     };
+
+    if (rowAdminYn === 'Y') {
+      const settings = getKeyValueMap(SHEET_NAMES.SETTINGS);
+      response.adminCode = settings.ADMIN_CODE || '';
+    }
+
+    return response;
   }
 
-  return createAccount(sheet, mainName);
+  return createAccount(sheet, mainName, password);
 }
 
-function createAccount(sheet, mainName) {
+function createAccount(sheet, mainName, password) {
   const headers = sheet.getDataRange().getValues()[0].map(v => String(v).trim());
 
   const accountIdCol = headers.indexOf('account_id');
   const mainNameCol = headers.indexOf('main_name');
   const useYnCol = headers.indexOf('use_yn');
   const createdAtCol = headers.indexOf('created_at');
+  const adminYnCol = headers.indexOf('admin_yn');
+  const passwordCol = headers.indexOf('password');
 
   const row = new Array(headers.length).fill('');
   const accountId = 'ACC_' + Utilities.getUuid().slice(0, 8).toUpperCase();
@@ -253,6 +292,8 @@ function createAccount(sheet, mainName) {
   if (accountIdCol > -1) row[accountIdCol] = accountId;
   if (mainNameCol > -1) row[mainNameCol] = mainName;
   if (useYnCol > -1) row[useYnCol] = 'Y';
+  if (adminYnCol > -1) row[adminYnCol] = 'N';
+  if (passwordCol > -1) row[passwordCol] = password;
   if (createdAtCol > -1) row[createdAtCol] = createdAt;
 
   sheet.appendRow(row);
@@ -1099,6 +1140,25 @@ function validateAdminCode(adminCode) {
   }
 }
 
+function updateAdminCodeSetting(adminCode, newCode) {
+  validateAdminCode(adminCode); // 현재 코드로 권한 확인
+  const actualNewCode = normalizeValue(newCode);
+  if (!actualNewCode) return { ok: false, message: '새 코드를 입력해주세요.' };
+
+  const sheet = getSheet(SHEET_NAMES.SETTINGS);
+  const values = sheet.getDataRange().getValues();
+
+  for (let i = 1; i < values.length; i++) {
+    if (normalizeValue(values[i][0]) === 'ADMIN_CODE') {
+      sheet.getRange(i + 1, 2).setValue(actualNewCode);
+      return { ok: true, message: '관리자 코드가 성공적으로 변경되었습니다.' };
+    }
+  }
+
+  sheet.appendRow(['ADMIN_CODE', actualNewCode]);
+  return { ok: true, message: '관리자 코드가 등록되었습니다.' };
+}
+
 /************************************************
  * 라우팅
  ************************************************/
@@ -1117,7 +1177,7 @@ function doGet(e) {
         return outputJson(handleInit());
 
       case 'login':
-        return outputJson(login(e.parameter.mainName));
+        return outputJson(login(e.parameter.mainName, e.parameter.password));
 
       case 'getCharacters':
         return outputJson(getCharacters(e.parameter.accountId));
@@ -1213,6 +1273,9 @@ function doGet(e) {
 
       case 'updateCharacterByAdmin':
         return outputJson(updateCharacterByAdmin(e));
+
+      case 'updateAdminCodeSetting':
+        return outputJson(updateAdminCodeSetting(e.parameter.adminCode, e.parameter.newAdminCode));
 
       default:
         return outputJson({

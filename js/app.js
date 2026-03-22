@@ -1,6 +1,8 @@
 async function login() {
   const mainNameInput = getEl("mainName");
   const mainName = mainNameInput.value.trim();
+  const passwordInput = getEl("password");
+  const password = passwordInput ? passwordInput.value.trim() : "";
   const resultEl = getEl("loginResult");
 
   if (!mainName) {
@@ -8,11 +10,23 @@ async function login() {
     resultEl.classList.add("error");
     return;
   }
+  if (!password) {
+    resultEl.textContent = "비밀번호를 입력해주세요.";
+    resultEl.classList.add("error");
+    return;
+  }
 
   resultEl.textContent = "확인 중입니다...";
-  const data = await callApi({ action: "login", mainName });
+  const data = await callApi({ action: "login", mainName, password });
 
   if (data.ok) {
+    if (data.isAdmin) {
+      sessionStorage.setItem("isAdmin", "true");
+      if (data.adminCode) sessionStorage.setItem("adminCode", data.adminCode);
+    } else {
+      sessionStorage.removeItem("isAdmin");
+      sessionStorage.removeItem("adminCode");
+    }
     location.href = `./main.html?mainName=${encodeURIComponent(data.mainName)}&accountId=${data.accountId}`;
   } else {
     resultEl.textContent = data.message || "입장에 실패했습니다.";
@@ -21,7 +35,9 @@ async function login() {
 }
 
 getEl("loginButton").onclick = login;
-getEl("mainName").onkeydown = (e) => { if(e.key === "Enter") login(); };
+getEl("mainName").onkeydown = (e) => { if(e.key === "Enter") getEl("password").focus(); };
+const pwdEl = getEl("password");
+if (pwdEl) pwdEl.onkeydown = (e) => { if(e.key === "Enter") login(); };
 
 // =========================
 // 관리자 이스터에그 (5번 연속 터치)

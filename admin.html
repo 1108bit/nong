@@ -59,6 +59,21 @@
           <div class="card-head"><h2 class="section-title">등록된 일정 목록</h2></div>
           <div class="admin-list" id="scheduleList"></div>
         </article>
+
+      <article class="main-card admin-card-full">
+        <div class="card-head"><h2 class="section-title">보안 설정</h2></div>
+        <div class="form-group">
+          <label class="input-label">현재 관리자 코드</label>
+          <input type="password" id="oldAdminCodeInput" class="main-input" placeholder="현재 코드를 입력하세요" />
+        </div>
+        <div class="form-group">
+          <label class="input-label">새 관리자 코드</label>
+          <input type="text" id="newAdminCodeInput" class="main-input" placeholder="변경할 코드를 입력하세요" />
+        </div>
+        <div class="admin-action-row">
+          <button class="btn btn-primary" id="changeAdminCodeButton">코드 변경</button>
+        </div>
+      </article>
       </section>
     </div>
   </main>
