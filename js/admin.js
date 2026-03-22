@@ -66,21 +66,19 @@ function initDateChips() {
 function initTimeChips() {
   let html = "";
   for (let h = 12; h <= 24; h++) {
-    for (let m of ["00", "30"]) {
-      if (h === 24 && m === "30") continue; // 24:30은 존재하지 않으므로 건너뜀
-      
-      let displayH = h;
-      let ampm = "오전";
-      if (h >= 12 && h < 24) { ampm = "오후"; displayH = h === 12 ? 12 : h - 12; }
-      else if (h === 24) { ampm = "오전"; displayH = 12; }
-      
-      const valueH = h === 24 ? "00" : String(h).padStart(2, '0');
-      const dateVal = `${valueH}:${m}`;
-      const isSelected = dateVal === "21:00" ? "selected" : "";
-      
-      const appleDisplay = `<span style="font-size:11px; opacity:0.6; font-weight:700;">${ampm}</span><span style="font-size:16px; font-weight:900; margin-top:4px;">${displayH}:${m}</span>`;
-      html += `<button type="button" class="chip-btn date-chip ${isSelected}" data-value="${dateVal}">${appleDisplay}</button>`;
-    }
+    let m = "00"; // 1시간 단위
+    
+    let displayH = h;
+    let ampm = "오전";
+    if (h >= 12 && h < 24) { ampm = "오후"; displayH = h === 12 ? 12 : h - 12; }
+    else if (h === 24) { ampm = "오전"; displayH = 12; }
+    
+    const valueH = h === 24 ? "00" : String(h).padStart(2, '0');
+    const dateVal = `${valueH}:${m}`;
+    const isSelected = dateVal === "21:00" ? "selected" : "";
+    
+    const appleDisplay = `<span style="font-size:11px; opacity:0.6; font-weight:700;">${ampm}</span><span style="font-size:16px; font-weight:900; margin-top:4px;">${displayH}:${m}</span>`;
+    html += `<button type="button" class="chip-btn date-chip ${isSelected}" data-value="${dateVal}">${appleDisplay}</button>`;
   }
   
   const group1 = getEl("timeChipGroup");

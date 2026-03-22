@@ -47,21 +47,26 @@
               <div class="card-head"><h2 class="section-title">새 일정 등록</h2></div>
               <div class="admin-form-grid">
                 <div class="form-group" style="margin-bottom: 0;">
-                  <label class="input-label" style="margin-bottom: 8px; display: flex; align-items: center;">
-                    일자 선택
-                    <span style="font-size: 11px; color: var(--text-muted); opacity: 0.8; margin-left: 8px; font-weight: 500;">좌우로 스와이프 ↔</span>
-                  </label>
+                  <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                    <label class="input-label" style="margin: 0;">일자 선택</label>
+                    <div style="position: relative;">
+                      <button type="button" class="mini-btn">📅 직접 선택</button>
+                      <input type="date" id="calendarPicker" style="position: absolute; right: 0; top: 0; width: 100%; height: 100%; opacity: 0; cursor: pointer;" />
+                    </div>
+                  </div>
                   <div class="chip-select-group horizontal-scroll-chips" id="dateChipGroup" style="margin-top: 0;"></div>
                   <input type="hidden" id="dateInput" />
                   <input type="hidden" id="dayInput" />
                 </div>
                 <div class="form-group" style="margin-bottom: 0;">
-                  <label class="input-label" style="margin-bottom: 8px; display: flex; align-items: center;">
-                    시간 선택
-                    <span style="font-size: 11px; color: var(--text-muted); opacity: 0.8; margin-left: 8px; font-weight: 500;">좌우로 스와이프 ↔</span>
-                  </label>
+                  <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                    <label class="input-label" style="margin: 0;">시간 선택</label>
+                    <div style="position: relative;">
+                      <button type="button" class="mini-btn">⏰ 직접 선택</button>
+                      <input type="time" id="timeSlotInput" value="21:00" step="3600" style="position: absolute; right: 0; top: 0; width: 100%; height: 100%; opacity: 0; cursor: pointer;" />
+                    </div>
+                  </div>
                   <div class="chip-select-group horizontal-scroll-chips" id="timeChipGroup" data-target="timeSlotInput" style="margin-top: 0;"></div>
-                  <input type="hidden" id="timeSlotInput" value="21:00" />
                 </div>
                 <div class="form-group" style="grid-column: 1 / -1;">
                   <label class="input-label">메모 (선택)</label>
@@ -181,21 +186,26 @@
             
             <div class="admin-form-grid">
               <div class="form-group" style="margin-bottom: 0;">
-                <label class="input-label" style="margin-bottom: 8px; display: flex; align-items: center;">
-                  일자 변경
-                  <span style="font-size: 11px; color: var(--text-muted); opacity: 0.8; margin-left: 8px; font-weight: 500;">좌우로 스와이프 ↔</span>
-                </label>
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                  <label class="input-label" style="margin: 0;">일자 변경</label>
+                  <div style="position: relative;">
+                    <button type="button" class="mini-btn">📅 직접 선택</button>
+                    <input type="date" id="editCalendarPicker" style="position: absolute; right: 0; top: 0; width: 100%; height: 100%; opacity: 0; cursor: pointer;" />
+                  </div>
+                </div>
                 <div class="chip-select-group horizontal-scroll-chips" id="editDateChipGroup" style="margin-top: 0;"></div>
                 <input type="hidden" id="editDateInput" />
                 <input type="hidden" id="editDayInput" />
               </div>
               <div class="form-group" style="margin-bottom: 0;">
-                <label class="input-label" style="margin-bottom: 8px; display: flex; align-items: center;">
-                  시간 변경
-                  <span style="font-size: 11px; color: var(--text-muted); opacity: 0.8; margin-left: 8px; font-weight: 500;">좌우로 스와이프 ↔</span>
-                </label>
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                  <label class="input-label" style="margin: 0;">시간 변경</label>
+                  <div style="position: relative;">
+                    <button type="button" class="mini-btn">⏰ 직접 선택</button>
+                    <input type="time" id="editTimeSlotInput" value="21:00" step="3600" style="position: absolute; right: 0; top: 0; width: 100%; height: 100%; opacity: 0; cursor: pointer;" />
+                  </div>
+                </div>
                 <div class="chip-select-group horizontal-scroll-chips" id="editTimeChipGroup" data-target="editTimeSlotInput" style="margin-top: 0;"></div>
-                <input type="hidden" id="editTimeSlotInput" value="21:00" />
               </div>
               <div class="form-group" style="grid-column: 1 / -1;">
                 <label class="input-label">메모 변경</label>
