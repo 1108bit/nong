@@ -351,6 +351,12 @@ function editUserCharacter(accountId, originalName, className, type, power) {
 
   getEl("adminCharacterModal").classList.add("show");
   document.body.classList.add("modal-open");
+  
+  // 모달이 열릴 때 스크롤 너비 재계산(인디케이터 위치 갱신)
+  setTimeout(() => {
+    getEl("editDateChipGroup")?.dispatchEvent(new Event('scroll'));
+    getEl("editTimeChipGroup")?.dispatchEvent(new Event('scroll'));
+  }, 10);
 }
 
 function closeAdminModal() {
@@ -508,6 +514,28 @@ document.querySelectorAll('.chip-select-group').forEach(group => {
     });
 });
 
+// 스크롤 인디케이터 동기화 로직
+function syncScrollIndicator(scrollBoxId, indicatorId) {
+  const box = getEl(scrollBoxId);
+  const ind = getEl(indicatorId);
+  if (!box || !ind) return;
+  const dot = ind.querySelector('.scroll-indicator-dot');
+  if (!dot) return;
+
+  const updateDot = () => {
+    const maxScroll = box.scrollWidth - box.clientWidth;
+    if (maxScroll <= 0) {
+      dot.style.transform = `translateX(0px)`;
+      return;
+    }
+    const ratio = box.scrollLeft / maxScroll;
+    const moveX = ratio * (ind.clientWidth - dot.clientWidth);
+    dot.style.transform = `translateX(${moveX}px)`;
+  };
+  box.addEventListener('scroll', updateDot);
+  setTimeout(updateDot, 100);
+}
+
 // 동적으로 생성된 HTML(innerHTML)의 인라인 이벤트를 위한 전역 스코프 함수 노출
 window.toggleUserAdmin = toggleUserAdmin;
 window.resetUserPassword = resetUserPassword;
@@ -548,3 +576,8 @@ window.handleDrop = function(e) {
 };
 
 applyDragScroll();
+
+syncScrollIndicator("dateChipGroup", "dateScrollInd");
+syncScrollIndicator("timeChipGroup", "timeScrollInd");
+syncScrollIndicator("editDateChipGroup", "editDateScrollInd");
+syncScrollIndicator("editTimeChipGroup", "editTimeScrollInd");

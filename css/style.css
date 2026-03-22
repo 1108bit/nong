@@ -2498,7 +2498,7 @@ body.modal-open {
   background: #ffffff !important;
   color: #000000 !important;
   transform: scale(1.1) translateY(-2px) !important; /* 위로 살짝 띄우는 프리미엄 효과 */
-  box-shadow: 0 8px 20px rgba(255, 255, 255, 0.3) !important;
+  box-shadow: 0 4px 12px rgba(255, 255, 255, 0.15) !important;
   z-index: 10 !important;
   border-color: transparent !important;
 }
@@ -2507,7 +2507,26 @@ body.modal-open {
   opacity: 1 !important;
 }
 
-/* 5. 드래그 앤 드롭 상호작용 */
+/* 5. 스크롤 인디케이터 (Apple Style) */
+.scroll-indicator {
+  width: 36px;
+  height: 4px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 2px;
+  position: relative;
+  overflow: hidden;
+}
+.scroll-indicator-dot {
+  width: 12px;
+  height: 100%;
+  background: var(--cyan-1);
+  border-radius: 2px;
+  position: absolute;
+  left: 0;
+  top: 0;
+}
+
+/* 6. 드래그 앤 드롭 상호작용 */
 .drop-zone {
   transition: background 0.2s ease, border-color 0.2s ease;
 }
@@ -2519,7 +2538,7 @@ body.modal-open {
   cursor: grabbing !important;
 }
 
-/* 6. 스크롤 제어 */
+/* 7. 스크롤 제어 */
 .slim-scroll-list {
   max-height: 560px;
   overflow-y: auto;

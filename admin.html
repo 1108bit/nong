@@ -47,19 +47,19 @@
               <div class="card-head"><h2 class="section-title">새 일정 등록</h2></div>
               <div class="admin-form-grid">
                 <div class="form-group" style="margin-bottom: 0;">
-                  <label class="input-label" style="margin-bottom: 8px; display: flex; align-items: center;">
-                    일자 선택
-                    <span style="font-size: 11px; color: var(--text-muted); opacity: 0.8; margin-left: 8px; font-weight: 500;">좌우로 스와이프 ↔</span>
-                  </label>
+                  <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                    <label class="input-label" style="margin: 0;">일자 선택</label>
+                    <div class="scroll-indicator" id="dateScrollInd"><div class="scroll-indicator-dot"></div></div>
+                  </div>
                   <div class="chip-select-group horizontal-scroll-chips" id="dateChipGroup" style="margin-top: 0;"></div>
                   <input type="hidden" id="dateInput" />
                   <input type="hidden" id="dayInput" />
                 </div>
                 <div class="form-group" style="margin-bottom: 0;">
-                  <label class="input-label" style="margin-bottom: 8px; display: flex; align-items: center;">
-                    시간 선택
-                    <span style="font-size: 11px; color: var(--text-muted); opacity: 0.8; margin-left: 8px; font-weight: 500;">좌우로 스와이프 ↔</span>
-                  </label>
+                  <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                    <label class="input-label" style="margin: 0;">시간 선택</label>
+                    <div class="scroll-indicator" id="timeScrollInd"><div class="scroll-indicator-dot"></div></div>
+                  </div>
                   <div class="chip-select-group horizontal-scroll-chips" id="timeChipGroup" data-target="timeSlotInput" style="margin-top: 0;"></div>
                   <input type="hidden" id="timeSlotInput" value="21:00" />
                 </div>
@@ -181,19 +181,19 @@
             
             <div class="admin-form-grid">
               <div class="form-group" style="margin-bottom: 0;">
-                <label class="input-label" style="margin-bottom: 8px; display: flex; align-items: center;">
-                  일자 변경
-                  <span style="font-size: 11px; color: var(--text-muted); opacity: 0.8; margin-left: 8px; font-weight: 500;">좌우로 스와이프 ↔</span>
-                </label>
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                  <label class="input-label" style="margin: 0;">일자 변경</label>
+                  <div class="scroll-indicator" id="editDateScrollInd"><div class="scroll-indicator-dot"></div></div>
+                </div>
                 <div class="chip-select-group horizontal-scroll-chips" id="editDateChipGroup" style="margin-top: 0;"></div>
                 <input type="hidden" id="editDateInput" />
                 <input type="hidden" id="editDayInput" />
               </div>
               <div class="form-group" style="margin-bottom: 0;">
-                <label class="input-label" style="margin-bottom: 8px; display: flex; align-items: center;">
-                  시간 변경
-                  <span style="font-size: 11px; color: var(--text-muted); opacity: 0.8; margin-left: 8px; font-weight: 500;">좌우로 스와이프 ↔</span>
-                </label>
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                  <label class="input-label" style="margin: 0;">시간 변경</label>
+                  <div class="scroll-indicator" id="editTimeScrollInd"><div class="scroll-indicator-dot"></div></div>
+                </div>
                 <div class="chip-select-group horizontal-scroll-chips" id="editTimeChipGroup" data-target="editTimeSlotInput" style="margin-top: 0;"></div>
                 <input type="hidden" id="editTimeSlotInput" value="21:00" />
               </div>
