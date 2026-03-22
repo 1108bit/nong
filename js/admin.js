@@ -1,3 +1,9 @@
+// 페이지 진입 시 즉각적인 권한 검사 (비정상 접근 원천 차단)
+if (sessionStorage.getItem("isAdmin") !== "true" || !getAdminCode()) {
+  alert("관리자 권한이 필요합니다.");
+  location.replace("index.html");
+}
+
 // 날짜 칩 자동 생성 로직 (오늘부터 14일)
 function initDateChips() {
   const group = getEl("dateChipGroup");
@@ -40,7 +46,7 @@ function initDateChips() {
 
 async function loadAdminSchedule() {
   const adminCode = getAdminCode();
-  if (!adminCode) return movePage("admin-login.html");
+  if (!adminCode) return movePage("index.html");
   
   // 마스터 계정이 아니면 보안 설정 카드 숨김
   if (getAccountId() !== 'MASTER_ADMIN') {
@@ -53,7 +59,7 @@ async function loadAdminSchedule() {
     callApi({ action: "getAvailabilitySummary" })
   ]);
 
-  if (!scheduleData.ok) return movePage("admin-login.html");
+  if (!scheduleData.ok) return movePage("index.html");
   if (!summaryData.ok) return alert("참여 현황을 가져오는데 실패했습니다.");
 
   const list = getEl("scheduleList");
