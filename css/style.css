@@ -155,14 +155,13 @@ a {
 .main-card {
   position: relative;
   overflow: hidden;
-  background:
-    linear-gradient(180deg, rgba(10, 22, 36, 0.92) 0%, rgba(14, 29, 46, 0.94) 100%);
-  border: 1px solid var(--line-1);
+  background: linear-gradient(180deg, rgba(12, 22, 34, 0.8) 0%, rgba(16, 28, 42, 0.85) 100%);
+  border: 1px solid rgba(255, 255, 255, 0.04);
   border-radius: var(--radius-lg);
   padding: 18px 16px;
-  box-shadow: var(--shadow-1);
-  backdrop-filter: blur(14px);
-  -webkit-backdrop-filter: blur(14px);
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.2);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
 }
 
 .main-card::before {
@@ -1154,7 +1153,7 @@ a {
 ========================= */
 #scheduleList {
   flex: 1;
-  max-height: 500px;
+  max-height: 560px;
   overflow-y: auto;
   padding-right: 6px;
   scrollbar-width: thin;
@@ -1492,7 +1491,9 @@ body.modal-open {
   justify-content: center;
 
   padding: 16px 12px;
-  background: rgba(2, 6, 23, 0.58);
+  background: rgba(2, 6, 23, 0.65);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
 
   opacity: 0;
   pointer-events: none;
@@ -1512,10 +1513,11 @@ body.modal-open {
   border-radius: 28px 28px 20px 20px;
   padding: 28px 16px 16px;
 
-  background:
-    linear-gradient(180deg, rgba(10, 22, 36, 0.98) 0%, rgba(14, 29, 46, 0.98) 100%);
-  border: 1px solid rgba(141, 189, 235, 0.14);
-  box-shadow: 0 24px 48px rgba(0, 0, 0, 0.38);
+  background: rgba(14, 26, 40, 0.85);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: 0 24px 48px rgba(0, 0, 0, 0.4);
+  backdrop-filter: blur(24px) saturate(180%);
+  -webkit-backdrop-filter: blur(24px) saturate(180%);
 
   transform: translateY(18px);
   transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); /* 쫀득한 스프링 팝 애니메이션 */
@@ -1630,32 +1632,32 @@ body.modal-open {
 .chip-btn {
   position: relative; /* z-index 적용을 위해 필수 */
   cursor: pointer;
-  opacity: 0.4;
+  opacity: 0.6;
   filter: grayscale(0.8);
   transition: all 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-  border-width: 1px;
-  border-style: solid;
-  padding: 8px 14px;
+  border: none;
+  background: rgba(255, 255, 255, 0.06);
+  padding: 6px 14px;
   font-size: 13px;
-  border-radius: 12px;
-  font-weight: 700;
+  border-radius: 999px; /* 애플 스타일 알약 칩 */
+  font-weight: 600;
   color: var(--text-muted);
 }
 
 .chip-btn:hover {
-  z-index: 5;
+  background: rgba(255, 255, 255, 0.1);
 }
 
 .chip-btn.selected {
   opacity: 1;
   filter: grayscale(0);
-  background: rgba(67, 217, 255, 0.15); /* 선택 시 은은한 배경색 추가 */
+  background: rgba(67, 217, 255, 0.12);
   transform: scale(1.05) !important;
-  border-color: var(--cyan-1) !important;
-  box-shadow: 0 0 15px rgba(67, 217, 255, 0.4), 0 6px 14px rgba(0, 0, 0, 0.25) !important;
+  border: 1px solid rgba(67, 217, 255, 0.4) !important;
+  box-shadow: none !important; /* 과도한 네온 제거 */
   z-index: 5;
   color: #fff;
-  font-weight: 900;
+  font-weight: 800;
 }
 
 .chip-btn:disabled {
@@ -1671,6 +1673,18 @@ body.modal-open {
     right: auto;
     width: min(560px, calc(100% - 24px));
     transform: translateX(-50%);
+  }
+  
+  /* 모달 PC 화면 시 중앙 팝업 느낌 강화 */
+  .modal-overlay {
+    align-items: center;
+  }
+  .modal-sheet {
+    border-radius: 24px;
+    transform: scale(0.95) translateY(0);
+  }
+  .modal-overlay.show .modal-sheet {
+    transform: scale(1) translateY(0);
   }
 }
 
@@ -2112,7 +2126,9 @@ body.modal-open {
 .availability-item:active,
 .party-slot-btn:active,
 .character-card:active,
-.admin-card-item:active {
+.admin-list-row:active,
+.icon-btn:active,
+.chip-btn:active {
   transform: scale(0.96) !important;
   transition: transform 0.1s ease !important; /* 쫀득하고 빠른 클릭 반응 */
 }

@@ -36,13 +36,13 @@
             <div class="form-group">
               <label class="input-label">시간 선택</label>
               <div style="display: flex; gap: 10px; align-items: center;">
-                <input type="text" id="timeSlotInput" class="main-input" value="21:00" maxlength="5" style="width: 100px; flex-shrink: 0; text-align: center; font-weight: 900; font-size: 16px;" />
-                <div class="chip-select-group horizontal-scroll-chips" data-target="timeSlotInput" style="margin-top: 0;">
-                  <button type="button" class="chip-btn" data-value="20:00">20:00</button>
+                <div style="display: flex; align-items: center; background: rgba(255,255,255,0.05); border-radius: 12px; padding: 0 12px; height: 42px; border: 1px solid rgba(255,255,255,0.08);">
+                  <span style="font-size: 14px; margin-right: 6px; opacity: 0.8;">⏰</span>
+                  <input type="time" id="timeSlotInput" value="21:00" style="background: transparent; border: none; color: var(--text-main); font-weight: 800; font-size: 15px; outline: none; color-scheme: dark; font-family: inherit;" />
+                </div>
+                <div class="chip-select-group horizontal-scroll-chips" data-target="timeSlotInput" style="margin-top: 0; padding-bottom: 0 !important; padding-top: 0 !important;">
                   <button type="button" class="chip-btn selected" data-value="21:00">21:00</button>
-                  <button type="button" class="chip-btn" data-value="21:30">21:30</button>
                   <button type="button" class="chip-btn" data-value="22:00">22:00</button>
-                  <button type="button" class="chip-btn" data-value="23:00">23:00</button>
                 </div>
               </div>
             </div>
@@ -183,13 +183,13 @@
             <div class="form-group">
               <label class="input-label">시간 변경</label>
               <div style="display: flex; gap: 10px; align-items: center;">
-                <input type="text" id="editTimeSlotInput" class="main-input" maxlength="5" style="width: 100px; flex-shrink: 0; text-align: center; font-weight: 900; font-size: 16px;" />
-                <div class="chip-select-group horizontal-scroll-chips" data-target="editTimeSlotInput" style="margin-top: 0;">
-                  <button type="button" class="chip-btn" data-value="20:00">20:00</button>
+                <div style="display: flex; align-items: center; background: rgba(255,255,255,0.05); border-radius: 12px; padding: 0 12px; height: 42px; border: 1px solid rgba(255,255,255,0.08);">
+                  <span style="font-size: 14px; margin-right: 6px; opacity: 0.8;">⏰</span>
+                  <input type="time" id="editTimeSlotInput" value="21:00" style="background: transparent; border: none; color: var(--text-main); font-weight: 800; font-size: 15px; outline: none; color-scheme: dark; font-family: inherit;" />
+                </div>
+                <div class="chip-select-group horizontal-scroll-chips" data-target="editTimeSlotInput" style="margin-top: 0; padding-bottom: 0 !important; padding-top: 0 !important;">
                   <button type="button" class="chip-btn" data-value="21:00">21:00</button>
-                  <button type="button" class="chip-btn" data-value="21:30">21:30</button>
                   <button type="button" class="chip-btn" data-value="22:00">22:00</button>
-                  <button type="button" class="chip-btn" data-value="23:00">23:00</button>
                 </div>
               </div>
             </div>

@@ -110,13 +110,17 @@ async function loadAdminSchedule() {
     return `
       <div class="admin-list-row ${riskClass}">
         <div class="row-info-group">
-          <div class="row-time">
+          <div class="row-time" style="width: 90px;">
             <span class="row-date">${shortDate} (${i.day})</span>
             <span class="row-hhmm">${timeFormatted}</span>
           </div>
           <div class="row-badges">
-            <span class="row-badge ${count >= 8 ? 'good' : (count > 0 ? 'warn' : '')}">👤 ${count}</span>
-            <span class="row-badge ${hasHealer ? 'good' : 'warn'}">❤️ ${hasHealer ? 'O' : '<del style="opacity:0.6;">X</del>'}</span>
+            <span class="row-badge" style="background: ${count >= 8 ? 'rgba(16, 185, 129, 0.15)' : 'rgba(234, 179, 8, 0.15)'}; color: ${count >= 8 ? '#a7f3d0' : '#fef08a'};">
+              <span class="ui-dot ${count >= 8 ? 'green' : 'gold'}" style="margin-right: 4px;"></span> 👤 ${count}명
+            </span>
+            <span class="row-badge" style="background: ${hasHealer ? 'rgba(16, 185, 129, 0.15)' : 'rgba(244, 63, 94, 0.15)'}; color: ${hasHealer ? '#a7f3d0' : '#fecdd3'};">
+              <span class="ui-dot ${hasHealer ? 'green' : 'red'}" style="margin-right: 4px;"></span> ❤️ ${hasHealer ? 'O' : 'X'}
+            </span>
           </div>
           ${i.note ? `<div class="row-note" title="${escapeHtml(i.note)}">${escapeHtml(i.note)}</div>` : ''}
         </div>
