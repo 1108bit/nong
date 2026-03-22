@@ -899,75 +899,68 @@ function getMainData(accountId) {
 /************************************************
  * PARTY
  ************************************************/
+/**
+ * [업데이트] 지능형 파티 분배 알고리즘 (2026 아이온 2 최적화)
+ * 1. 치유성(Healer)을 각 파티에 우선적으로 1명씩 분배
+ * 2. 나머지 인원을 전투력 내림차순 정렬 후 스네이크(1->2->2->1) 방식으로 배분
+ */
 function getPartyComposition(weekKey, day, timeSlot) {
-  // 해당 시간대 참여자 조회
   const summary = getAvailabilitySummary(weekKey).items
     .filter(item => normalizeValue(item.day) === normalizeValue(day))
     .filter(item => normalizeValue(item.time_slot) === normalizeValue(timeSlot));
 
-  // 계정별 최고 전투력 캐릭터만 선택
   const byAccount = {};
   summary.forEach(item => {
     const key = normalizeValue(item.account_id);
     if (!key) return;
-
-    if (!byAccount[key]) {
-      byAccount[key] = item;
-      return;
-    }
-
-    const prev = byAccount[key];
-    const currentPower = Number(item.power_value || 0);
-    const prevPower = Number(prev.power_value || 0);
-
-    if (currentPower > prevPower) {
+    if (!byAccount[key] || Number(item.power_value || 0) > Number(byAccount[key].power_value || 0)) {
       byAccount[key] = item;
     }
   });
 
-  const candidates = Object.keys(byAccount).map(key => byAccount[key]);
+  const candidates = Object.values(byAccount);
+  const healers = candidates.filter(c => c.className === ROLE.HEALER)
+    .sort((a, b) => b.power_value - a.power_value);
+  const others = candidates.filter(c => c.className !== ROLE.HEALER)
+    .sort((a, b) => b.power_value - a.power_value);
 
-  // 정렬: 치유성 우선, 다음은 전투력 높은순
-  candidates.sort((a, b) => {
-    const aHeal = a.className === ROLE.HEALER ? 1 : 0;
-    const bHeal = b.className === ROLE.HEALER ? 1 : 0;
-    if (aHeal !== bHeal) return bHeal - aHeal;
-    return Number(b.power_value || 0) - Number(a.power_value || 0);
-  });
-
-  // 파티 분배: 균등하게 배분, 최대 4명씩
   const party1 = [];
   const party2 = [];
 
-  candidates.forEach(item => {
-    if (party1.length <= party2.length) {
+  // 1. 치유성 분배 (1파티 우선 순차 배분)
+  healers.forEach((h, idx) => {
+    if (idx % 2 === 0 && party1.length < PARTY_SIZE) party1.push(h);
+    else if (party2.length < PARTY_SIZE) party2.push(h);
+  });
+
+  // 2. 나머지 인원 스네이크 배분 (균형 유지)
+  let toParty1 = party1.length <= party2.length;
+  others.forEach(member => {
+    if (toParty1) {
       if (party1.length < PARTY_SIZE) {
-        party1.push(item);
+        party1.push(member);
+        if (party2.length < PARTY_SIZE) toParty1 = false;
       } else if (party2.length < PARTY_SIZE) {
-        party2.push(item);
+        party2.push(member);
       }
     } else {
       if (party2.length < PARTY_SIZE) {
-        party2.push(item);
+        party2.push(member);
+        if (party1.length < PARTY_SIZE) toParty1 = true;
       } else if (party1.length < PARTY_SIZE) {
-        party1.push(item);
+        party1.push(member);
       }
     }
   });
-
-  const totalCount = party1.length + party2.length;
-  const highPowerCount = candidates.filter(i => Number(i.power_value || 0) >= 400).length;
-  const hasHeal = candidates.some(i => i.className === ROLE.HEALER);
-  const party2HasHeal = party2.some(i => i.className === ROLE.HEALER);
 
   return {
     ok: true,
     party1,
     party2,
-    totalCount,
-    highPowerCount,
-    hasHeal,
-    party2HasHeal
+    totalCount: party1.length + party2.length,
+    highPowerCount: candidates.filter(i => Number(i.power_value || 0) >= 400).length,
+    hasHeal: party1.some(i => i.className === ROLE.HEALER),
+    party2HasHeal: party2.some(i => i.className === ROLE.HEALER)
   };
 }
 
