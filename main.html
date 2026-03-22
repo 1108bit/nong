@@ -4,188 +4,100 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>NoStepBack - 메인</title>
-
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link
-    href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;800;900&display=swap"
-    rel="stylesheet"
-  />
-
   <link rel="stylesheet" href="./css/style.css" />
 </head>
 <body>
   <div class="bg-logo"></div>
   <div class="bg-dim"></div>
-
   <main class="app-page">
     <div class="main-shell">
       <section class="main-header-hero">
         <div class="main-hero-bg"></div>
-
         <div class="main-hero-top">
           <div>
             <div class="main-eyebrow">AION2 · GUILD MANAGER</div>
             <h1 class="main-page-title">NoStepBack</h1>
-            <p class="main-page-desc">길드 시간 선택, 파티 조합, 일정 운영을 한 번에 관리합니다</p>
+            <p class="main-page-desc">길드 일정과 캐릭터를 관리합니다</p>
           </div>
-
-          <button type="button" class="btn btn-secondary header-btn" id="logoutButton">로그아웃</button>
-        </div>
-
-        <div class="main-hero-logo-wrap">
-          <img src="./images/logo_main1.png" alt="NoStepBack 로고" class="main-hero-logo" />
+          <button type="button" class="btn btn-secondary" id="logoutButton">로그아웃</button>
         </div>
       </section>
 
       <section class="main-grid">
         <article class="main-card">
-          <div class="card-head">
-            <h2 class="section-title">내 정보</h2>
-          </div>
-
+          <div class="card-head"><h2 class="section-title">내 정보</h2></div>
           <div class="info-list">
-            <div class="info-row">
-              <span class="info-label">본캐명</span>
-              <strong class="info-value" id="accountMainName">-</strong>
-            </div>
-
-            <div class="info-row">
-              <span class="info-label">캐릭터 수</span>
-              <strong class="info-value" id="characterCount">0</strong>
-            </div>
-
-            <div class="info-row">
-              <span class="info-label">선택 시간</span>
-              <strong class="info-value" id="selectedCount">0개</strong>
-            </div>
-
-            <div class="info-row">
-              <span class="info-label">주간 참여</span>
-              <strong class="info-value" id="weeklyRunCount">0 / 2</strong>
-            </div>
-          </div>
-        </article>
-
-        <article class="main-card">
-          <div class="card-head">
-            <h2 class="section-title">빠른 요약</h2>
-            <div class="mini-guide">현재 선택 흐름 기준</div>
-          </div>
-
-          <div class="summary-list">
-            <div class="summary-item summary-accent">
-              <div class="summary-title">추천 시간</div>
-              <div class="summary-main" id="bestTimeText">추천 없음</div>
-              <div class="summary-sub">치유와 인원이 균형 잡힌 시간대</div>
-            </div>
-
-            <div class="summary-item">
-              <div class="summary-title">부족 시간</div>
-              <div class="summary-main" id="weakTimeText">부족 없음</div>
-              <div class="summary-sub">추가 인원 보강이 필요한 시간대</div>
-            </div>
+            <div class="info-row"><span class="info-label">본캐명</span><strong class="info-value" id="accountMainName">-</strong></div>
+            <div class="info-row"><span class="info-label">캐릭터 수</span><strong class="info-value" id="characterCount">0</strong></div>
+            <div class="info-row"><span class="info-label">선택 시간</span><strong class="info-value" id="selectedCount">0개</strong></div>
           </div>
         </article>
 
         <article class="main-card">
           <div class="card-head">
             <h2 class="section-title">내 캐릭터</h2>
-            <button type="button" class="mini-btn" id="addCharacterButton">캐릭터 추가</button>
+            <button type="button" class="mini-btn" id="addCharacterButton">추가</button>
           </div>
-
           <div class="character-list" id="characterList">
             <div class="character-empty">불러오는 중...</div>
           </div>
         </article>
 
         <article class="main-card">
-          <div class="card-head">
-            <h2 class="section-title">빠른 이동</h2>
-          </div>
-
+          <div class="card-head"><h2 class="section-title">빠른 이동</h2></div>
           <div class="quick-menu">
             <button type="button" class="btn btn-primary" id="goAvailabilityButton">시간 선택</button>
             <button type="button" class="btn btn-secondary" id="goPartyButton">조합 보기</button>
-            <button type="button" class="btn btn-secondary" id="goAdminButton">일정 관리</button>
           </div>
         </article>
       </section>
     </div>
 
     <div class="bottom-action-bar">
-      <button type="button" class="bottom-action-btn primary" id="bottomAvailabilityButton">
-        <span class="bottom-action-label">시간 선택</span>
-      </button>
-
-      <button type="button" class="bottom-action-btn" id="bottomPartyButton">
-        <span class="bottom-action-label">조합 보기</span>
-      </button>
-
-      <button type="button" class="bottom-action-btn accent" id="bottomAddCharacterButton">
-        <span class="bottom-action-label">캐릭터 추가</span>
-      </button>
+      <button class="bottom-action-btn primary" onclick="movePage('availability.html')">시간 선택</button>
+      <button class="bottom-action-btn" onclick="movePage('party.html')">조합 보기</button>
+      <button class="bottom-action-btn accent" id="bottomAddBtn">캐릭터 추가</button>
     </div>
 
     <div class="modal-overlay" id="characterModal">
       <div class="modal-sheet">
         <div class="modal-head">
-          <div>
-            <div class="modal-eyebrow">CHARACTER</div>
-            <h3 class="modal-title">캐릭터 추가</h3>
-            <p class="modal-desc">길드원 캐릭터 정보를 등록합니다</p>
-          </div>
-
-          <button type="button" class="modal-close-btn" id="closeCharacterModalButton">닫기</button>
+          <h3 class="modal-title">캐릭터 추가</h3>
+          <button class="modal-close-btn" id="closeCharacterModalButton">닫기</button>
         </div>
-
         <div class="modal-form">
           <div class="form-group">
-            <label class="input-label" for="modalCharacterName">캐릭터명</label>
-            <input type="text" id="modalCharacterName" class="main-input" placeholder="예: 수댕치유" />
+            <label class="input-label">캐릭터명</label>
+            <input type="text" id="modalCharacterName" class="main-input" placeholder="캐릭터명 입력" />
           </div>
-
           <div class="form-group">
-            <label class="input-label" for="modalCharacterClass">클래스</label>
+            <label class="input-label">클래스</label>
             <select id="modalCharacterClass" class="character-select">
-              <option value="">클래스 선택</option>
-              <option value="검성">검성</option>
-              <option value="수호성">수호성</option>
-              <option value="살성">살성</option>
-              <option value="궁성">궁성</option>
-              <option value="마도성">마도성</option>
-              <option value="정령성">정령성</option>
-              <option value="치유성">치유성</option>
-              <option value="호법성">호법성</option>
+              <option value="검성">검성</option><option value="수호성">수호성</option>
+              <option value="살성">살성</option><option value="궁성">궁성</option>
+              <option value="마도성">마도성</option><option value="정령성">정령성</option>
+              <option value="치유성">치유성</option><option value="호법성">호법성</option>
             </select>
           </div>
-
           <div class="modal-grid">
             <div class="form-group">
-              <label class="input-label" for="modalCharacterType">타입</label>
-              <select id="modalCharacterType" class="character-select">
-                <option value="본캐">본캐</option>
-                <option value="부캐" selected>부캐</option>
-              </select>
+              <label class="input-label">타입</label>
+              <select id="modalCharacterType" class="character-select"><option value="본캐">본캐</option><option value="부캐" selected>부캐</option></select>
             </div>
-
             <div class="form-group">
-              <label class="input-label" for="modalCharacterPower">전투력</label>
-              <input type="number" id="modalCharacterPower" class="main-input" placeholder="예: 412" />
+              <label class="input-label">전투력</label>
+              <input type="number" id="modalCharacterPower" class="main-input" placeholder="예: 400" />
             </div>
           </div>
-
-          <div class="page-message" id="characterModalMessage">입력 후 등록 버튼 눌러주세요.</div>
-
           <div class="modal-action-row">
-            <button type="button" class="btn btn-secondary" id="cancelCharacterButton">취소</button>
-            <button type="button" class="btn btn-primary" id="submitCharacterButton">등록</button>
+            <button class="btn btn-secondary" id="cancelCharacterButton">취소</button>
+            <button class="btn btn-primary" id="submitCharacterButton">등록하기</button>
           </div>
         </div>
       </div>
     </div>
   </main>
-
+  <script src="./js/common.js"></script>
   <script src="./js/main.js"></script>
 </body>
 </html>

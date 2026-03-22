@@ -4,54 +4,37 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>NoStepBack - 로그인</title>
-
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link
-    href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;800;900&display=swap"
-    rel="stylesheet"
-  />
-
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;800;900&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="./css/style.css" />
 </head>
 <body>
   <div class="bg-logo"></div>
   <div class="bg-dim"></div>
-
   <main class="page">
     <div class="login-shell">
       <section class="login-brand">
-        <div class="brand-badge" id="eyebrowText">AION2</div>
-        <h1 class="brand-title" id="siteTitle">NoStepBack</h1>
-        <p class="brand-sub" id="noticeText">레이드 플래너.</p>
+        <div class="brand-badge">AION2</div>
+        <h1 class="brand-title">NoStepBack</h1>
+        <p class="brand-sub">레이드 플래너에 오신 것을 환영합니다.</p>
       </section>
-
       <section class="login-card">
         <div class="login-head">
-          <h2 class="login-title" id="loginTitle">길드 입장</h2>
-          <p class="login-desc" id="loginDesc">본캐명을 입력하고 입장해주세요.</p>
+          <h2 class="login-title">길드 입장</h2>
+          <p class="login-desc">본캐명을 입력하고 입장해주세요.</p>
         </div>
-
         <div class="form-group">
-          <label class="input-label" for="mainName" id="mainNameLabel">본캐명</label>
-          <input
-            type="text"
-            id="mainName"
-            class="main-input"
-            placeholder="본캐명을 입력해주세요"
-            autocomplete="off"
-          />
+          <label class="input-label" for="mainName">본캐명</label>
+          <input type="text" id="mainName" class="main-input" placeholder="본캐명을 입력해주세요" autocomplete="off" />
         </div>
-
         <button type="button" class="main-button" id="loginButton">입장하기</button>
-
-        <div class="page-message" id="loginResult">불러오는 중입니다...</div>
+        <div class="page-message" id="loginResult">본캐명을 입력해주세요.</div>
       </section>
-
-      <p class="copyright-text" id="footerNote">© 농[젠카]. All Rights Reserved.</p>
+      <p class="copyright-text">© NoStepBack. All Rights Reserved.</p>
     </div>
   </main>
-
+  <script src="./js/common.js"></script>
   <script src="./js/app.js"></script>
 </body>
 </html>

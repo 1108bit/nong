@@ -4,121 +4,38 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>NoStepBack - 조합 보기</title>
-
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link
-    href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;800;900&display=swap"
-    rel="stylesheet"
-  />
-
   <link rel="stylesheet" href="./css/style.css" />
 </head>
 <body>
   <div class="bg-logo"></div>
   <div class="bg-dim"></div>
-
   <main class="app-page">
     <div class="main-shell">
       <section class="main-header-hero">
-        <div class="main-hero-bg"></div>
-
         <div class="main-hero-top">
-          <div>
-            <div class="main-eyebrow">AION2 · PARTY</div>
-            <h1 class="main-page-title">조합 보기</h1>
-            <p class="main-page-desc">시간별 인원과 추천 파티 구성을 한눈에 확인합니다</p>
-          </div>
-
-          <button type="button" class="btn btn-secondary header-btn" id="backButton">메인으로</button>
+          <h1 class="main-page-title">조합 보기</h1>
+          <button class="btn btn-secondary" id="backButton">메인으로</button>
         </div>
       </section>
-
       <section class="main-grid party-grid">
         <article class="main-card party-card-full">
-          <div class="card-head">
-            <h2 class="section-title">시간 선택</h2>
-            <button type="button" class="btn btn-secondary party-refresh-btn" id="refreshButton">지금 상태 보기</button>
-          </div>
-
-          <div class="page-message" id="pageMessage">불러오는 중...</div>
-
+          <div class="card-head"><h2 class="section-title">시간대 선택</h2></div>
           <div class="party-summary-list" id="summaryGrid">
-            <div class="availability-empty">불러오는 중...</div>
+            <div class="availability-empty">집계 데이터를 불러오는 중...</div>
           </div>
         </article>
-
         <article class="main-card">
-          <div class="card-head">
-            <h2 class="section-title">현재 상태</h2>
-            <div class="mini-guide">선택한 시간 기준</div>
-          </div>
-
-          <div class="summary-list">
-            <div class="summary-item summary-accent">
-              <div class="summary-title">선택 시간</div>
-              <div class="summary-main" id="statusTime">선택 전</div>
-              <div class="summary-sub" id="statusDesc">시간을 먼저 선택해주세요</div>
-            </div>
-          </div>
-
-          <div class="info-list" style="margin-top: 12px;">
-            <div class="info-row">
-              <span class="info-label">판단</span>
-              <strong class="info-value" id="statusClear">-</strong>
-            </div>
-
-            <div class="info-row">
-              <span class="info-label">추천 인원</span>
-              <strong class="info-value" id="statusPicked">0</strong>
-            </div>
-
-            <div class="info-row">
-              <span class="info-label">400+ 인원</span>
-              <strong class="info-value" id="status400">0</strong>
-            </div>
-
-            <div class="info-row">
-              <span class="info-label">전체 치유</span>
-              <strong class="info-value" id="statusHeal">0</strong>
-            </div>
-
-            <div class="info-row">
-              <span class="info-label">2파티 치유</span>
-              <strong class="info-value" id="statusParty2Heal">-</strong>
-            </div>
-          </div>
-
-          <div class="quick-menu single-action">
-            <button type="button" class="btn btn-primary" id="autoMatchButton">지금 조합 보기</button>
-          </div>
+          <div class="card-head"><h2 class="section-title">1파티</h2><div id="party1Badges"></div></div>
+          <div class="party-member-list" id="party1List"></div>
         </article>
-
         <article class="main-card">
-          <div class="card-head">
-            <h2 class="section-title">1파티</h2>
-            <div class="party-badges" id="party1Badges"></div>
-          </div>
-
-          <div class="party-member-list" id="party1List">
-            <div class="availability-empty">시간을 먼저 선택해주세요.</div>
-          </div>
-        </article>
-
-        <article class="main-card">
-          <div class="card-head">
-            <h2 class="section-title">2파티</h2>
-            <div class="party-badges" id="party2Badges"></div>
-          </div>
-
-          <div class="party-member-list" id="party2List">
-            <div class="availability-empty">조합 결과가 여기에 표시됩니다.</div>
-          </div>
+          <div class="card-head"><h2 class="section-title">2파티</h2><div id="party2Badges"></div></div>
+          <div class="party-member-list" id="party2List"></div>
         </article>
       </section>
     </div>
   </main>
-
+  <script src="./js/common.js"></script>
   <script src="./js/party.js"></script>
 </body>
 </html>
