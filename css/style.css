@@ -1149,6 +1149,18 @@ a {
   color: var(--cyan-2);
 }
 
+/* =========================
+   스크롤 가능한 일정 목록 (Compact View)
+========================= */
+#scheduleList {
+  max-height: 400px;
+  overflow-y: auto;
+  padding-right: 6px;
+  scrollbar-width: thin;
+}
+#scheduleList::-webkit-scrollbar { width: 6px; }
+#scheduleList::-webkit-scrollbar-thumb { background: rgba(138, 188, 233, 0.2); border-radius: 4px; }
+
 .user-search-result-box {
   padding: 16px;
   border-radius: 18px;

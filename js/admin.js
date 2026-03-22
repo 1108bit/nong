@@ -110,17 +110,21 @@ async function loadAdminSchedule() {
     return `
       <div class="admin-card-item ${riskClass}">
         <div class="admin-card-top">
-          <div class="admin-card-time">${shortDate} (${i.day}) <span style="margin-left: 4px; font-size: 1.1em; color: var(--cyan-1);">${timeFormatted}</span></div>
-          <div class="admin-status-chip ${i.open_yn === 'Y' ? 'open' : 'closed'}">${i.open_yn === 'Y' ? '열림' : '닫힘'}</div>
+          <div style="display: flex; align-items: center; gap: 8px;">
+            <div class="admin-card-time">${shortDate} (${i.day}) <span style="font-size: 1.1em; color: var(--cyan-1);">${timeFormatted}</span></div>
+            <div class="admin-status-chip ${i.open_yn === 'Y' ? 'open' : 'closed'}">${i.open_yn === 'Y' ? '열림' : '닫힘'}</div>
+          </div>
+          <div class="admin-card-actions">
+            <button class="mini-btn edit-btn" data-date="${escapeHtml(i.date)}" data-day="${escapeHtml(i.day)}" data-time="${escapeHtml(timeFormatted)}" data-note="${escapeHtml(i.note)}">수정</button>
+            <button class="mini-btn danger delete-btn" data-date="${escapeHtml(i.date)}" data-day="${escapeHtml(i.day)}" data-time="${escapeHtml(timeFormatted)}">삭제</button>
+          </div>
         </div>
-        <div class="admin-card-note">
-          인원: <strong style="color:${count >= 8 ? '#a7f3d0' : (count > 0 ? '#fb7185' : 'var(--text-sub)')}">${count}명</strong> | 치유성: ${hasHealer ? "✅" : "❌"}
+        <div class="admin-card-meta" style="display: flex; align-items: center; margin-top: 0;">
+          👥 인원: <strong style="color:${count >= 8 ? '#a7f3d0' : (count > 0 ? '#fb7185' : 'var(--text-sub)')}">${count}명</strong> 
+          <span style="margin: 0 6px; opacity: 0.3;">|</span> 
+          💚 치유성: ${hasHealer ? "✅" : "❌"}
         </div>
-        <div class="admin-card-note">${escapeHtml(i.note)}</div>
-        <div class="admin-card-actions">
-          <button class="mini-btn edit-btn" data-date="${escapeHtml(i.date)}" data-day="${escapeHtml(i.day)}" data-time="${escapeHtml(timeFormatted)}" data-note="${escapeHtml(i.note)}">수정</button>
-          <button class="mini-btn danger delete-btn" data-date="${escapeHtml(i.date)}" data-day="${escapeHtml(i.day)}" data-time="${escapeHtml(timeFormatted)}">삭제</button>
-        </div>
+        ${i.note ? `<div class="admin-card-note">${escapeHtml(i.note)}</div>` : ''}
       </div>
     `;
   }).join("");
@@ -405,3 +409,5 @@ document.querySelectorAll('.chip-select-group').forEach(group => {
 window.toggleUserAdmin = toggleUserAdmin;
 window.resetUserPassword = resetUserPassword;
 window.editUserCharacter = editUserCharacter;
+window.editSchedule = editSchedule;
+window.deleteSchedule = deleteSchedule;
