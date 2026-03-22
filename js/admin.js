@@ -62,19 +62,25 @@ function initDateChips() {
   }
 }
 
-// 캘린더 아이콘 날짜 선택 연동
-const customDateInput = getEl("customDateInput");
-if (customDateInput) {
-    customDateInput.addEventListener("change", (e) => {
-        const selectedDate = e.target.value;
-        if (selectedDate) {
-            const d = new Date(selectedDate);
-            const days = ["일", "월", "화", "수", "목", "금", "토"];
-            getEl("dateInput").value = selectedDate;
-            getEl("dayInput").value = days[d.getDay()];
-            document.querySelectorAll("#dateChipGroup .chip-btn").forEach(b => b.classList.remove("selected"));
-        }
+// 달력 아이콘 클릭 시 실제 input[type=date] 팝업 호출 (모바일/PC 네이티브 호환)
+const openCalBtn = getEl("openCalendar");
+const calPicker = getEl("calendarPicker");
+if (openCalBtn && calPicker) {
+  openCalBtn.onclick = () => {
+    if (typeof calPicker.showPicker === 'function') calPicker.showPicker();
+  };
+  calPicker.onchange = (e) => {
+    const val = e.target.value; // YYYY-MM-DD
+    if (!val) return;
+    const d = new Date(val);
+    const days = ["일", "월", "화", "수", "목", "금", "토"];
+    getEl("dateInput").value = val;
+    getEl("dayInput").value = days[d.getDay()];
+    // 선택된 날짜와 일치하는 칩이 있다면 강조, 없으면 모두 해제
+    document.querySelectorAll("#dateChipGroup .chip-btn").forEach(b => {
+      b.classList.toggle("selected", b.dataset.date === val);
     });
+  };
 }
 
 // 구글 시트의 ISO 8601 시간 오차(1899-12-30T...)를 완벽히 필터링하는 함수
