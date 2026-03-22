@@ -64,12 +64,13 @@ function movePage(url) {
   location.href = url;
 }
 
-// 숫자를 전투력 구간 텍스트로 변환하는 함수 ("100K ~ 150K")
+// 숫자를 전투력 구간 텍스트로 변환하는 함수 ("100<span class='unit-k'>K</span> ~ 150<span class='unit-k'>K</span>")
 function getPowerRange(power) {
   const p = Number(power) || 0;
-  if (p < 100) return "100K 미만";
-  if (p >= 500) return "500K 이상";
+  const kUnit = '<span class="unit-k">K</span>';
+  if (p < 100) return `100${kUnit} 미만`;
+  if (p >= 500) return `500${kUnit} 이상`;
   const start = Math.floor(p / 50) * 50;
   const end = start + 50;
-  return `${start}K ~ ${end}K`;
+  return `${start}${kUnit} ~ ${end}${kUnit}`;
 }
