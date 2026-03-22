@@ -24,7 +24,7 @@ async function loadPartySummary() {
   target.innerHTML = data.items.map(i => `
     <button type="button" class="party-slot-btn" data-day="${escapeHtml(i.day)}" data-time="${escapeHtml(i.time_slot)}">
       <div class="party-slot-time">${escapeHtml(i.day)} ${escapeHtml(i.time_slot)}</div>
-      <div class="party-slot-foot">눌러서 이 시간 조합 확인</div>
+      <div class="party-slot-foot">조합 상세 보기 ➔</div>
     </button>
   `).join("");
   
