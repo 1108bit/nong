@@ -18,9 +18,17 @@ function setPlaceholder(id, value) {
   }
 }
 
-function setMessage(message, isError = false) {
+function setMessage(message, isError = false, mode = "loading") {
+  if (!loginResult) return;
+
   loginResult.textContent = message || "";
-  loginResult.classList.toggle("error", isError);
+  loginResult.classList.remove("loading", "success", "error");
+
+  if (isError) {
+    loginResult.classList.add("error");
+  } else {
+    loginResult.classList.add(mode);
+  }
 }
 
 async function callApi(params) {
@@ -31,6 +39,8 @@ async function callApi(params) {
 
 async function initPage() {
   try {
+    setMessage("불러오는 중입니다...", false, "loading");
+
     const data = await callApi({ action: "init" });
 
     if (!data.ok) {
@@ -58,6 +68,8 @@ async function initPage() {
         `url("${image.IMG_LOGO.url}")`
       );
     }
+
+    setMessage("본캐명을 입력해주세요.", false, "success");
   } catch (error) {
     console.error(error);
     setMessage("초기 데이터를 불러오지 못했습니다.", true);
@@ -73,7 +85,7 @@ async function login() {
     return;
   }
 
-  setMessage("확인 중입니다...");
+  setMessage("확인 중입니다...", false, "loading");
 
   try {
     const data = await callApi({
@@ -85,6 +97,8 @@ async function login() {
       setMessage(data.message || "입장에 실패했습니다.", true);
       return;
     }
+
+    setMessage("입장 중입니다...", false, "success");
 
     location.href = `./main.html?mainName=${encodeURIComponent(data.mainName || mainName)}&accountId=${encodeURIComponent(data.accountId || "")}`;
   } catch (error) {

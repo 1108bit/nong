@@ -12,12 +12,18 @@ function getAccountId() {
   return getParams().get("accountId") || "";
 }
 
-function setMessage(message, isError = false) {
+function setMessage(message, isError = false, mode = "loading") {
   const el = document.getElementById("loginMessage");
   if (!el) return;
 
   el.textContent = message || "";
-  el.classList.toggle("error", isError);
+  el.classList.remove("loading", "success", "error");
+
+  if (isError) {
+    el.classList.add("error");
+  } else {
+    el.classList.add(mode);
+  }
 }
 
 async function callApi(params) {
@@ -35,7 +41,7 @@ async function loginAdmin() {
   }
 
   try {
-    setMessage("확인 중입니다...");
+    setMessage("확인 중입니다...", false, "loading");
 
     const data = await callApi({
       action: "adminLogin",
@@ -46,6 +52,8 @@ async function loginAdmin() {
       setMessage(data.message || "관리자 확인에 실패했습니다.", true);
       return;
     }
+
+    setMessage("입장 중입니다...", false, "success");
 
     const mainName = encodeURIComponent(getMainName());
     const accountId = encodeURIComponent(getAccountId());
@@ -71,3 +79,5 @@ document.getElementById("backButton").addEventListener("click", () => {
   const accountId = encodeURIComponent(getAccountId());
   location.href = `./main.html?mainName=${mainName}&accountId=${accountId}`;
 });
+
+setMessage("관리자 코드 입력 후 진행해주세요.", false, "success");

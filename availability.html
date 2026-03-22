@@ -8,31 +8,37 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link
-    href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;800&display=swap"
+    href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;800;900&display=swap"
     rel="stylesheet"
   />
 
   <link rel="stylesheet" href="./css/style.css" />
 </head>
 <body>
-  <main class="page">
+  <div class="bg-logo"></div>
+  <div class="bg-dim"></div>
+
+  <main class="app-page">
     <div class="main-shell">
+      <section class="main-header-hero">
+        <div class="main-hero-bg"></div>
 
-      <header class="main-header">
-        <div>
-          <div class="main-eyebrow">AION2</div>
-          <h1 class="main-page-title">시간 선택</h1>
-          <p class="main-page-desc">가능한 시간을 고르면 바로 반영됩니다</p>
+        <div class="main-hero-top">
+          <div>
+            <div class="main-eyebrow">AION2 · AVAILABILITY</div>
+            <h1 class="main-page-title">시간 선택</h1>
+            <p class="main-page-desc">가능한 시간만 눌러두면 바로 저장됩니다</p>
+          </div>
+
+          <button type="button" class="btn btn-secondary header-btn" id="backButton">메인으로</button>
         </div>
-
-        <button class="btn btn-secondary header-btn" id="backButton">메인으로</button>
-      </header>
+      </section>
 
       <section class="main-grid availability-grid">
-
-        <!-- 상단 요약 -->
         <article class="main-card">
-          <h2 class="section-title">내 상태</h2>
+          <div class="card-head">
+            <h2 class="section-title">내 상태</h2>
+          </div>
 
           <div class="info-list">
             <div class="info-row">
@@ -53,24 +59,43 @@
 
           <div class="availability-top-actions">
             <select id="characterSelect" class="character-select"></select>
-            <button class="btn btn-secondary" id="refreshButton">지금 상태 보기</button>
+            <button type="button" class="btn btn-secondary" id="refreshButton">지금 상태 보기</button>
           </div>
 
           <div class="page-message" id="pageMessage">불러오는 중...</div>
         </article>
 
-        <!-- 시간 목록 -->
+        <article class="main-card">
+          <div class="card-head">
+            <h2 class="section-title">빠른 요약</h2>
+            <div class="mini-guide">현재 선택 흐름 기준</div>
+          </div>
+
+          <div class="summary-list">
+            <div class="summary-item summary-accent">
+              <div class="summary-title">추천 시간</div>
+              <div class="summary-main" id="bestTimeText">-</div>
+              <div class="summary-sub" id="bestTimeSub">추천 시간 계산 중</div>
+            </div>
+
+            <div class="summary-item">
+              <div class="summary-title">부족한 시간</div>
+              <div class="summary-main" id="weakTimeText">-</div>
+              <div class="summary-sub" id="weakTimeSub">부족 시간 계산 중</div>
+            </div>
+          </div>
+        </article>
+
         <article class="main-card availability-card-full">
           <div class="card-head">
             <h2 class="section-title">이번 주 시간</h2>
-            <div class="mini-guide">추천 / 부족 / 과밀 상태를 바로 확인할 수 있습니다</div>
+            <div class="mini-guide">추천 / 무난 / 부족 / 과밀 상태 표시</div>
           </div>
 
           <div class="availability-list" id="availabilityList">
             <div class="availability-empty">불러오는 중...</div>
           </div>
         </article>
-
       </section>
     </div>
   </main>

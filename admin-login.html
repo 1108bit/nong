@@ -8,28 +8,37 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link
-    href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;800&display=swap"
+    href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;800;900&display=swap"
     rel="stylesheet"
   />
 
   <link rel="stylesheet" href="./css/style.css" />
 </head>
 <body>
-  <main class="page">
-    <div class="main-shell">
-      <header class="main-header">
-        <div>
-          <div class="main-eyebrow">AION2</div>
-          <h1 class="main-page-title">일정 관리</h1>
-          <p class="main-page-desc">운영진 전용 화면입니다</p>
-        </div>
+  <div class="bg-logo"></div>
+  <div class="bg-dim"></div>
 
-        <button class="btn btn-secondary header-btn" id="backButton">메인으로</button>
-      </header>
+  <main class="app-page">
+    <div class="main-shell">
+      <section class="main-header-hero">
+        <div class="main-hero-bg"></div>
+
+        <div class="main-hero-top">
+          <div>
+            <div class="main-eyebrow">AION2 · ADMIN</div>
+            <h1 class="main-page-title">일정 관리</h1>
+            <p class="main-page-desc">운영진 전용 인증 화면입니다</p>
+          </div>
+
+          <button type="button" class="btn btn-secondary header-btn" id="backButton">메인으로</button>
+        </div>
+      </section>
 
       <section class="main-grid">
         <article class="main-card">
-          <h2 class="section-title">관리자 확인</h2>
+          <div class="card-head">
+            <h2 class="section-title">관리자 확인</h2>
+          </div>
 
           <div class="form-group">
             <label class="input-label" for="adminCode">관리자 코드</label>
@@ -43,8 +52,8 @@
             />
           </div>
 
-          <button class="main-button" id="loginButton">확인하기</button>
-          <div class="result" id="loginMessage"></div>
+          <button type="button" class="main-button" id="loginButton">확인하기</button>
+          <div class="page-message" id="loginMessage">관리자 코드 입력 후 진행해주세요.</div>
         </article>
       </section>
     </div>

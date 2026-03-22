@@ -6,6 +6,7 @@ let scheduleItems = [];
 let summaryItems = [];
 let selectedMap = new Set();
 let refreshTimer = null;
+let isSaving = false;
 
 /* =========================
    공통
@@ -38,12 +39,18 @@ function makeKey(day, time) {
   return `${day}__${time}`;
 }
 
-function setMessage(message, isError = false) {
+function setMessage(message, isError = false, mode = "loading") {
   const el = document.getElementById("pageMessage");
   if (!el) return;
 
   el.textContent = message || "";
-  el.classList.toggle("error", isError);
+  el.classList.remove("loading", "success", "error");
+
+  if (isError) {
+    el.classList.add("error");
+  } else {
+    el.classList.add(mode);
+  }
 }
 
 function setText(id, value) {
@@ -60,6 +67,29 @@ function escapeHtml(value) {
     .replaceAll(">", "&gt;")
     .replaceAll('"', "&quot;")
     .replaceAll("'", "&#39;");
+}
+
+function renderAvailabilitySkeleton() {
+  const target = document.getElementById("availabilityList");
+  if (!target) return;
+
+  target.innerHTML = `
+    <div class="skeleton-list">
+      <div class="skeleton-block skeleton-card tall"></div>
+      <div class="skeleton-block skeleton-card tall"></div>
+      <div class="skeleton-block skeleton-card tall"></div>
+    </div>
+  `;
+}
+
+function applyTouchPopToAvailability() {
+  document.querySelectorAll(".availability-item, .btn, .main-button").forEach(el => {
+    el.addEventListener("click", () => {
+      el.classList.remove("touch-pop");
+      void el.offsetWidth;
+      el.classList.add("touch-pop");
+    });
+  });
 }
 
 /* =========================
@@ -169,10 +199,11 @@ function renderCharacterOptions() {
   }
 
   select.innerHTML = characterItems.map(item => {
-    const name = escapeHtml(item.name || "");
+    const rawName = item.name || "";
+    const name = escapeHtml(rawName);
     const type = escapeHtml(item.type || "-");
     const className = escapeHtml(item.className || "클래스 미입력");
-    return `<option value="${name}">${name} (${type} / ${className})</option>`;
+    return `<option value="${escapeHtml(rawName)}">${name} (${type} / ${className})</option>`;
   }).join("");
 
   setText("selectedCharacterText", getSelectedCharacterName() || "-");
@@ -213,7 +244,7 @@ function getHighPowerCount(items) {
 function getStatusInfo(realCount, healerCount) {
   if (realCount >= 9) {
     return {
-      text: "사람 많음",
+      text: "과밀",
       className: "crowded"
     };
   }
@@ -249,7 +280,7 @@ function getBestTime() {
     const highPowerCount = getHighPowerCount(slotItems);
 
     slotMap.set(key, {
-      label: `${item.date || ""} ${item.day} ${item.time_slot}`.trim(),
+      label: `${item.date || ""} ${item.day || ""} ${item.time_slot || ""}`.trim(),
       realCount,
       healerCount,
       highPowerCount
@@ -259,8 +290,11 @@ function getBestTime() {
   const list = Array.from(slotMap.values());
 
   list.sort((a, b) => {
-    if ((a.realCount >= 6 && a.healerCount > 0) !== (b.realCount >= 6 && b.healerCount > 0)) {
-      return (b.realCount >= 6 && b.healerCount > 0) - (a.realCount >= 6 && a.healerCount > 0);
+    const aRecommended = a.realCount >= 6 && a.healerCount > 0;
+    const bRecommended = b.realCount >= 6 && b.healerCount > 0;
+
+    if (aRecommended !== bRecommended) {
+      return Number(bRecommended) - Number(aRecommended);
     }
     if (a.realCount !== b.realCount) return b.realCount - a.realCount;
     if (a.healerCount !== b.healerCount) return b.healerCount - a.healerCount;
@@ -280,7 +314,7 @@ function getWeakTime() {
     const healerCount = getHealerCount(slotItems);
 
     slotMap.set(key, {
-      label: `${item.date || ""} ${item.day} ${item.time_slot}`.trim(),
+      label: `${item.date || ""} ${item.day || ""} ${item.time_slot || ""}`.trim(),
       realCount,
       healerCount
     });
@@ -294,6 +328,30 @@ function getWeakTime() {
   });
 
   return list[0] || null;
+}
+
+function renderSummaryCards() {
+  const best = getBestTime();
+  const weak = getWeakTime();
+
+  if (best) {
+    setText("bestTimeText", best.label || "-");
+    setText(
+      "bestTimeSub",
+      `실인원 ${best.realCount}명 · 치유 ${best.healerCount} · 400+ ${best.highPowerCount}`
+    );
+  } else {
+    setText("bestTimeText", "-");
+    setText("bestTimeSub", "추천 시간 계산 불가");
+  }
+
+  if (weak) {
+    setText("weakTimeText", weak.label || "-");
+    setText("weakTimeSub", `실인원 ${weak.realCount}명 · 치유 ${weak.healerCount}`);
+  } else {
+    setText("weakTimeText", "-");
+    setText("weakTimeSub", "부족 시간 계산 불가");
+  }
 }
 
 /* =========================
@@ -338,11 +396,13 @@ function renderAvailabilityList() {
 
     const lines = [
       `<div class="availability-item-top">`,
+      `<div>`,
       `<div class="availability-time">${escapeHtml(item.date || "")} ${escapeHtml(item.day || "")} ${escapeHtml(item.time_slot || "")}</div>`,
-      `<div class="availability-status ${status.className}">${status.text}</div>`,
-      `</div>`,
       `<div class="availability-meta">실인원 ${realCount}명 · 등록 ${charCount}개</div>`,
-      `<div class="availability-meta">치유 ${healerCount} · 400+ ${highPowerCount}</div>`
+      `<div class="availability-meta">치유 ${healerCount} · 400+ ${highPowerCount}</div>`,
+      `</div>`,
+      `<div class="availability-status ${status.className}">${status.text}</div>`,
+      `</div>`
     ];
 
     if (item.note) {
@@ -350,9 +410,9 @@ function renderAvailabilityList() {
     }
 
     if (isSelected) {
-      lines.push(`<div class="availability-foot selected">선택됨</div>`);
+      lines.push(`<div class="availability-foot selected">선택됨 · 다시 누르면 해제</div>`);
     } else {
-      lines.push(`<div class="availability-foot">선택 시 ${expectedCount}명</div>`);
+      lines.push(`<div class="availability-foot">선택 시 예상 실인원 ${expectedCount}명</div>`);
     }
 
     return `
@@ -368,6 +428,7 @@ function renderAvailabilityList() {
   }).join("");
 
   bindSlotEvents();
+  applyTouchPopToAvailability();
 }
 
 /* =========================
@@ -396,7 +457,8 @@ async function saveAvailability() {
     }));
 
   try {
-    setMessage("반영 중입니다...");
+    isSaving = true;
+    setMessage("저장 중입니다...", false, "loading");
 
     const data = await callApi({
       action: "saveAvailability",
@@ -415,11 +477,14 @@ async function saveAvailability() {
 
     await loadSummary();
     updateTopInfo();
+    renderSummaryCards();
     renderAvailabilityList();
-    setMessage("반영되었습니다.");
+    setMessage("저장되었습니다.", false, "success");
   } catch (error) {
     console.error(error);
     setMessage("저장 중 문제가 발생했습니다.", true);
+  } finally {
+    isSaving = false;
   }
 }
 
@@ -430,16 +495,17 @@ async function saveAvailability() {
 async function refreshPage(showMessage = true) {
   try {
     if (showMessage) {
-      setMessage("지금 상태를 다시 불러오는 중입니다...");
+      setMessage("최신 상태를 다시 불러오는 중입니다...", false, "loading");
     }
 
     await loadSummary();
     await loadAvailability();
     updateTopInfo();
+    renderSummaryCards();
     renderAvailabilityList();
 
     if (showMessage) {
-      setMessage("최신 상태로 반영되었습니다.");
+      setMessage("최신 상태로 반영되었습니다.", false, "success");
     }
   } catch (error) {
     console.error(error);
@@ -454,6 +520,8 @@ async function refreshPage(showMessage = true) {
 function bindSlotEvents() {
   document.querySelectorAll(".availability-item").forEach(btn => {
     btn.addEventListener("click", async () => {
+      if (isSaving) return;
+
       const day = btn.dataset.day;
       const time = btn.dataset.time;
       const key = makeKey(day, time);
@@ -475,11 +543,12 @@ function bindEvents() {
   document.getElementById("characterSelect").addEventListener("change", async () => {
     try {
       setText("selectedCharacterText", getSelectedCharacterName() || "-");
-      setMessage("캐릭터 기준으로 다시 불러오는 중입니다...");
+      setMessage("캐릭터 기준으로 다시 불러오는 중입니다...", false, "loading");
       await loadAvailability();
       updateTopInfo();
+      renderSummaryCards();
       renderAvailabilityList();
-      setMessage("불러왔습니다.");
+      setMessage("불러왔습니다.", false, "success");
     } catch (error) {
       console.error(error);
       setMessage("캐릭터 정보를 반영하지 못했습니다.", true);
@@ -504,7 +573,8 @@ function bindEvents() {
 async function initPage() {
   try {
     updateTopInfo();
-    setMessage("불러오는 중입니다...");
+    renderAvailabilitySkeleton();
+    setMessage("불러오는 중입니다...", false, "loading");
 
     await loadWeekKey();
     await loadCharacters();
@@ -513,17 +583,18 @@ async function initPage() {
     await loadAvailability();
 
     updateTopInfo();
+    renderSummaryCards();
     renderAvailabilityList();
 
     const best = getBestTime();
     const weak = getWeakTime();
 
     if (!scheduleItems.length) {
-      setMessage("이번 주에 열린 일정이 없습니다.");
+      setMessage("이번 주에 열린 일정이 없습니다.", false, "success");
     } else if (best && weak) {
-      setMessage(`추천 시간: ${best.label} / 부족한 시간: ${weak.label}`);
+      setMessage(`추천 시간 ${best.label} · 부족 시간 ${weak.label}`, false, "success");
     } else {
-      setMessage("시간을 선택하면 바로 반영됩니다.");
+      setMessage("시간을 선택하면 바로 저장됩니다.", false, "success");
     }
 
     if (refreshTimer) {

@@ -8,31 +8,38 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link
-    href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;800&display=swap"
+    href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;800;900&display=swap"
     rel="stylesheet"
   />
 
   <link rel="stylesheet" href="./css/style.css" />
 </head>
 <body>
-  <main class="page">
+  <div class="bg-logo"></div>
+  <div class="bg-dim"></div>
+
+  <main class="app-page">
     <div class="main-shell">
+      <section class="main-header-hero">
+        <div class="main-hero-bg"></div>
 
-      <header class="main-header">
-        <div>
-          <div class="main-eyebrow">AION2</div>
-          <h1 class="main-page-title">일정 관리</h1>
-          <p class="main-page-desc">주간 일정 열기, 닫기, 수정</p>
+        <div class="main-hero-top">
+          <div>
+            <div class="main-eyebrow">AION2 · ADMIN PANEL</div>
+            <h1 class="main-page-title">일정 관리</h1>
+            <p class="main-page-desc">주간 일정 등록, 수정, 오픈 상태를 한 번에 관리합니다</p>
+          </div>
+
+          <button type="button" class="btn btn-secondary header-btn" id="backButton">메인으로</button>
         </div>
-
-        <button class="btn btn-secondary header-btn" id="backButton">메인으로</button>
-      </header>
+      </section>
 
       <section class="main-grid admin-grid">
-
-        <!-- 입력 -->
         <article class="main-card admin-card-full">
-          <h2 class="section-title">일정 입력</h2>
+          <div class="card-head">
+            <h2 class="section-title">일정 입력</h2>
+            <div class="mini-guide">수정 후 저장하면 바로 반영됩니다</div>
+          </div>
 
           <div class="admin-form-grid">
             <div class="form-group">
@@ -47,7 +54,7 @@
 
             <div class="form-group">
               <label class="input-label" for="dayInput">요일</label>
-              <select class="main-input" id="dayInput">
+              <select class="character-select" id="dayInput">
                 <option value="수">수</option>
                 <option value="목">목</option>
                 <option value="금">금</option>
@@ -65,7 +72,7 @@
 
             <div class="form-group">
               <label class="input-label" for="openYnInput">열림 여부</label>
-              <select class="main-input" id="openYnInput">
+              <select class="character-select" id="openYnInput">
                 <option value="Y">열림</option>
                 <option value="N">닫힘</option>
               </select>
@@ -73,7 +80,7 @@
 
             <div class="form-group">
               <label class="input-label" for="statusInput">상태</label>
-              <select class="main-input" id="statusInput">
+              <select class="character-select" id="statusInput">
                 <option value="OPEN">OPEN</option>
                 <option value="FINAL">FINAL</option>
                 <option value="CLOSED">CLOSED</option>
@@ -92,19 +99,20 @@
           </div>
 
           <div class="admin-action-row">
-            <button class="btn btn-primary" id="saveButton">저장</button>
-            <button class="btn btn-secondary" id="refreshButton">지금 상태 보기</button>
+            <button type="button" class="btn btn-primary" id="saveButton">저장</button>
+            <button type="button" class="btn btn-secondary" id="refreshButton">지금 상태 보기</button>
           </div>
 
-          <div class="page-message" id="adminMessage"></div>
+          <div class="page-message" id="adminMessage">주간 일정을 불러오는 중입니다.</div>
         </article>
 
-        <!-- 현황 -->
         <article class="main-card">
-          <h2 class="section-title">이번 주 현황</h2>
+          <div class="card-head">
+            <h2 class="section-title">이번 주 현황</h2>
+          </div>
 
           <div class="summary-list">
-            <div class="summary-item">
+            <div class="summary-item summary-accent">
               <div class="summary-title">열린 일정</div>
               <div class="summary-main" id="openCountText">0개</div>
               <div class="summary-sub">현재 유저에게 보이는 일정 수</div>
@@ -118,18 +126,16 @@
           </div>
         </article>
 
-        <!-- 목록 -->
         <article class="main-card admin-card-full">
           <div class="card-head">
             <h2 class="section-title">일정 목록</h2>
-            <div class="mini-guide">수정이 필요한 일정은 목록에서 바로 반영 가능합니다</div>
+            <div class="mini-guide">목록에서 수정 대상 확인 후 다시 입력하면 됩니다</div>
           </div>
 
           <div class="admin-list" id="scheduleList">
             <div class="availability-empty">불러오는 중...</div>
           </div>
         </article>
-
       </section>
     </div>
   </main>
