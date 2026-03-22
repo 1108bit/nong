@@ -7,9 +7,9 @@ async function loadPartySummary() {
   // 로딩 중 스켈레톤 UI 표시
   if (target) {
     target.innerHTML = `
-      <div class="party-slot-btn skeleton" style="height:82px; margin-bottom:10px;"></div>
-      <div class="party-slot-btn skeleton" style="height:82px; margin-bottom:10px;"></div>
-      <div class="party-slot-btn skeleton" style="height:82px; margin-bottom:10px;"></div>
+      <div class="skeleton-block skeleton-card" style="margin-bottom:10px;"></div>
+      <div class="skeleton-block skeleton-card" style="margin-bottom:10px;"></div>
+      <div class="skeleton-block skeleton-card" style="margin-bottom:10px;"></div>
     `;
   }
 
@@ -37,8 +37,8 @@ async function loadPartySummary() {
 async function showComposition(day, time) {
     // 파티 구성 분석 중 스켈레톤 UI 표시
     const skeletonHtml = `
-        <div class="party-member-card skeleton" style="height:74px; margin-bottom:8px;"></div>
-        <div class="party-member-card skeleton" style="height:74px; margin-bottom:8px;"></div>
+        <div class="skeleton-block skeleton-card" style="margin-bottom:8px;"></div>
+        <div class="skeleton-block skeleton-card" style="margin-bottom:8px;"></div>
     `;
     getEl("party1List").innerHTML = skeletonHtml;
     getEl("party2List").innerHTML = skeletonHtml;

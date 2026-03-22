@@ -14,8 +14,8 @@ async function loadMain() {
   const list = getEl("characterList");
   // 데이터를 가져오기 전 가짜 카드를 보여줌
   list.innerHTML = `
-    <div class="character-card skeleton" style="height:86px; margin-bottom:10px;"></div>
-    <div class="character-card skeleton" style="height:86px; margin-bottom:10px;"></div>
+    <div class="skeleton-block skeleton-card" style="margin-bottom:10px;"></div>
+    <div class="skeleton-block skeleton-card" style="margin-bottom:10px;"></div>
   `;
 
   const data = await callApi({ action: "getMainData", accountId });
@@ -351,7 +351,7 @@ let adminClickTimer = null;
 
 const adminSecretBtn = getEl("adminSecretBtn");
 if (adminSecretBtn) {
-  adminSecretBtn.addEventListener("click", () => {
+  adminSecretBtn.addEventListener("click", async () => {
     adminClickCount++;
     clearTimeout(adminClickTimer);
     // 1초 내에 이어서 누르지 않으면 횟수 초기화
@@ -359,7 +359,17 @@ if (adminSecretBtn) {
     
     if (adminClickCount >= 3) {
       adminClickCount = 0;
-      movePage("admin-login.html"); // 3번 누르면 관리자 로그인 화면으로 이동
+      const code = prompt("마스터 계정으로 전환합니다. 관리자 코드를 입력하세요.");
+      if (!code) return;
+
+      const res = await callApi({ action: "adminLogin", adminCode: code });
+      if (res.ok) {
+        sessionStorage.setItem("isAdmin", "true");
+        sessionStorage.setItem("adminCode", code);
+        location.href = `./main.html?mainName=${encodeURIComponent('👑 마스터')}&accountId=MASTER_ADMIN`;
+      } else {
+        alert("관리자 코드가 일치하지 않습니다.");
+      }
     }
   });
 }

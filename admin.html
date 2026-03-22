@@ -61,21 +61,6 @@
         </article>
 
       <article class="main-card admin-card-full">
-        <div class="card-head"><h2 class="section-title">마스터 계정 설정</h2></div>
-        <div class="form-group">
-          <label class="input-label">현재 마스터 비밀번호</label>
-          <input type="password" id="oldMasterPwdInput" class="main-input" placeholder="현재 비밀번호" />
-        </div>
-        <div class="form-group">
-          <label class="input-label">새 마스터 비밀번호</label>
-          <input type="password" id="newMasterPwdInput" class="main-input" placeholder="변경할 4자리 숫자" maxlength="4" />
-        </div>
-        <div class="admin-action-row">
-          <button class="btn btn-primary" id="changeMasterPwdBtn">마스터 비밀번호 변경</button>
-        </div>
-      </article>
-
-      <article class="main-card admin-card-full">
         <div class="card-head"><h2 class="section-title">보안 설정</h2></div>
         <div class="form-group">
           <label class="input-label">현재 관리자 코드</label>
@@ -90,6 +75,53 @@
         </div>
       </article>
       </section>
+
+      <!-- 유저 캐릭터 편집 모달 -->
+      <div class="modal-overlay" id="adminCharacterModal">
+        <div class="modal-sheet">
+          <div class="modal-head">
+            <h3 class="modal-title">유저 캐릭터 편집</h3>
+            <button class="modal-close-btn" id="closeAdminModalButton">닫기</button>
+          </div>
+          <div class="modal-form">
+            <input type="hidden" id="adminModalAccountId" />
+            <input type="hidden" id="adminModalOriginalName" />
+            <div class="form-group">
+              <label class="input-label">캐릭터명</label>
+              <input type="text" id="adminModalCharacterName" class="main-input" placeholder="캐릭터명 입력" />
+            </div>
+            <div class="form-group">
+              <label class="input-label">클래스</label>
+              <select id="adminModalCharacterClass" class="character-select">
+                <option value="검성">검성</option><option value="수호성">수호성</option>
+                <option value="살성">살성</option><option value="궁성">궁성</option>
+                <option value="마도성">마도성</option><option value="정령성">정령성</option>
+                <option value="치유성">치유성</option><option value="호법성">호법성</option>
+              </select>
+            </div>
+            <div class="modal-grid">
+              <div class="form-group">
+                <label class="input-label">타입</label>
+                <select id="adminModalCharacterType" class="character-select"><option value="본캐">본캐</option><option value="부캐">부캐</option></select>
+              </div>
+              <div class="form-group">
+                <label class="input-label">전투력</label>
+                <select id="adminModalCharacterPower" class="character-select">
+                  <option value="100">100</option><option value="200">200</option>
+                  <option value="300">300</option><option value="400">400</option>
+                  <option value="500">500</option><option value="600">600</option>
+                  <option value="700">700</option><option value="800">800</option>
+                  <option value="900">900</option><option value="1000">1000</option>
+                </select>
+              </div>
+            </div>
+            <div class="modal-action-row">
+              <button class="btn btn-secondary" id="cancelAdminModalButton">취소</button>
+              <button class="btn btn-primary" id="submitAdminCharacterButton">수정하기</button>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
   </main>
   <script src="./js/common.js"></script>

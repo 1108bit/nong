@@ -199,18 +199,6 @@ function login(mainName, password) {
   }
   if (!password) return { ok: false, message: '비밀번호를 입력해주세요.' };
 
-  // [최고 관리자(마스터) 전용 계정]
-  const settings = getKeyValueMap(SHEET_NAMES.SETTINGS);
-  const masterPwd = settings.MASTER_PASSWORD || '1108';
-  if (mainName === '관리자' && password === masterPwd) {
-    return {
-      ok: true,
-      accountId: 'MASTER_ADMIN',
-      mainName: '👑 마스터',
-      isAdmin: true,
-      adminCode: settings.ADMIN_CODE
-    };
-  }
 
   const sheet = getSheet(SHEET_NAMES.ACCOUNTS);
   const values = sheet.getDataRange().getValues();
@@ -318,6 +306,10 @@ function getCharacters(accountId) {
       message: 'accountId가 없습니다.',
       items: []
     };
+  }
+
+  if (accountId === normalizeCompareValue('MASTER_ADMIN')) {
+    return { ok: true, items: [], adminYn: 'Y' };
   }
 
   const rows = getRowsAsObjects(SHEET_NAMES.CHARACTERS);
@@ -985,6 +977,19 @@ function getAvailabilitySummary(weekKey) {
  * MAIN
  ************************************************/
 function getMainData(accountId) {
+  if (accountId === 'MASTER_ADMIN') {
+    const actualWeekKey = getCurrentWeekKey().weekKey;
+    const summary = getAvailabilitySummary(actualWeekKey).items;
+    return {
+      ok: true,
+      mainName: '👑 마스터',
+      characters: [],
+      selectedCount: 0,
+      weeklyRunCount: 0,
+      summary
+    };
+  }
+
   const accountRows = getRowsAsObjects(SHEET_NAMES.ACCOUNTS);
   const characterRows = getRowsAsObjects(SHEET_NAMES.CHARACTERS);
   const availabilityRows = getRowsAsObjects(SHEET_NAMES.AVAILABILITY);
@@ -1187,27 +1192,6 @@ function changePassword(accountId, oldPassword, newPassword) {
   return { ok: false, message: '계정을 찾을 수 없습니다.' };
 }
 
-function changeMasterPassword(adminCode, oldPassword, newPassword) {
-  validateAdminCode(adminCode);
-  const settings = getKeyValueMap(SHEET_NAMES.SETTINGS);
-  const currentMaster = settings.MASTER_PASSWORD || '1108';
-  
-  if (currentMaster !== normalizeValue(oldPassword)) {
-    return { ok: false, message: '현재 마스터 비밀번호가 일치하지 않습니다.' };
-  }
-  
-  const sheet = getSheet(SHEET_NAMES.SETTINGS);
-  const values = sheet.getDataRange().getValues();
-  for (let i = 1; i < values.length; i++) {
-    if (normalizeValue(values[i][0]) === 'MASTER_PASSWORD') {
-      sheet.getRange(i + 1, 2).setValue(normalizeValue(newPassword));
-      return { ok: true, message: '마스터 비밀번호가 변경되었습니다.' };
-    }
-  }
-  sheet.appendRow(['MASTER_PASSWORD', normalizeValue(newPassword)]);
-  return { ok: true, message: '마스터 비밀번호가 설정되었습니다.' };
-}
-
 function toggleAdminRole(adminCode, targetAccountId) {
   validateAdminCode(adminCode);
   const sheet = getSheet(SHEET_NAMES.ACCOUNTS);
@@ -1348,9 +1332,6 @@ function doGet(e) {
 
       case 'changePassword':
         return outputJson(changePassword(e.parameter.accountId, e.parameter.oldPassword, e.parameter.newPassword));
-        
-      case 'changeMasterPassword':
-        return outputJson(changeMasterPassword(e.parameter.adminCode, e.parameter.oldPassword, e.parameter.newPassword));
         
       case 'toggleAdminRole':
         return outputJson(toggleAdminRole(e.parameter.adminCode, e.parameter.targetAccountId));

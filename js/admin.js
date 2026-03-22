@@ -135,22 +135,48 @@ async function openUserCharacterManager(targetAccountId) {
   `).join("");
 }
 
-// 유저 캐릭터 편집 모달 (간단한 prompt 사용)
+// 유저 캐릭터 편집 모달 열기
 function editUserCharacter(accountId, originalName, className, type, power) {
-  const newName = prompt("캐릭터 이름", originalName);
-  if (!newName) return;
+  getEl("adminModalAccountId").value = accountId;
+  getEl("adminModalOriginalName").value = originalName;
+  getEl("adminModalCharacterName").value = originalName;
+  getEl("adminModalCharacterClass").value = className;
+  getEl("adminModalCharacterType").value = type;
+  getEl("adminModalCharacterPower").value = power;
 
-  const newClass = prompt("직업", className);
-  if (!newClass) return;
+  getEl("adminCharacterModal").classList.add("show");
+  document.body.classList.add("modal-open");
+}
 
-  const newType = prompt("타입 (본캐/부캐)", type);
-  if (!newType) return;
+function closeAdminModal() {
+  getEl("adminCharacterModal").classList.remove("show");
+  document.body.classList.remove("modal-open");
+}
 
-  const newPower = prompt("전투력", power);
-  if (!newPower) return;
+getEl("closeAdminModalButton").onclick = closeAdminModal;
+getEl("cancelAdminModalButton").onclick = closeAdminModal;
 
-  // updateCharacterByAdmin 호출
-  callApi({
+// 모달에서 '수정하기' 버튼 클릭 시
+getEl("submitAdminCharacterButton").onclick = async () => {
+  const btn = getEl("submitAdminCharacterButton");
+  const originalText = btn.textContent;
+  btn.disabled = true;
+  btn.textContent = "처리 중...";
+
+  const accountId = getEl("adminModalAccountId").value;
+  const originalName = getEl("adminModalOriginalName").value;
+  const newName = getEl("adminModalCharacterName").value.trim();
+  const newClass = getEl("adminModalCharacterClass").value;
+  const newType = getEl("adminModalCharacterType").value;
+  const newPower = getEl("adminModalCharacterPower").value;
+
+  if (!newName) {
+    btn.disabled = false;
+    btn.textContent = originalText;
+    return alert("캐릭터 이름을 입력하세요.");
+  }
+
+  const res = await callApi({
     action: "updateCharacterByAdmin",
     adminCode: getAdminCode(),
     targetAccountId: accountId,
@@ -159,15 +185,19 @@ function editUserCharacter(accountId, originalName, className, type, power) {
     newClass: newClass,
     newType: newType,
     newPower: newPower
-  }).then(res => {
-    if (res.ok) {
-      alert("수정되었습니다.");
-      openUserCharacterManager(accountId); // 목록 새로고침
-    } else {
-      alert(res.message || "수정 실패");
-    }
   });
-}
+
+  btn.disabled = false;
+  btn.textContent = originalText;
+
+  if (res.ok) {
+    alert("수정되었습니다.");
+    closeAdminModal();
+    openUserCharacterManager(accountId); // 목록 새로고침
+  } else {
+    alert(res.message || "수정 실패");
+  }
+};
 
 // 유저 운영진 권한 토글
 async function toggleUserAdmin(targetAccountId) {
@@ -209,22 +239,5 @@ if (changeAdminCodeBtn) {
       getEl("oldAdminCodeInput").value = "";
       getEl("newAdminCodeInput").value = "";
     }
-  };
-}
-
-// =========================
-// 마스터 비밀번호 변경 로직
-// =========================
-const changeMasterPwdBtn = getEl("changeMasterPwdBtn");
-if (changeMasterPwdBtn) {
-  changeMasterPwdBtn.onclick = async () => {
-    const oldPwd = getEl("oldMasterPwdInput").value.trim();
-    const newPwd = getEl("newMasterPwdInput").value.trim();
-    if (!oldPwd || !newPwd) return alert("비밀번호를 모두 입력해주세요.");
-    if (!confirm("마스터 비밀번호를 변경하시겠습니까?")) return;
-    
-    const res = await callApi({ action: "changeMasterPassword", adminCode: getAdminCode(), oldPassword: oldPwd, newPassword: newPwd });
-    alert(res.message);
-    if (res.ok) { getEl("oldMasterPwdInput").value = ""; getEl("newMasterPwdInput").value = ""; }
   };
 }

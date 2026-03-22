@@ -8,9 +8,9 @@ async function initAvailability() {
   const target = getEl("availabilityList");
   if (target) {
     target.innerHTML = `
-      <div class="availability-item skeleton" style="height:102px; margin-bottom:10px;"></div>
-      <div class="availability-item skeleton" style="height:102px; margin-bottom:10px;"></div>
-      <div class="availability-item skeleton" style="height:102px; margin-bottom:10px;"></div>
+      <div class="skeleton-block skeleton-card tall" style="margin-bottom:10px;"></div>
+      <div class="skeleton-block skeleton-card tall" style="margin-bottom:10px;"></div>
+      <div class="skeleton-block skeleton-card tall" style="margin-bottom:10px;"></div>
     `;
   }
 
