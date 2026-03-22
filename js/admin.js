@@ -87,6 +87,52 @@ function initTimeChips() {
   if (group2) group2.innerHTML = html;
 }
 
+// 달력 및 시간 입력창 변경 이벤트 연동
+const calPicker = getEl("calendarPicker");
+if (calPicker) {
+  calPicker.onchange = (e) => {
+    const val = e.target.value;
+    if (!val) return;
+    const d = new Date(val);
+    const days = ["일", "월", "화", "수", "목", "금", "토"];
+    getEl("dateInput").value = val;
+    getEl("dayInput").value = days[d.getDay()];
+    document.querySelectorAll("#dateChipGroup .chip-btn").forEach(b => b.classList.toggle("selected", b.dataset.date === val));
+  };
+}
+
+const editCalPicker = getEl("editCalendarPicker");
+if (editCalPicker) {
+  editCalPicker.onchange = (e) => {
+    const val = e.target.value;
+    if (!val) return;
+    const d = new Date(val);
+    const days = ["일", "월", "화", "수", "목", "금", "토"];
+    getEl("editDateInput").value = val;
+    getEl("editDayInput").value = days[d.getDay()];
+    document.querySelectorAll("#editDateChipGroup .chip-btn").forEach(b => b.classList.toggle("selected", b.dataset.date === val));
+  };
+}
+
+// 시간 입력창 정각 보정 및 칩 연동 로직
+function syncTimeInputToChip(inputId, groupSelector) {
+  const inputEl = getEl(inputId);
+  if (inputEl) {
+    inputEl.addEventListener("change", (e) => {
+      if (!e.target.value) return;
+      let [h, m] = e.target.value.split(":");
+      m = "00"; // 1시간 단위 강제 정각 고정
+      e.target.value = `${h}:${m}`;
+      const timeGroup = getEl(groupSelector);
+      if (timeGroup) {
+        timeGroup.querySelectorAll(".chip-btn").forEach(b => b.classList.toggle("selected", b.dataset.value === `${h}:${m}`));
+      }
+    });
+  }
+}
+syncTimeInputToChip("timeSlotInput", "timeChipGroup");
+syncTimeInputToChip("editTimeSlotInput", "editTimeChipGroup");
+
 // 구글 시트의 ISO 8601 시간 오차(1899-12-30T...)를 완벽히 필터링하는 함수
 function formatDisplayTime(ts) {
   if (!ts) return "";
@@ -149,20 +195,12 @@ async function loadAdminSchedule() {
           </div>
         </div>
         <div class="action-area">
-          <button class="icon-btn edit-btn" title="수정" data-date="${escapeHtml(i.date)}" data-day="${escapeHtml(i.day)}" data-time="${escapeHtml(timeFormatted)}" data-note="${escapeHtml(i.note)}">✏️</button>
-          <button class="icon-btn delete-btn" title="삭제" data-date="${escapeHtml(i.date)}" data-day="${escapeHtml(i.day)}" data-time="${escapeHtml(timeFormatted)}">🗑️</button>
+          <button type="button" class="icon-btn edit-btn" title="수정" onclick="editSchedule('${escapeHtml(i.date)}', '${escapeHtml(i.day)}', '${escapeHtml(timeFormatted)}', '${escapeHtml(i.note)}')">✏️</button>
+          <button type="button" class="icon-btn delete-btn" title="삭제" onclick="deleteSchedule('${escapeHtml(i.date)}', '${escapeHtml(i.day)}', '${escapeHtml(timeFormatted)}')">🗑️</button>
         </div>
       </div>
     `;
   }).join("");
-  
-  // 버튼 클릭 이벤트 리스너 추가
-  document.querySelectorAll(".edit-btn").forEach(btn => {
-    btn.onclick = () => editSchedule(btn.dataset.date, btn.dataset.day, btn.dataset.time, btn.dataset.note);
-  });
-  document.querySelectorAll(".delete-btn").forEach(btn => {
-    btn.onclick = () => deleteSchedule(btn.dataset.date, btn.dataset.day, btn.dataset.time);
-  });
 }
 
 async function saveSchedule() {
@@ -211,6 +249,17 @@ async function deleteSchedule(date, day, time) {
   else alert(res.message || "삭제에 실패했습니다.");
 }
 
+// 가로 스크롤 컨테이너 내에서 선택된 칩으로 부드럽게 자동 스크롤하는 함수
+function scrollToSelectedChip(containerId) {
+  const container = getEl(containerId);
+  if (!container) return;
+  const selected = container.querySelector('.chip-btn.selected');
+  if (selected) {
+    const scrollLeft = selected.offsetLeft - container.clientWidth / 2 + selected.clientWidth / 2;
+    container.scrollTo({ left: scrollLeft, behavior: 'smooth' });
+  }
+}
+
 function editSchedule(date, day, time, note) {
   // 원본 데이터 저장 (날짜/시간 변경 시 기존 일정 삭제용)
   getEl("editOriginalDate").value = date;
@@ -221,6 +270,9 @@ function editSchedule(date, day, time, note) {
   getEl("editDayInput").value = day;
   getEl("editTimeSlotInput").value = time;
   getEl("editNoteInput").value = note;
+
+  const editCal = getEl("editCalendarPicker");
+  if (editCal) editCal.value = date;
 
   // 칩 시각적 연동
   const dateGroup = getEl("editDateChipGroup");
@@ -240,6 +292,8 @@ function editSchedule(date, day, time, note) {
   setTimeout(() => {
     getEl("editDateChipGroup")?.dispatchEvent(new Event('scroll'));
     getEl("editTimeChipGroup")?.dispatchEvent(new Event('scroll'));
+    scrollToSelectedChip("editDateChipGroup");
+    scrollToSelectedChip("editTimeChipGroup");
   }, 10);
 }
 
@@ -598,6 +652,7 @@ window.resetUserPassword = resetUserPassword;
 window.editUserCharacter = editUserCharacter;
 window.editSchedule = editSchedule;
 window.deleteSchedule = deleteSchedule;
+window.openPartyDetail = openPartyDetail;
 
 // =========================
 // 드래그 앤 드롭 함수 전역 노출

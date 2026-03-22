@@ -1,0 +1,17 @@
+{
+  "name": "NoStepBack Legion",
+  "short_name": "NoStepBack",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#06111d",
+  "theme_color": "#06111d",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "images/logo_main1.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}

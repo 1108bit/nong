@@ -6,6 +6,7 @@
   <meta name="theme-color" content="#06111d" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <link rel="manifest" href="./manifest.json" />
   <title>NoStepBack - 로그인</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -64,5 +65,12 @@
   </main>
   <script src="./js/common.js?v=4"></script>
   <script src="./js/app.js?v=4"></script>
+  <script>
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('./sw.js');
+      });
+    }
+  </script>
 </body>
 </html>
