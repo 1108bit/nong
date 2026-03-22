@@ -16,7 +16,7 @@ async function loadPartySummary() {
   const data = await callApi({ action: "getAvailabilitySummary" });
   
   if (!data.ok || !data.items.length) {
-    target.innerHTML = `<div class="availability-empty">집계 데이터가 없습니다.</div>`;
+    target.innerHTML = `<div class="availability-empty">📊 아직 집계된 데이터가 없습니다.</div>`;
     return;
   }
 
@@ -64,7 +64,7 @@ async function showComposition(day, time) {
 function renderParty(id, list) {
     const target = getEl(id);
     if (!list.length) {
-        target.innerHTML = `<div class="availability-empty">구성 없음</div>`;
+        target.innerHTML = `<div class="availability-empty">텅 비어있습니다</div>`;
         return;
     }
 

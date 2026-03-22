@@ -48,7 +48,7 @@ function openEditModal(characterName) {
 function renderCharacters(items) {
   const list = getEl("characterList");
   if (!items || items.length === 0) {
-    list.innerHTML = `<div class="character-empty">등록된 캐릭터가 없습니다</div>`;
+    list.innerHTML = `<div class="character-empty">📭 등록된 캐릭터가 없습니다.<br><span style="font-size:12px; opacity:0.7;">우측 상단의 [추가] 버튼을 눌러보세요!</span></div>`;
     return;
   }
 
