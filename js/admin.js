@@ -103,28 +103,27 @@ async function loadAdminSchedule() {
     
     // 1명이라도 참여했는데 8명 미만이거나 치유성이 없을 때만 Risk(빨간 테두리) 표시
     const isRisk = count > 0 && (count < 8 || !hasHealer); 
-    const riskClass = isRisk ? "admin-card-risk" : "";
+    const riskClass = isRisk ? "risk" : "";
     const timeFormatted = formatDisplayTime(i.time_slot);
     const shortDate = i.date && i.date.length >= 10 ? i.date.substring(5).replace('-', '.') : i.date;
 
     return `
-      <div class="admin-card-item ${riskClass}">
-        <div class="admin-card-top">
-          <div style="display: flex; align-items: center; gap: 8px;">
-            <div class="admin-card-time">${shortDate} (${i.day}) <span style="font-size: 1.1em; color: var(--cyan-1);">${timeFormatted}</span></div>
-            <div class="admin-status-chip ${i.open_yn === 'Y' ? 'open' : 'closed'}">${i.open_yn === 'Y' ? '열림' : '닫힘'}</div>
+      <div class="admin-list-row ${riskClass}">
+        <div class="row-info-group">
+          <div class="row-time">
+            <span class="row-date">${shortDate} (${i.day})</span>
+            <span class="row-hhmm">${timeFormatted}</span>
           </div>
-          <div class="admin-card-actions">
-            <button class="mini-btn edit-btn" data-date="${escapeHtml(i.date)}" data-day="${escapeHtml(i.day)}" data-time="${escapeHtml(timeFormatted)}" data-note="${escapeHtml(i.note)}">수정</button>
-            <button class="mini-btn danger delete-btn" data-date="${escapeHtml(i.date)}" data-day="${escapeHtml(i.day)}" data-time="${escapeHtml(timeFormatted)}">삭제</button>
+          <div class="row-badges">
+            <span class="row-badge ${count >= 8 ? 'good' : (count > 0 ? 'warn' : '')}">👤 ${count}</span>
+            <span class="row-badge ${hasHealer ? 'good' : 'warn'}">❤️ ${hasHealer ? 'O' : '<del style="opacity:0.6;">X</del>'}</span>
           </div>
+          ${i.note ? `<div class="row-note" title="${escapeHtml(i.note)}">${escapeHtml(i.note)}</div>` : ''}
         </div>
-        <div class="admin-card-meta" style="display: flex; align-items: center; margin-top: 0;">
-          👥 인원: <strong style="color:${count >= 8 ? '#a7f3d0' : (count > 0 ? '#fb7185' : 'var(--text-sub)')}">${count}명</strong> 
-          <span style="margin: 0 6px; opacity: 0.3;">|</span> 
-          💚 치유성: ${hasHealer ? "✅" : "❌"}
+        <div class="row-action-group">
+          <button class="icon-btn edit-btn" title="수정" data-date="${escapeHtml(i.date)}" data-day="${escapeHtml(i.day)}" data-time="${escapeHtml(timeFormatted)}" data-note="${escapeHtml(i.note)}">✏️</button>
+          <button class="icon-btn delete-btn" title="삭제" data-date="${escapeHtml(i.date)}" data-day="${escapeHtml(i.day)}" data-time="${escapeHtml(timeFormatted)}">🗑️</button>
         </div>
-        ${i.note ? `<div class="admin-card-note">${escapeHtml(i.note)}</div>` : ''}
       </div>
     `;
   }).join("");
