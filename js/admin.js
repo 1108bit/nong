@@ -58,6 +58,16 @@ function editSchedule(date, day, time, note) {
 
 getEl("saveButton").onclick = saveSchedule;
 getEl("refreshButton").onclick = loadAdminSchedule;
+getEl("checkSchemaButton").onclick = async () => {
+  const res = await callApi({ action: "validateDatabaseSchema" });
+  if (!res.ok) return alert(res.message || "검증에 실패했습니다.");
+
+  if (res.isValid) {
+    alert("DB 스키마가 정상입니다.");
+  } else {
+    alert("DB 스키마 오류:\n" + (res.errors || []).join("\n"));
+  }
+};
 getEl("backButton").onclick = () => movePage("main.html");
 
 loadAdminSchedule();
