@@ -85,33 +85,29 @@ function renderCharacters(items) {
 // 모달 열기 로직 개선
 getEl("addCharacterButton").addEventListener("click", () => {
     const nameInput = getEl("modalCharacterName");
-    const typeSelect = getEl("modalCharacterType");
-    const classSelect = getEl("modalCharacterClass");
+    const typeInput = getEl("modalCharacterType");
     const powerInput = getEl("modalCharacterPower");
+    const chipMain = getEl("chipTypeMain");
+    const chipSub = getEl("chipTypeSub");
 
     if (!hasMainCharacter) {
         // 본캐가 없는 경우: 로그인한 닉네임 고정, 타입 '본캐' 고정
         const mainName = getMainName();
         nameInput.value = mainName || "";
         nameInput.readOnly = true; // 수정 불가
-        typeSelect.value = CHARACTER_TYPES.MAIN;
-        typeSelect.disabled = true; // 선택 불가
-        classSelect.disabled = false;
+        typeInput.value = CHARACTER_TYPES.MAIN;
+        if (chipMain) { chipMain.classList.add("selected"); chipMain.disabled = false; }
+        if (chipSub) { chipSub.classList.remove("selected"); chipSub.disabled = true; }
         powerInput.disabled = false;
         alert("최초 1회 본캐 정보를 먼저 등록해야 합니다.");
     } else {
         // 본캐가 있는 경우: 부캐 입력 모드
         nameInput.value = "";
         nameInput.readOnly = false;
-        typeSelect.value = CHARACTER_TYPES.SUB;
-        typeSelect.disabled = false;
-        classSelect.disabled = false;
+        typeInput.value = CHARACTER_TYPES.SUB;
+        if (chipSub) { chipSub.classList.add("selected"); chipSub.disabled = false; }
+        if (chipMain) { chipMain.classList.remove("selected"); chipMain.disabled = true; }
         powerInput.disabled = false;
-        
-        // 부캐 추가 시 '본캐' 선택 못하게 옵션 비활성화
-        Array.from(typeSelect.options).forEach(opt => {
-            if(opt.value === CHARACTER_TYPES.MAIN) opt.disabled = true;
-        });
     }
 
     getEl("characterModal").classList.add("show");
