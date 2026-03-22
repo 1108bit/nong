@@ -410,9 +410,48 @@ if (changeAdminCodeBtn) {
   };
 }
 
+// 드래그 클릭 판별용 상태 변수
+let isDraggingScroll = false;
+
+// 마우스 드래그로 가로 스크롤을 구현하는 애플 스타일 로직
+function applyDragScroll() {
+  const sliders = document.querySelectorAll('.horizontal-scroll-chips');
+  let isDown = false;
+  let startX;
+  let scrollLeft;
+
+  sliders.forEach(slider => {
+    slider.addEventListener('mousedown', (e) => {
+      isDown = true;
+      isDraggingScroll = false;
+      startX = e.pageX - slider.offsetLeft;
+      scrollLeft = slider.scrollLeft;
+    });
+    slider.addEventListener('mouseleave', () => { isDown = false; });
+    slider.addEventListener('mouseup', () => { isDown = false; });
+    slider.addEventListener('mousemove', (e) => {
+      if (!isDown) return;
+      e.preventDefault();
+      const x = e.pageX - slider.offsetLeft;
+      const walk = (x - startX) * 2; // 스크롤 속도 배율
+      if (Math.abs(walk) > 5) isDraggingScroll = true; // 5px 이상 드래그 시 클릭 무시용 트리거 작동
+      slider.scrollLeft = scrollLeft - walk;
+    });
+    
+    // 드래그가 끝났을 때 원치 않게 칩이 클릭되는 현상 방지
+    slider.addEventListener('click', (e) => {
+      if (isDraggingScroll) {
+        e.preventDefault();
+        e.stopPropagation();
+      }
+    }, true);
+  });
+}
+
 // 칩 버튼 클릭 이벤트 위임 (관리자용)
 document.querySelectorAll('.chip-select-group').forEach(group => {
     group.addEventListener('click', e => {
+        if (isDraggingScroll) return; // 드래그 중엔 클릭 무시
         const btn = e.target.closest('.chip-btn');
         if (!btn || btn.disabled) return;
         
@@ -430,3 +469,5 @@ window.resetUserPassword = resetUserPassword;
 window.editUserCharacter = editUserCharacter;
 window.editSchedule = editSchedule;
 window.deleteSchedule = deleteSchedule;
+
+applyDragScroll();
