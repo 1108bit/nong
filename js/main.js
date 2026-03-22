@@ -1,5 +1,11 @@
 // js/main.js
+const CHARACTER_TYPES = {
+  MAIN: "본캐",
+  SUB: "부캐"
+};
+
 let hasMainCharacter = false; // 현재 본캐 등록 여부
+let characters = []; // 전역 변수 제거, 로컬로 관리
 
 async function loadMain() {
   const accountId = getAccountId();
@@ -20,11 +26,18 @@ async function loadMain() {
   setText("selectedCount", (data.selectedCount || 0) + "개");
   
   // 등록된 캐릭터 중 '본캐'가 있는지 확인
-  hasMainCharacter = data.characters?.some(c => c.type === "본캐");
+  hasMainCharacter = data.characters?.some(c => c.type === CHARACTER_TYPES.MAIN);
 
-  window.characters = data.characters || [];
-  renderCharacters(window.characters);
+  characters = data.characters || [];
+  renderCharacters(characters);
   applyTouchPop();
+}
+
+// 캐릭터 편집 모달 열기
+function openEditModal(characterName) {
+  const charData = characters.find(c => c.character_name === characterName);
+  if (!charData) return;
+  editCharacter(charData);
 }
 
 // 캐릭터 목록 그리기 (전투력 구간 반영 + 삭제 버튼)
@@ -36,11 +49,11 @@ function renderCharacters(items) {
   }
 
   list.innerHTML = items.map(c => {
-    const isMainChar = c.type === '본캐';
+    const isMainChar = c.type === CHARACTER_TYPES.MAIN;
     const pRange = getPowerRange(c.power);
     
     return `
-      <div class="character-card ${isMainChar ? 'main-char-card' : ''}">
+      <div class="character-card ${isMainChar ? 'main-char-card' : ''}" data-character-name="${escapeHtml(c.character_name)}">
         <div class="character-left">
           <div class="character-name">${escapeHtml(c.character_name)}</div>
           <div class="character-sub">
@@ -62,7 +75,7 @@ function renderCharacters(items) {
 }
 
 // 모달 열기 로직 개선
-getEl("addCharacterButton").onclick = () => {
+getEl("addCharacterButton").addEventListener("click", () => {
     const nameInput = getEl("modalCharacterName");
     const typeSelect = getEl("modalCharacterType");
     const classSelect = getEl("modalCharacterClass");
@@ -73,7 +86,7 @@ getEl("addCharacterButton").onclick = () => {
         const mainName = getMainName();
         nameInput.value = mainName || "";
         nameInput.readOnly = true; // 수정 불가
-        typeSelect.value = "본캐";
+        typeSelect.value = CHARACTER_TYPES.MAIN;
         typeSelect.disabled = true; // 선택 불가
         classSelect.disabled = false;
         powerInput.disabled = false;
@@ -82,20 +95,20 @@ getEl("addCharacterButton").onclick = () => {
         // 본캐가 있는 경우: 부캐 입력 모드
         nameInput.value = "";
         nameInput.readOnly = false;
-        typeSelect.value = "부캐";
+        typeSelect.value = CHARACTER_TYPES.SUB;
         typeSelect.disabled = false;
         classSelect.disabled = false;
         powerInput.disabled = false;
         
         // 부캐 추가 시 '본캐' 선택 못하게 옵션 비활성화
         Array.from(typeSelect.options).forEach(opt => {
-            if(opt.value === "본캐") opt.disabled = true;
+            if(opt.value === CHARACTER_TYPES.MAIN) opt.disabled = true;
         });
     }
 
     getEl("characterModal").classList.add("show");
     document.body.classList.add("modal-open");
-};
+});
 
 // 캐릭터 등록 실행
 getEl("submitCharacterButton").onclick = () => submitCharacter();
@@ -268,6 +281,9 @@ function closeModal() {
     // 필드 잠금 해제
     getEl("modalCharacterName").readOnly = false;
     getEl("modalCharacterType").disabled = false;
+    
+    // 타입 옵션 비활성화 해제 (부캐 추가 모달 닫고 다시 열 때 선택 불가 버그 방지)
+    Array.from(getEl("modalCharacterType").options).forEach(opt => opt.disabled = false);
 }
 
 getEl("closeCharacterModalButton").onclick = closeModal;

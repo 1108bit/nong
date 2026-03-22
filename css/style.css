@@ -444,11 +444,13 @@ a {
   display: flex;
   gap: 6px;
   align-items: center;
+  position: relative;
+  z-index: 10;
 }
 
 .character-edit-btn, .character-delete-btn, .character-toggle-btn {
-  width: 28px;
-  height: 28px;
+  width: 32px;
+  height: 32px;
   border-radius: 6px;
   border: 1px solid rgba(255, 255, 255, 0.08);
   background: rgba(255, 255, 255, 0.03); /* 투명한 배경 */
@@ -1229,6 +1231,19 @@ a {
   color: #d8b4fe;
 }
 
+/* 본캐/부캐 전용 색상 */
+.chip-type.main {
+  background: rgba(234, 179, 8, 0.15);
+  border-color: rgba(234, 179, 8, 0.3);
+  color: #fef08a;
+}
+
+.chip-type.sub {
+  background: rgba(100, 116, 139, 0.18);
+  border-color: rgba(148, 163, 184, 0.25);
+  color: #cbd5e1;
+}
+
 /* 오른쪽 */
 .character-right {
   display: flex;
@@ -1648,7 +1663,6 @@ body.modal-open {
     opacity: 0;
     margin-bottom: -86px; /* 아래 카드들이 부드럽게 올라오도록 설정 */
   }
-}
 }
 
 .party-member-chips {

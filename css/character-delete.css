@@ -1,9 +1,9 @@
 /* 캐릭터 삭제 버튼 스타일 */
 .character-delete-btn {
-  width: 24px;
-  height: 24px;
+  width: 32px;
+  height: 32px;
   padding: 0;
-  margin-left: 8px;
+  margin-left: 4px;
   border: none;
   background: rgba(251, 113, 133, 0.2);
   color: #fb7185;

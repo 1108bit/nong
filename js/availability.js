@@ -29,12 +29,15 @@ function renderList(items) {
     `;
   }).join("");
   
-  // 버튼 클릭 이벤트 리스너 추가
-  document.querySelectorAll(".availability-item").forEach(btn => {
-    btn.onclick = () => toggleTime(btn.dataset.day, btn.dataset.time);
-  });
   applyTouchPop();
 }
+
+// 이벤트 위임(Event Delegation)을 통한 리스너 최적화
+getEl("availabilityList").addEventListener("click", (e) => {
+  const btn = e.target.closest(".availability-item");
+  if (!btn) return;
+  toggleTime(btn.dataset.day, btn.dataset.time);
+});
 
 async function toggleTime(day, time) {
   const key = `${day}__${time}`;

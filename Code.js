@@ -52,6 +52,13 @@ function getSheet(sheetName) {
   return sheet;
 }
 
+function getColumnMap(headers) {
+  return headers.reduce((map, header, index) => {
+    map[String(header).trim()] = index;
+    return map;
+  }, {});
+}
+
 function getRowsAsObjects(sheetName) {
   const sheet = getSheet(sheetName);
   const values = sheet.getDataRange().getValues();
@@ -378,13 +385,12 @@ function deleteCharacter(accountId, characterName) {
   const sheet = getSheet(SHEET_NAMES.CHARACTERS);
   const values = sheet.getDataRange().getValues();
   const headers = values[0].map(v => String(v).trim());
+  const colMap = getColumnMap(headers);
 
-  const accountIdCol = headers.indexOf('account_id');
-  const nameCol = headers.indexOf('name');
 
   for (let i = values.length - 1; i >= 1; i--) {
-    const rowAccountId = normalizeCompareValue(values[i][accountIdCol]);
-    const rowName = normalizeCompareValue(values[i][nameCol]);
+    const rowAccountId = normalizeCompareValue(values[i][colMap.account_id]);
+    const rowName = normalizeCompareValue(values[i][colMap.name]);
 
     if (rowAccountId === normalizeCompareValue(accountId) &&
         rowName === normalizeCompareValue(characterName)) {
