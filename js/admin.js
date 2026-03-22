@@ -108,7 +108,7 @@ async function saveSchedule() {
   const btn = getEl("saveButton");
   const originalText = btn.textContent;
   btn.disabled = true;
-  btn.textContent = "저장 중...";
+  btn.innerHTML = `<span style="display:inline-block; animation: spin 1s linear infinite;">⏳</span> 저장 중...`;
 
   const res = await callApi({
     action: "saveRaidSchedule",
@@ -156,7 +156,6 @@ getEl("timeSlotInput").addEventListener("input", (e) => {
 });
 
 getEl("saveButton").onclick = saveSchedule;
-getEl("refreshButton").onclick = loadAdminSchedule;
 getEl("checkSchemaButton").onclick = async () => {
   const res = await callApi({ action: "validateDatabaseSchema" });
   if (!res.ok) return alert(res.message || "검증에 실패했습니다.");

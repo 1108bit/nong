@@ -98,6 +98,18 @@ function formatDateTime(value) {
   return String(value || '').trim();
 }
 
+function formatTime(value) {
+  if (Object.prototype.toString.call(value) === '[object Date]' && !isNaN(value)) {
+    return Utilities.formatDate(value, 'Asia/Seoul', 'HH:mm');
+  }
+  const str = String(value || '').trim();
+  if (str.includes('T')) {
+      const match = str.match(/T(\d{2}:\d{2})/);
+      if(match) return match[1];
+  }
+  return str;
+}
+
 function nowText() {
   return Utilities.formatDate(new Date(), 'Asia/Seoul', 'yyyy-MM-dd HH:mm:ss');
 }
@@ -687,7 +699,7 @@ function getRaidSchedule(weekKey) {
       week_key: formatDate(row.week_key),
       date: formatDate(row.date),
       day: row.day || '',
-      time_slot: row.time_slot || '',
+      time_slot: formatTime(row.time_slot),
       open_yn: row.open_yn || 'Y',
       status: row.status || 'OPEN',
       note: row.note || '',
@@ -714,7 +726,7 @@ function getRaidScheduleAdmin(weekKey, adminCode) {
       week_key: formatDate(row.week_key),
       date: formatDate(row.date),
       day: row.day || '',
-      time_slot: row.time_slot || '',
+      time_slot: formatTime(row.time_slot),
       open_yn: row.open_yn || 'Y',
       status: row.status || 'OPEN',
       note: row.note || '',
@@ -858,7 +870,7 @@ function getAvailability(accountId, characterName, weekKey) {
       character_name: row.character_name || '',
       type: row.type || '',
       day: row.day || '',
-      time_slot: row.time_slot || '',
+      time_slot: formatTime(row.time_slot),
       status: row.status || 'SELECTED',
       created_at: formatDateTime(row.created_at),
       updated_at: formatDateTime(row.updated_at)
@@ -972,7 +984,7 @@ function getAvailabilitySummary(weekKey) {
       character_name: row.character_name || '',
       type: row.type || '',
       day: row.day || '',
-      time_slot: row.time_slot || '',
+      time_slot: formatTime(row.time_slot),
       status: row.status || 'SELECTED',
       className: character ? (character.class_name || '') : '',
       power: character ? (character.power || '') : '',
