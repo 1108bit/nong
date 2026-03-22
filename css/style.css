@@ -1244,9 +1244,9 @@ a {
 
 .character-card {
   display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 16px;
 
   padding: 16px;
   border-radius: 20px;
@@ -1259,22 +1259,24 @@ a {
   box-shadow: 0 10px 24px rgba(0, 0, 0, 0.22);
 }
 
-/* 왼쪽 */
-.character-left {
+/* 상단: 이름 및 버튼 */
+.character-card-top {
   display: flex;
-  flex-direction: column;
-  gap: 6px;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.character-info {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
 }
 
 .character-name {
   font-size: 16px;
   font-weight: 900;
   letter-spacing: -0.02em;
-}
-
-.character-sub {
-  display: flex;
-  gap: 6px;
 }
 
 /* 칩 */
@@ -1304,12 +1306,22 @@ a {
   color: #cbd5e1;
 }
 
-/* 오른쪽 */
-.character-right {
+/* 중앙: 전투력 */
+.character-card-center {
   display: flex;
   flex-direction: column;
-  align-items: flex-end;
-  gap: 6px;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  padding: 8px 0;
+  background: rgba(14, 28, 44, 0.3);
+  border-radius: 12px;
+}
+
+.character-power-label {
+  font-size: 11px;
+  color: var(--text-muted);
+  font-weight: 700;
 }
 
 .character-power {

@@ -54,20 +54,21 @@ function renderCharacters(items) {
     
     return `
       <div class="character-card ${isMainChar ? 'main-char-card' : ''}" data-character-name="${escapeHtml(c.character_name)}">
-        <div class="character-left">
-          <div class="character-name">${escapeHtml(c.character_name)}</div>
-          <div class="character-sub">
-            <span class="chip chip-class ${escapeHtml(c.className)}">${escapeHtml(c.className)}</span>
+        <div class="character-card-top">
+          <div class="character-info">
+            <div class="character-name">${escapeHtml(c.character_name)}</div>
             <span class="chip chip-type ${isMainChar ? 'main' : 'sub'}">${escapeHtml(c.type)}</span>
+            <span class="chip chip-class ${escapeHtml(c.className)}">${escapeHtml(c.className)}</span>
           </div>
-        </div>
-        <div class="character-right">
-          <div class="character-power">${pRange}</div>
           <div class="character-actions">
             <button class="character-edit-btn" title="편집" onclick="openEditModal('${escapeHtml(c.character_name)}')">✎</button>
             <button class="character-toggle-btn" title="본캐/부캐 전환" onclick="toggleCharacterType('${escapeHtml(c.character_name)}')">⇄</button>
             ${!isMainChar ? `<button class="character-delete-btn" title="삭제" onclick="confirmDelete('${escapeHtml(c.character_name)}')">✕</button>` : ''}
           </div>
+        </div>
+        <div class="character-card-center">
+          <div class="character-power-label">전투력 구간</div>
+          <div class="character-power">${pRange}</div>
         </div>
       </div>
     `;
