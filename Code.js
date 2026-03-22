@@ -1157,8 +1157,10 @@ function validateAdminCode(adminCode) {
   }
 }
 
-function updateAdminCodeSetting(adminCode, newCode) {
+function updateAdminCodeSetting(adminCode, newCode, callerAccountId) {
   validateAdminCode(adminCode); // 현재 코드로 권한 확인
+  if (callerAccountId !== 'MASTER_ADMIN') return { ok: false, message: '마스터 계정만 접근 가능합니다.' };
+
   const actualNewCode = normalizeValue(newCode);
   if (!actualNewCode) return { ok: false, message: '새 코드를 입력해주세요.' };
 
@@ -1198,8 +1200,10 @@ function changePassword(accountId, oldPassword, newPassword) {
   return { ok: false, message: '계정을 찾을 수 없습니다.' };
 }
 
-function toggleAdminRole(adminCode, targetAccountId) {
+function toggleAdminRole(adminCode, targetAccountId, callerAccountId) {
   validateAdminCode(adminCode);
+  if (callerAccountId !== 'MASTER_ADMIN') return { ok: false, message: '마스터 계정만 접근 가능합니다.' };
+
   const sheet = getSheet(SHEET_NAMES.ACCOUNTS);
   const values = sheet.getDataRange().getValues();
   const accountIdCol = values[0].map(v => String(v).trim()).indexOf('account_id');
@@ -1352,13 +1356,13 @@ function doGet(e) {
         return outputJson(updateCharacterByAdmin(e));
 
       case 'updateAdminCodeSetting':
-        return outputJson(updateAdminCodeSetting(e.parameter.adminCode, e.parameter.newAdminCode));
+        return outputJson(updateAdminCodeSetting(e.parameter.adminCode, e.parameter.newAdminCode, e.parameter.callerAccountId));
 
       case 'changePassword':
         return outputJson(changePassword(e.parameter.accountId, e.parameter.oldPassword, e.parameter.newPassword));
         
       case 'toggleAdminRole':
-        return outputJson(toggleAdminRole(e.parameter.adminCode, e.parameter.targetAccountId));
+        return outputJson(toggleAdminRole(e.parameter.adminCode, e.parameter.targetAccountId, e.parameter.callerAccountId));
 
       case 'resetUserPasswordByAdmin':
         return outputJson(resetUserPasswordByAdmin(e.parameter.adminCode, e.parameter.targetAccountId));

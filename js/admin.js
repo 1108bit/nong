@@ -41,6 +41,12 @@ function initDateChips() {
 async function loadAdminSchedule() {
   const adminCode = getAdminCode();
   if (!adminCode) return movePage("admin-login.html");
+  
+  // 마스터 계정이 아니면 보안 설정 카드 숨김
+  if (getAccountId() !== 'MASTER_ADMIN') {
+    const secCard = getEl("securitySettingsCard");
+    if (secCard) secCard.style.display = "none";
+  }
 
   const [scheduleData, summaryData] = await Promise.all([
     callApi({ action: "getRaidScheduleAdmin", adminCode }),
@@ -174,11 +180,14 @@ async function openUserCharacterManager(targetAccountId) {
   }
 
   const roleText = data.adminYn === 'Y' ? '<span style="color:var(--gold-1)">👑 운영진</span>' : '일반 유저';
+  const isMaster = getAccountId() === 'MASTER_ADMIN';
+  const roleButtonHtml = isMaster ? `<button class="mini-btn" onclick="toggleUserAdmin('${targetAccountId}')">권한 변경</button>` : '';
+
   getEl("userMessage").innerHTML = `
     ${targetAccountId}의 캐릭터 목록 (${data.items.length}개) <br>
     현재 권한: <strong>${roleText}</strong>
     <div style="margin-top: 8px; display: flex; gap: 8px;">
-      <button class="mini-btn" onclick="toggleUserAdmin('${targetAccountId}')">권한 변경</button>
+      ${roleButtonHtml}
       <button class="mini-btn danger" onclick="resetUserPassword('${targetAccountId}')">비밀번호 초기화</button>
     </div>
   `;
@@ -283,7 +292,7 @@ getEl("submitAdminCharacterButton").onclick = async () => {
 // 유저 운영진 권한 토글
 async function toggleUserAdmin(targetAccountId) {
   if(!confirm(`[${targetAccountId}] 계정의 운영진 권한을 변경하시겠습니까?`)) return;
-  const res = await callApi({ action: "toggleAdminRole", adminCode: getAdminCode(), targetAccountId });
+  const res = await callApi({ action: "toggleAdminRole", adminCode: getAdminCode(), targetAccountId, callerAccountId: getAccountId() });
   alert(res.message);
   if (res.ok) openUserCharacterManager(targetAccountId); // UI 갱신
 }
@@ -314,7 +323,8 @@ if (changeAdminCodeBtn) {
     const res = await callApi({
       action: "updateAdminCodeSetting",
       adminCode: oldCode, // 기존 세션값 대신 사용자가 직접 입력한 '현재 코드'를 검증용으로 전송
-      newAdminCode: newCode
+      newAdminCode: newCode,
+      callerAccountId: getAccountId()
     });
 
     changeAdminCodeBtn.disabled = false;
