@@ -88,11 +88,12 @@ async function loadAdminSchedule() {
     const isRisk = count > 0 && (count < 8 || !hasHealer); 
     const riskClass = isRisk ? "admin-card-risk" : "";
     const timeFormatted = formatDisplayTime(i.time_slot);
+    const shortDate = i.date && i.date.length >= 10 ? i.date.substring(5).replace('-', '.') : i.date;
 
     return `
       <div class="admin-card-item ${riskClass}">
         <div class="admin-card-top">
-          <div class="admin-card-time">${i.date} (${i.day}) ${timeFormatted}</div>
+          <div class="admin-card-time">${shortDate} (${i.day}) <span style="margin-left: 4px; font-size: 1.1em; color: var(--cyan-1);">${timeFormatted}</span></div>
           <div class="admin-status-chip ${i.open_yn === 'Y' ? 'open' : 'closed'}">${i.open_yn === 'Y' ? '열림' : '닫힘'}</div>
         </div>
         <div class="admin-card-note">
