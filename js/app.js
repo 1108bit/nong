@@ -1,8 +1,25 @@
+// 페이지 로드 시 자동 로그인 체크
+window.addEventListener("DOMContentLoaded", () => {
+  const autoAccountId = localStorage.getItem("autoAccountId");
+  const autoMainName = localStorage.getItem("autoMainName");
+  
+  if (autoAccountId && autoMainName) {
+    const isAdmin = localStorage.getItem("autoIsAdmin") === "true";
+    if (isAdmin) {
+      sessionStorage.setItem("isAdmin", "true");
+      const adminCode = localStorage.getItem("autoAdminCode");
+      if (adminCode) sessionStorage.setItem("adminCode", adminCode);
+    }
+    location.href = `./main.html?mainName=${encodeURIComponent(autoMainName)}&accountId=${autoAccountId}`;
+  }
+});
+
 async function login() {
   const mainNameInput = getEl("mainName");
   const mainName = mainNameInput.value.trim();
   const passwordInput = getEl("password");
   const password = passwordInput ? passwordInput.value.trim() : "";
+  const isAutoLogin = getEl("autoLoginCheck")?.checked;
   const resultEl = getEl("loginResult");
 
   if (!mainName) {
@@ -27,6 +44,24 @@ async function login() {
       sessionStorage.removeItem("isAdmin");
       sessionStorage.removeItem("adminCode");
     }
+
+    if (isAutoLogin) {
+      localStorage.setItem("autoAccountId", data.accountId);
+      localStorage.setItem("autoMainName", data.mainName);
+      if (data.isAdmin) {
+        localStorage.setItem("autoIsAdmin", "true");
+        if (data.adminCode) localStorage.setItem("autoAdminCode", data.adminCode);
+      } else {
+        localStorage.removeItem("autoIsAdmin");
+        localStorage.removeItem("autoAdminCode");
+      }
+    } else {
+      localStorage.removeItem("autoAccountId");
+      localStorage.removeItem("autoMainName");
+      localStorage.removeItem("autoIsAdmin");
+      localStorage.removeItem("autoAdminCode");
+    }
+
     location.href = `./main.html?mainName=${encodeURIComponent(data.mainName)}&accountId=${data.accountId}`;
   } else {
     resultEl.textContent = data.message || "입장에 실패했습니다.";

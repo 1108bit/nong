@@ -346,6 +346,11 @@ getEl("goPartyButton").onclick = () => movePage("party.html");
 getEl("logoutButton").onclick = () => {
     // 로그아웃 시 sessionStorage 정리
     sessionStorage.clear();
+    // 자동 로그인 정보도 해제
+    localStorage.removeItem("autoAccountId");
+    localStorage.removeItem("autoMainName");
+    localStorage.removeItem("autoIsAdmin");
+    localStorage.removeItem("autoAdminCode");
     location.href = "index.html";
 };
 

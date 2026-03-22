@@ -131,7 +131,7 @@ async function openUserCharacterManager(targetAccountId) {
       <div class="character-right">
         <div class="character-power">${getPowerRange(c.power)}</div>
         <div class="character-actions">
-          <button class="character-edit-btn" onclick="editUserCharacter('${escapeHtml(targetAccountId)}', '${escapeHtml(c.name)}', '${escapeHtml(c.className)}', '${escapeHtml(c.type)}', '${escapeHtml(c.power)}')">편집</button>
+          <button class="character-edit-btn" title="편집" onclick="editUserCharacter('${escapeHtml(targetAccountId)}', '${escapeHtml(c.name)}', '${escapeHtml(c.className)}', '${escapeHtml(c.type)}', '${escapeHtml(c.power)}')">✎</button>
         </div>
       </div>
     </div>

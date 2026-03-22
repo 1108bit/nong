@@ -421,11 +421,12 @@ a {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  padding: 2px 8px;
-  border-radius: 4px;
-  font-size: 11px;
+  padding: 3px 6px;
+  border-radius: 6px;
+  font-size: 10px;
   font-weight: 500;
   border: 1px solid transparent;
+  white-space: nowrap;
 }
 
 /* 파란색 계열: 수호성, 검성 */
@@ -490,8 +491,8 @@ a {
 }
 
 .character-edit-btn, .character-delete-btn, .character-toggle-btn {
-  width: 32px;
-  height: 32px;
+  width: 28px;
+  height: 28px;
   border-radius: 6px;
   border: 1px solid rgba(255, 255, 255, 0.08);
   background: rgba(255, 255, 255, 0.03); /* 투명한 배경 */
@@ -530,13 +531,36 @@ a {
   letter-spacing: -0.01em;
 }
 
-.forgot-password-link {
-  text-align: right;
+.login-options-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
   margin-top: -8px;
   margin-bottom: 18px;
 }
 
-.forgot-password-link span {
+.checkbox-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+}
+
+.checkbox-label input[type="checkbox"] {
+  width: 15px;
+  height: 15px;
+  margin: 0;
+  accent-color: var(--cyan-1);
+  cursor: pointer;
+}
+
+.checkbox-text {
+  font-size: 12px;
+  color: var(--text-sub);
+  user-select: none;
+}
+
+.forgot-link {
   font-size: 12px;
   color: var(--cyan-1);
   cursor: pointer;
@@ -544,7 +568,7 @@ a {
   transition: opacity 0.2s ease, text-shadow 0.2s ease;
 }
 
-.forgot-password-link span:hover {
+.forgot-link:hover {
   opacity: 1;
   text-shadow: 0 0 8px rgba(67, 217, 255, 0.4);
 }
@@ -1246,10 +1270,11 @@ a {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 12px;
+  gap: 8px;
 
-  padding: 18px 16px;
-  border-radius: 20px;
+  padding: 12px 14px;
+  border-radius: 16px;
+  flex-wrap: wrap; /* 화면이 좁을 때 줄바꿈 허용 */
 
   background:
     linear-gradient(180deg, rgba(20, 36, 54, 0.9) 0%, rgba(25, 43, 62, 0.96) 100%);
@@ -1262,28 +1287,31 @@ a {
 /* 왼쪽: 이름 및 직업 */
 .character-left {
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
+  align-items: center;
   gap: 8px;
 }
 
 .character-sub {
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: 4px;
 }
 
 .character-name {
-  font-size: 17px;
+  font-size: 15px;
   font-weight: 900;
   letter-spacing: -0.02em;
+  white-space: nowrap;
 }
 
 /* 칩 */
 .chip {
-  padding: 4px 8px;
-  border-radius: 999px;
-  font-size: 11px;
+  padding: 4px 6px;
+  border-radius: 6px;
+  font-size: 10px;
   font-weight: 800;
+  white-space: nowrap;
 }
 
 .chip-type {
@@ -1308,18 +1336,19 @@ a {
 /* 오른쪽: 전투력 및 버튼 */
 .character-right {
   display: flex;
-  flex-direction: column;
-  align-items: flex-end;
-  gap: 10px;
+  flex-direction: row;
+  align-items: center;
+  gap: 12px;
 }
 
 .character-power {
-  font-size: 20px;
+  font-size: 14px;
   font-weight: 900;
   color: #6cb9ff;
-  text-shadow: 0 0 12px rgba(108, 185, 255, 0.4); /* 게임 UI 특유의 네온 글로우 효과 */
+  text-shadow: 0 0 8px rgba(108, 185, 255, 0.4);
   letter-spacing: -0.02em;
   line-height: 1;
+  white-space: nowrap;
 }
 
 .character-state {

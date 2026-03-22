@@ -28,8 +28,12 @@
           <label class="input-label" for="password">비밀번호</label>
           <input type="password" id="password" class="main-input" placeholder="숫자 4자리" maxlength="4" autocomplete="off" />
         </div>
-        <div class="forgot-password-link">
-          <span id="forgotPasswordBtn">비밀번호를 잊으셨나요?</span>
+        <div class="login-options-row">
+          <label class="checkbox-label">
+            <input type="checkbox" id="autoLoginCheck" checked />
+            <span class="checkbox-text">자동 로그인</span>
+          </label>
+          <span id="forgotPasswordBtn" class="forgot-link">비밀번호를 잊으셨나요?</span>
         </div>
         <button type="button" class="main-button" id="loginButton">로그인</button>
         <div class="page-message" id="loginResult">본캐명을 입력해주세요.</div>
