@@ -260,6 +260,12 @@ if (getAccountId() === "MASTER_ADMIN") {
 getEl("searchUserButton").onclick = async () => {
   const searchValue = getEl("userAccountIdInput").value.trim();
   if (!searchValue) return alert("유저 본캐명을 입력하세요.");
+  
+  const searchArea = getEl("userSearchResultArea");
+  if (searchArea) searchArea.style.display = "block";
+  getEl("userMessage").innerHTML = "검색 중입니다...";
+  getEl("userCharacterList").innerHTML = "";
+  
   await openUserCharacterManager(searchValue);
 };
 
