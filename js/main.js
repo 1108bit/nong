@@ -37,7 +37,7 @@ function renderCharacters(items) {
         <div class="character-left">
           <div class="character-name">${escapeHtml(c.character_name)}</div>
           <div class="character-sub">
-            <span class="chip chip-class">${escapeHtml(c.className)}</span>
+            <span class="chip chip-class ${escapeHtml(c.className)}">${escapeHtml(c.className)}</span>
             <span class="chip chip-type">${escapeHtml(c.type)}</span>
           </div>
         </div>
@@ -259,7 +259,22 @@ function closeModal() {
 
 getEl("closeCharacterModalButton").onclick = closeModal;
 getEl("cancelCharacterButton").onclick = closeModal;
+    getEl("modalCharacterPower").onchange = (e) => {
+        const power = Number(e.target.value);
+        const rangeText = getPowerRange(power);
 
+        let hintEl = document.querySelector('.modal-power-hint');
+        if (!hintEl) {
+            hintEl = document.createElement('div');
+            hintEl.className = 'modal-power-hint';
+            hintEl.style.fontSize = '12px';
+            hintEl.style.color = 'var(--text-sub)';
+            hintEl.style.marginTop = '4px';
+            getEl('modalCharacterPower').parentElement.appendChild(hintEl);
+        }
+
+        hintEl.textContent = `전투력 구간: ${rangeText}`;
+    };
 // 버튼 연결
 getEl("goAvailabilityButton").onclick = () => movePage("availability.html");
 getEl("goPartyButton").onclick = () => movePage("party.html");

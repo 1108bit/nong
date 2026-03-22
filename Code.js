@@ -130,6 +130,45 @@ function getImageMap() {
   return result;
 }
 
+/**
+ * SETTINGS 탭 스키마 정의(SCHEMA_*)에 따라 시트 헤더 유효성 검사
+ */
+function validateDatabaseSchema() {
+  const settings = getKeyValueMap(SHEET_NAMES.SETTINGS);
+  const report = [];
+
+  const targetSheets = {
+    'ACCOUNTS': settings.SCHEMA_ACCOUNTS,
+    'CHARACTERS': settings.SCHEMA_CHARACTERS,
+    'AVAILABILITY': settings.SCHEMA_AVAILABILITY
+  };
+
+  for (const [sheetName, schemaText] of Object.entries(targetSheets)) {
+    if (!schemaText) continue;
+
+    const requiredHeaders = schemaText.split(',').map(s => s.trim()).filter(Boolean);
+    const sheet = getSheet(sheetName);
+    const values = sheet.getDataRange().getValues();
+
+    if (!values || !values.length) {
+      report.push(`[${sheetName}] 시트가 비어있습니다.`);
+      continue;
+    }
+
+    const actualHeaders = values[0].map(v => String(v || '').trim());
+    const missing = requiredHeaders.filter(h => actualHeaders.indexOf(h) === -1);
+
+    if (missing.length > 0) {
+      report.push(`[${sheetName}] 누락 항목: ${missing.join(', ')}`);
+    }
+  }
+
+  return {
+    isValid: report.length === 0,
+    errors: report
+  };
+}
+
 function handleInit() {
   return {
     ok: true,
@@ -876,6 +915,19 @@ function getMainData(accountId) {
       use_yn: row.use_yn || 'Y'
     }));
 
+  const schemaResult = validateDatabaseSchema();
+  if (!schemaResult.isValid) {
+    return {
+      ok: false,
+      message: 'DB 스키마 검증 실패: ' + schemaResult.errors.join(' | '),
+      mainName: '',
+      characters: [],
+      selectedCount: 0,
+      weeklyRunCount: 0,
+      summary: []
+    };
+  }
+
   const selectedCount = availabilityRows
     .filter(row => formatDate(row.week_key) === actualWeekKey)
     .filter(row => normalizeCompareValue(row.account_id) === normalizeCompareValue(accountId))
@@ -1099,6 +1151,9 @@ function doGet(e) {
 
       case 'getMainData':
         return outputJson(getMainData(e.parameter.accountId));
+
+      case 'validateDatabaseSchema':
+        return outputJson(validateDatabaseSchema());
 
       case 'getPartyComposition':
         return outputJson(
