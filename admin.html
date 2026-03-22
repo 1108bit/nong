@@ -42,7 +42,7 @@
                 </div>
               </div>
             </div>
-            <div class="form-group" style="grid-column: 1 / -1;"><label class="input-label">메모</label><input type="text" id="noteInput" class="main-input" placeholder="예: 본캐 위주" /></div>
+            <div class="form-group" style="grid-column: 1 / -1;"><label class="input-label">메모</label><input type="text" id="noteInput" class="main-input" autocomplete="off" /></div>
           </div>
           <div class="admin-action-row">
             <button class="btn btn-primary" id="saveButton">일정 저장</button>
@@ -61,7 +61,7 @@
           <div class="form-group">
             <label class="input-label">유저 검색 (본캐명)</label>
             <div style="display: flex; gap: 8px;">
-              <input type="text" id="userAccountIdInput" class="main-input" placeholder="예: 농[젠카]" />
+              <input type="text" id="userAccountIdInput" class="main-input" autocomplete="off" />
               <button class="btn btn-primary" id="searchUserButton" style="flex-shrink: 0; min-width: 90px;">검색</button>
             </div>
           </div>
@@ -80,11 +80,11 @@
         </div>
         <div class="form-group">
           <label class="input-label">현재 관리자 코드</label>
-          <input type="password" id="oldAdminCodeInput" class="main-input" placeholder="현재 코드를 입력하세요" />
+          <input type="password" id="oldAdminCodeInput" class="main-input" autocomplete="new-password" />
         </div>
         <div class="form-group">
           <label class="input-label">새 관리자 코드</label>
-          <input type="text" id="newAdminCodeInput" class="main-input" placeholder="변경할 코드를 입력하세요" />
+          <input type="password" id="newAdminCodeInput" class="main-input" autocomplete="new-password" />
         </div>
         <div class="admin-action-row">
           <button class="btn btn-primary" id="changeAdminCodeButton">코드 변경</button>
