@@ -286,6 +286,7 @@ function createAccount(sheet, mainName, password) {
   if (createdAtCol > -1) row[createdAtCol] = createdAt;
 
   sheet.appendRow(row);
+  SpreadsheetApp.flush(); // 즉시 시트에 기록 반영
 
   return {
     ok: true,
@@ -402,6 +403,7 @@ function addCharacter(e) {
   if (updatedAtCol > -1) row[updatedAtCol] = updatedAt;
 
   sheet.appendRow(row);
+  SpreadsheetApp.flush(); // 즉시 시트에 기록 반영
 
   return {
     ok: true,
@@ -434,6 +436,7 @@ function deleteCharacter(accountId, characterName) {
     if (rowAccountId === normalizeCompareValue(accountId) &&
         rowName === normalizeCompareValue(characterName)) {
       sheet.deleteRow(i + 1);
+      SpreadsheetApp.flush();
       return {
         ok: true,
         message: '삭제되었습니다.'
@@ -486,6 +489,7 @@ function toggleCharacterType(accountId, characterName) {
       if (newType === '본캐') {
         updateAccountMainName(accountId, characterName);
       }
+      SpreadsheetApp.flush();
 
       return {
         ok: true,
@@ -551,6 +555,7 @@ function updateCharacter(e) {
       if (type === '본캐') {
         updateAccountMainName(accountId, name);
       }
+      SpreadsheetApp.flush();
 
       return {
         ok: true,
@@ -596,6 +601,7 @@ function updateCharacterByAdmin(e) {
       if (classCol > -1) sheet.getRange(i + 1, classCol + 1).setValue(newClass);
       if (typeCol > -1) sheet.getRange(i + 1, typeCol + 1).setValue(newType);
       if (powerCol > -1) sheet.getRange(i + 1, powerCol + 1).setValue(newPower);
+      SpreadsheetApp.flush();
 
       return { ok: true, message: '관리자 권한으로 수정되었습니다.' };
     }
