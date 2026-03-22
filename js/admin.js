@@ -87,6 +87,11 @@ async function loadAdminSchedule() {
 }
 
 async function saveSchedule() {
+  const btn = getEl("saveButton");
+  const originalText = btn.textContent;
+  btn.disabled = true;
+  btn.textContent = "저장 중...";
+
   const res = await callApi({
     action: "saveRaidSchedule",
     adminCode: getAdminCode(),
@@ -96,13 +101,19 @@ async function saveSchedule() {
     note: getEl("noteInput").value,
     openYn: "Y", status: "OPEN"
   });
+  
+  btn.disabled = false;
+  btn.textContent = originalText;
+
   if(res.ok) { alert("저장되었습니다."); loadAdminSchedule(); }
+  else { alert(res.message || "일정 저장에 실패했습니다."); }
 }
 
 async function deleteSchedule(date, day, time) {
   if(!confirm("정말 삭제하시겠습니까?")) return;
   const res = await callApi({ action: "deleteRaidSchedule", adminCode: getAdminCode(), date, day, timeSlot: time });
   if(res.ok) loadAdminSchedule();
+  else alert(res.message || "삭제에 실패했습니다.");
 }
 
 function editSchedule(date, day, time, note) {

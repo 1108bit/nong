@@ -736,7 +736,7 @@ function saveRaidSchedule(weekKey, date, day, timeSlot, openYn, status, note, so
   const noteCol = headers.indexOf('note');
   const sortCol = headers.indexOf('sort');
 
-  const actualWeekKey = normalizeValue(weekKey);
+  const actualWeekKey = normalizeValue(weekKey) || getCurrentWeekKey().weekKey;
   const actualDate = normalizeValue(date);
   const actualDay = normalizeValue(day);
   const actualTimeSlot = normalizeValue(timeSlot);
@@ -804,7 +804,7 @@ function deleteRaidSchedule(weekKey, date, day, timeSlot, adminCode) {
   const dayCol = headers.indexOf('day');
   const timeSlotCol = headers.indexOf('time_slot');
 
-  const actualWeekKey = normalizeValue(weekKey);
+  const actualWeekKey = normalizeValue(weekKey) || getCurrentWeekKey().weekKey;
   const actualDate = normalizeValue(date);
   const actualDay = normalizeValue(day);
   const actualTimeSlot = normalizeValue(timeSlot);
