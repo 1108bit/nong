@@ -927,6 +927,11 @@ function getPartyComposition(weekKey, day, timeSlot) {
   const party1 = [];
   const party2 = [];
 
+  // 치유성 경고
+  const warning = healers.length === 0
+    ? '선택된 시간대에 치유성 캐릭터가 없습니다. 치유성을 포함한 상태에서 재시도해주세요.'
+    : '';
+
   // 1. 치유성 분배 (1파티 우선 순차 배분)
   healers.forEach((h, idx) => {
     if (idx % 2 === 0 && party1.length < PARTY_SIZE) party1.push(h);
@@ -955,6 +960,7 @@ function getPartyComposition(weekKey, day, timeSlot) {
 
   return {
     ok: true,
+    warning,
     party1,
     party2,
     totalCount: party1.length + party2.length,

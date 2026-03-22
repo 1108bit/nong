@@ -28,6 +28,10 @@ async function showComposition(day, time) {
     const res = await callApi({ action: "getPartyComposition", day, time_slot: time });
     if(!res.ok) return alert(res.message);
 
+    if (res.warning) {
+        alert(res.warning);
+    }
+
     // 1파티, 2파티 렌더링
     renderParty("party1List", res.party1 || []);
     renderParty("party2List", res.party2 || []);
