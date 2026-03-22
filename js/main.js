@@ -86,17 +86,20 @@ function renderCharacters(items) {
 getEl("characterList").addEventListener("click", (e) => {
   const editBtn = e.target.closest(".character-edit-btn");
   if (editBtn) {
-    openEditModal(editBtn.dataset.name);
+    const name = editBtn.getAttribute("data-name");
+    if (name) openEditModal(name);
     return;
   }
   const toggleBtn = e.target.closest(".character-toggle-btn");
   if (toggleBtn) {
-    toggleCharacterType(toggleBtn.dataset.name);
+    const name = toggleBtn.getAttribute("data-name");
+    if (name) toggleCharacterType(name);
     return;
   }
   const delBtn = e.target.closest(".character-delete-btn");
   if (delBtn) {
-    confirmDelete(delBtn.dataset.name);
+    const name = delBtn.getAttribute("data-name");
+    if (name) confirmDelete(name);
     return;
   }
 });

@@ -3,16 +3,19 @@ const API_URL = "https://script.google.com/macros/s/AKfycbwOlszRW-sCVG7WH8hlWcwU
 // 서버 통신 함수
 async function callApi(params) {
   try {
+    console.log(`➡️ [API 요청] ${params.action} :`, params);
     params.t = new Date().getTime(); // 브라우저 캐싱 방지용 타임스탬프 추가
     const url = `${API_URL}?${new URLSearchParams(params).toString()}`;
     const res = await fetch(url);
     if (!res.ok) {
-      console.error(`API 오류 (${res.status}):`, res.statusText);
+      console.error(`❌ [API HTTP 오류] (${res.status}):`, res.statusText);
       return { ok: false, message: `서버 오류 (${res.status})` };
     }
-    return await res.json();
+    const data = await res.json();
+    console.log(`⬅️ [API 응답] ${params.action} :`, data);
+    return data;
   } catch (e) {
-    console.error("연결 오류:", e);
+    console.error("❌ [API 연결 실패]:", e);
     return { ok: false, message: "서버 연결에 실패했습니다." };
   }
 }
