@@ -313,6 +313,18 @@ getEl("logoutButton").onclick = () => {
     location.href = "index.html";
 };
 
+// 일반 유저 비밀번호 변경
+const changePwdBtn = getEl("changePwdButton");
+if (changePwdBtn) {
+  changePwdBtn.onclick = async () => {
+    const oldPwd = prompt("현재 비밀번호 4자리를 입력해주세요."); if (!oldPwd) return;
+    const newPwd = prompt("새롭게 설정할 비밀번호 4자리를 입력해주세요."); if (!newPwd) return;
+    if (oldPwd === newPwd) return alert("기존 비밀번호와 동일합니다.");
+    const res = await callApi({ action: "changePassword", accountId: getAccountId(), oldPassword: oldPwd, newPassword: newPwd });
+    alert(res.message);
+  };
+}
+
 // 하단 액션 바 버튼 연결
 const bottomAddBtn = getEl("bottomAddBtn");
 if (bottomAddBtn) {

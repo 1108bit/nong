@@ -108,7 +108,12 @@ async function openUserCharacterManager(targetAccountId) {
     return;
   }
 
-  getEl("userMessage").textContent = `${targetAccountId}의 캐릭터 목록 (${data.items.length}개)`;
+  const roleText = data.adminYn === 'Y' ? '<span style="color:var(--gold-1)">👑 운영진</span>' : '일반 유저';
+  getEl("userMessage").innerHTML = `
+    ${targetAccountId}의 캐릭터 목록 (${data.items.length}개) <br>
+    현재 권한: <strong>${roleText}</strong>
+    <button class="mini-btn" style="margin-left:12px;" onclick="toggleUserAdmin('${targetAccountId}')">권한 부여/해제</button>
+  `;
 
   const list = getEl("userCharacterList");
   list.innerHTML = data.items.map(c => `
@@ -164,6 +169,14 @@ function editUserCharacter(accountId, originalName, className, type, power) {
   });
 }
 
+// 유저 운영진 권한 토글
+async function toggleUserAdmin(targetAccountId) {
+  if(!confirm(`[${targetAccountId}] 계정의 운영진 권한을 변경하시겠습니까?`)) return;
+  const res = await callApi({ action: "toggleAdminRole", adminCode: getAdminCode(), targetAccountId });
+  alert(res.message);
+  if (res.ok) openUserCharacterManager(targetAccountId); // UI 갱신
+}
+
 // =========================
 // 보안 설정: 관리자 코드 변경 로직
 // =========================
@@ -196,5 +209,22 @@ if (changeAdminCodeBtn) {
       getEl("oldAdminCodeInput").value = "";
       getEl("newAdminCodeInput").value = "";
     }
+  };
+}
+
+// =========================
+// 마스터 비밀번호 변경 로직
+// =========================
+const changeMasterPwdBtn = getEl("changeMasterPwdBtn");
+if (changeMasterPwdBtn) {
+  changeMasterPwdBtn.onclick = async () => {
+    const oldPwd = getEl("oldMasterPwdInput").value.trim();
+    const newPwd = getEl("newMasterPwdInput").value.trim();
+    if (!oldPwd || !newPwd) return alert("비밀번호를 모두 입력해주세요.");
+    if (!confirm("마스터 비밀번호를 변경하시겠습니까?")) return;
+    
+    const res = await callApi({ action: "changeMasterPassword", adminCode: getAdminCode(), oldPassword: oldPwd, newPassword: newPwd });
+    alert(res.message);
+    if (res.ok) { getEl("oldMasterPwdInput").value = ""; getEl("newMasterPwdInput").value = ""; }
   };
 }

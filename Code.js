@@ -200,11 +200,12 @@ function login(mainName, password) {
   if (!password) return { ok: false, message: '비밀번호를 입력해주세요.' };
 
   // [최고 관리자(마스터) 전용 계정]
-  if (mainName === '관리자' && password === '1108') {
-    const settings = getKeyValueMap(SHEET_NAMES.SETTINGS);
+  const settings = getKeyValueMap(SHEET_NAMES.SETTINGS);
+  const masterPwd = settings.MASTER_PASSWORD || '1108';
+  if (mainName === '관리자' && password === masterPwd) {
     return {
       ok: true,
-      accountId: '관리자',
+      accountId: 'MASTER_ADMIN',
       mainName: '👑 마스터',
       isAdmin: true,
       adminCode: settings.ADMIN_CODE
@@ -320,6 +321,10 @@ function getCharacters(accountId) {
   }
 
   const rows = getRowsAsObjects(SHEET_NAMES.CHARACTERS);
+  const accRows = getRowsAsObjects(SHEET_NAMES.ACCOUNTS);
+  
+  const acc = accRows.find(r => normalizeCompareValue(r.account_id) === accountId);
+  const adminYn = acc ? (normalizeValue(acc.admin_yn).toUpperCase() === 'Y' ? 'Y' : 'N') : 'N';
 
   const items = rows
     .filter(row => normalizeCompareValue(row.account_id) === accountId)
@@ -338,7 +343,8 @@ function getCharacters(accountId) {
 
   return {
     ok: true,
-    items
+    items,
+    adminYn
   };
 }
 
@@ -1159,6 +1165,69 @@ function updateAdminCodeSetting(adminCode, newCode) {
   return { ok: true, message: '관리자 코드가 등록되었습니다.' };
 }
 
+function changePassword(accountId, oldPassword, newPassword) {
+  const sheet = getSheet(SHEET_NAMES.ACCOUNTS);
+  const values = sheet.getDataRange().getValues();
+  const headers = values[0].map(v => String(v).trim());
+  const accountIdCol = headers.indexOf('account_id');
+  const passwordCol = headers.indexOf('password');
+
+  if (passwordCol === -1) return { ok: false, message: '서버에 password 컬럼이 없습니다.' };
+
+  for (let i = 1; i < values.length; i++) {
+    if (normalizeCompareValue(values[i][accountIdCol]) === normalizeCompareValue(accountId)) {
+      const currentPwd = normalizeValue(values[i][passwordCol]);
+      if (currentPwd !== normalizeValue(oldPassword)) {
+        return { ok: false, message: '현재 비밀번호가 일치하지 않습니다.' };
+      }
+      sheet.getRange(i + 1, passwordCol + 1).setValue(normalizeValue(newPassword));
+      return { ok: true, message: '비밀번호가 성공적으로 변경되었습니다.' };
+    }
+  }
+  return { ok: false, message: '계정을 찾을 수 없습니다.' };
+}
+
+function changeMasterPassword(adminCode, oldPassword, newPassword) {
+  validateAdminCode(adminCode);
+  const settings = getKeyValueMap(SHEET_NAMES.SETTINGS);
+  const currentMaster = settings.MASTER_PASSWORD || '1108';
+  
+  if (currentMaster !== normalizeValue(oldPassword)) {
+    return { ok: false, message: '현재 마스터 비밀번호가 일치하지 않습니다.' };
+  }
+  
+  const sheet = getSheet(SHEET_NAMES.SETTINGS);
+  const values = sheet.getDataRange().getValues();
+  for (let i = 1; i < values.length; i++) {
+    if (normalizeValue(values[i][0]) === 'MASTER_PASSWORD') {
+      sheet.getRange(i + 1, 2).setValue(normalizeValue(newPassword));
+      return { ok: true, message: '마스터 비밀번호가 변경되었습니다.' };
+    }
+  }
+  sheet.appendRow(['MASTER_PASSWORD', normalizeValue(newPassword)]);
+  return { ok: true, message: '마스터 비밀번호가 설정되었습니다.' };
+}
+
+function toggleAdminRole(adminCode, targetAccountId) {
+  validateAdminCode(adminCode);
+  const sheet = getSheet(SHEET_NAMES.ACCOUNTS);
+  const values = sheet.getDataRange().getValues();
+  const accountIdCol = values[0].map(v => String(v).trim()).indexOf('account_id');
+  const adminYnCol = values[0].map(v => String(v).trim()).indexOf('admin_yn');
+  
+  if (adminYnCol === -1) return { ok: false, message: 'admin_yn 컬럼이 없습니다.' };
+
+  for (let i = 1; i < values.length; i++) {
+    if (normalizeCompareValue(values[i][accountIdCol]) === normalizeCompareValue(targetAccountId)) {
+      const currentRole = normalizeValue(values[i][adminYnCol]).toUpperCase();
+      const newRole = currentRole === 'Y' ? 'N' : 'Y';
+      sheet.getRange(i + 1, adminYnCol + 1).setValue(newRole);
+      return { ok: true, message: `운영진 권한이 ${newRole === 'Y' ? '부여' : '해제'}되었습니다.`, newRole };
+    }
+  }
+  return { ok: false, message: '계정을 찾을 수 없습니다.' };
+}
+
 /************************************************
  * 라우팅
  ************************************************/
@@ -1276,6 +1345,15 @@ function doGet(e) {
 
       case 'updateAdminCodeSetting':
         return outputJson(updateAdminCodeSetting(e.parameter.adminCode, e.parameter.newAdminCode));
+
+      case 'changePassword':
+        return outputJson(changePassword(e.parameter.accountId, e.parameter.oldPassword, e.parameter.newPassword));
+        
+      case 'changeMasterPassword':
+        return outputJson(changeMasterPassword(e.parameter.adminCode, e.parameter.oldPassword, e.parameter.newPassword));
+        
+      case 'toggleAdminRole':
+        return outputJson(toggleAdminRole(e.parameter.adminCode, e.parameter.targetAccountId));
 
       default:
         return outputJson({

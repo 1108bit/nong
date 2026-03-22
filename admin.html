@@ -61,6 +61,21 @@
         </article>
 
       <article class="main-card admin-card-full">
+        <div class="card-head"><h2 class="section-title">마스터 계정 설정</h2></div>
+        <div class="form-group">
+          <label class="input-label">현재 마스터 비밀번호</label>
+          <input type="password" id="oldMasterPwdInput" class="main-input" placeholder="현재 비밀번호" />
+        </div>
+        <div class="form-group">
+          <label class="input-label">새 마스터 비밀번호</label>
+          <input type="password" id="newMasterPwdInput" class="main-input" placeholder="변경할 4자리 숫자" maxlength="4" />
+        </div>
+        <div class="admin-action-row">
+          <button class="btn btn-primary" id="changeMasterPwdBtn">마스터 비밀번호 변경</button>
+        </div>
+      </article>
+
+      <article class="main-card admin-card-full">
         <div class="card-head"><h2 class="section-title">보안 설정</h2></div>
         <div class="form-group">
           <label class="input-label">현재 관리자 코드</label>
