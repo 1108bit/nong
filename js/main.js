@@ -5,6 +5,13 @@ async function loadMain() {
   const accountId = getAccountId();
   if (!accountId) return location.href = "index.html";
 
+  const list = getEl("characterList");
+  // 데이터를 가져오기 전 가짜 카드를 보여줌
+  list.innerHTML = `
+    <div class="character-card skeleton" style="height:86px; margin-bottom:10px;"></div>
+    <div class="character-card skeleton" style="height:86px; margin-bottom:10px;"></div>
+  `;
+
   const data = await callApi({ action: "getMainData", accountId });
   if (!data.ok) return;
 
@@ -15,7 +22,8 @@ async function loadMain() {
   // 등록된 캐릭터 중 '본캐'가 있는지 확인
   hasMainCharacter = data.characters?.some(c => c.type === "본캐");
 
-  renderCharacters(data.characters || []);
+  window.characters = data.characters || [];
+  renderCharacters(window.characters);
   applyTouchPop();
 }
 
@@ -27,70 +35,30 @@ function renderCharacters(items) {
     return;
   }
 
-  list.innerHTML = items.map((c, idx) => {
-    const powerValue = Number(c.power) || 0;
-    const powerRange = getPowerRange(powerValue); // 구간 계산 호출
-    const isMainChar = c.type === "본캐";
-
+  list.innerHTML = items.map(c => {
+    const isMainChar = c.type === '본캐';
+    const pRange = getPowerRange(c.power);
+    
     return `
-      <div class="character-card" data-char-index="${idx}">
+      <div class="character-card ${isMainChar ? 'main-char-card' : ''}">
         <div class="character-left">
           <div class="character-name">${escapeHtml(c.character_name)}</div>
           <div class="character-sub">
             <span class="chip chip-class ${escapeHtml(c.className)}">${escapeHtml(c.className)}</span>
-            <span class="chip chip-type">${escapeHtml(c.type)}</span>
+            <span class="chip chip-type ${isMainChar ? 'main' : 'sub'}">${escapeHtml(c.type)}</span>
           </div>
         </div>
         <div class="character-right">
-          <div class="character-power">${powerRange}</div> 
-          <div class="character-state ${c.use_yn === 'Y' ? 'on' : 'off'}">
-            ${c.use_yn === 'Y' ? '사용중' : '미사용'}
+          <div class="character-power">${pRange}</div>
+          <div class="character-actions">
+            <button class="character-edit-btn" title="편집" onclick="openEditModal('${escapeHtml(c.character_name)}')">✎</button>
+            <button class="character-toggle-btn" title="본캐/부캐 전환" onclick="toggleCharacterType('${escapeHtml(c.character_name)}')">⇄</button>
+            ${!isMainChar ? `<button class="character-delete-btn" title="삭제" onclick="confirmDelete('${escapeHtml(c.character_name)}')">✕</button>` : ''}
           </div>
-          ${!isMainChar ? `<button class="character-delete-btn" data-char-name="${escapeHtml(c.character_name)}" data-is-main="${isMainChar}" title="캐릭터 삭제">✕</button>` : ''}
-          <button class="character-edit-btn" data-char-name="${escapeHtml(c.character_name)}" data-char-data='${JSON.stringify(c)}' title="캐릭터 편집">✏️</button>
-          <button class="character-toggle-btn" data-char-name="${escapeHtml(c.character_name)}" data-current-type="${escapeHtml(c.type)}" title="타입 전환">🔄</button>
         </div>
       </div>
     `;
   }).join("");
-  
-  // 삭제 버튼 이벤트 리스너 추가
-  document.querySelectorAll(".character-delete-btn").forEach(btn => {
-    btn.onclick = (e) => {
-      e.stopPropagation();
-      const charName = btn.dataset.charName;
-      const isMain = btn.dataset.isMain === "true";
-      if (isMain) {
-        alert("본캐는 삭제할 수 없습니다.");
-        return;
-      }
-      if (confirm(`'${charName}' 캐릭터를 삭제하시겠습니까?`)) {
-        deleteCharacter(charName);
-      }
-    };
-  });
-
-  // 편집 버튼 이벤트 리스너 추가
-  document.querySelectorAll(".character-edit-btn").forEach(btn => {
-    btn.onclick = (e) => {
-      e.stopPropagation();
-      const charData = JSON.parse(btn.dataset.charData);
-      editCharacter(charData);
-    };
-  });
-
-  // 타입 전환 버튼 이벤트 리스너 추가
-  document.querySelectorAll(".character-toggle-btn").forEach(btn => {
-    btn.onclick = (e) => {
-      e.stopPropagation();
-      const charName = btn.dataset.charName;
-      const currentType = btn.dataset.currentType;
-      const newType = currentType === "본캐" ? "부캐" : "본캐";
-      if (confirm(`'${charName}' 캐릭터를 ${newType}로 변경하시겠습니까?`)) {
-        toggleCharacterType(charName);
-      }
-    };
-  });
 }
 
 // 모달 열기 로직 개선
@@ -130,68 +98,113 @@ getEl("addCharacterButton").onclick = () => {
 };
 
 // 캐릭터 등록 실행
-getEl("submitCharacterButton").onclick = async () => {
-    const name = getEl("modalCharacterName").value.trim();
-    const className = getEl("modalCharacterClass").value;
-    const type = getEl("modalCharacterType").value;
-    const power = getEl("modalCharacterPower").value;
+getEl("submitCharacterButton").onclick = () => submitCharacter();
 
-    if(!name || !className) return alert("이름과 클래스를 입력해주세요.");
-    
-    const modal = getEl("characterModal");
-    const isEditMode = modal.dataset.mode === "edit";
-    const originalName = modal.dataset.originalName;
+// 버튼 처리 중 상태 관리 (캐릭터 등록 시)
+async function submitCharacter() {
+  const btn = getEl("submitCharacterButton");
+  const originalText = btn.textContent;
+  
+  // 처리 중 UI 고정
+  btn.disabled = true;
+  btn.textContent = "처리 중...";
+  btn.style.opacity = "0.6";
 
-    // 입력 값 검증
-    if (type === "본캐" && !hasMainCharacter) {
-        // 본캐 등록 시 입력한 이름이 로그인 이름과 같은지 확인
-        if (name !== getMainName()) {
-            alert(`본캐 이름은 '${getMainName()}'과(와) 같아야 합니다.`);
-            return;
-        }
+  const name = getEl("modalCharacterName").value.trim();
+  const className = getEl("modalCharacterClass").value;
+  const type = getEl("modalCharacterType").value;
+  const power = getEl("modalCharacterPower").value;
+
+  if(!name || !className) {
+    // 버튼 복구
+    btn.disabled = false;
+    btn.textContent = originalText;
+    btn.style.opacity = "1";
+    return alert("이름과 클래스를 입력해주세요.");
+  }
+  
+  const modal = getEl("characterModal");
+  const isEditMode = modal.dataset.mode === "edit";
+  const originalName = modal.dataset.originalName;
+
+  // 입력 값 검증
+  if (type === "본캐" && !hasMainCharacter) {
+    // 본캐 등록 시 입력한 이름이 로그인 이름과 같은지 확인
+    if (name !== getMainName()) {
+      // 버튼 복구
+      btn.disabled = false;
+      btn.textContent = originalText;
+      btn.style.opacity = "1";
+      alert(`본캐 이름은 '${getMainName()}'과(와) 같아야 합니다.`);
+      return;
     }
+  }
 
-    const apiAction = isEditMode ? "updateCharacter" : "addCharacter";
-    const apiParams = {
-        action: apiAction,
-        accountId: getAccountId(),
-        name, className, type, power
-    };
+  const apiAction = isEditMode ? "updateCharacter" : "addCharacter";
+  const apiParams = {
+    action: apiAction,
+    accountId: getAccountId(),
+    name, className, type, power
+  };
 
-    if (isEditMode) {
-        apiParams.originalName = originalName;
+  if (isEditMode) {
+    apiParams.originalName = originalName;
+  }
+
+  const res = await callApi(apiParams);
+
+  // 완료 후 복구
+  btn.disabled = false;
+  btn.textContent = originalText;
+  btn.style.opacity = "1";
+
+  if(res.ok) {
+    getEl("characterModal").classList.remove("show");
+    document.body.classList.remove("modal-open");
+    // 모드 초기화
+    getEl("characterModal").dataset.mode = "";
+    getEl("characterModal").dataset.originalName = "";
+    getEl("modalTitle").textContent = "캐릭터 추가";
+    getEl("submitCharacterButton").textContent = "등록하기";
+    loadMain();
+  } else {
+    alert(res.message || "처리에 실패했습니다.");
+  }
+}
+
+// 캐릭터 삭제 확인 함수
+async function confirmDelete(characterName) {
+  if (!confirm(`'${characterName}' 캐릭터를 삭제하시겠습니까?`)) return;
+
+  // 1. 해당 캐릭터 카드 요소 찾기
+  const cards = document.querySelectorAll(".character-card");
+  let targetCard = null;
+  cards.forEach(card => {
+    if (card.querySelector(".character-name").textContent === characterName) {
+      targetCard = card;
     }
+  });
 
-    const res = await callApi(apiParams);
+  // 2. 애니메이션 적용
+  if (targetCard) {
+    targetCard.classList.add("removing");
+  }
 
-    if(res.ok) {
-        getEl("characterModal").classList.remove("show");
-        document.body.classList.remove("modal-open");
-        // 모드 초기화
-        getEl("characterModal").dataset.mode = "";
-        getEl("characterModal").dataset.originalName = "";
-        getEl("modalTitle").textContent = "캐릭터 추가";
-        getEl("submitCharacterButton").textContent = "등록하기";
-        loadMain();
-    } else {
-        alert(res.message || "처리에 실패했습니다.");
-    }
-};
-
-// 캐릭터 삭제 함수
-async function deleteCharacter(characterName) {
+  // 3. 애니메이션 시간(0.4초) 대기 후 실제 삭제 API 호출
+  setTimeout(async () => {
     const res = await callApi({
-        action: "deleteCharacter",
-        accountId: getAccountId(),
-        characterName: characterName
+      action: "deleteCharacter",
+      accountId: getAccountId(),
+      characterName: characterName
     });
 
     if (res.ok) {
-        alert(`'${characterName}' 캐릭터가 삭제되었습니다.`);
-        loadMain();
+      loadMain(); // 리스트 새로고침
     } else {
-        alert(res.message || "캐릭터 삭제에 실패했습니다.");
+      alert(res.message || "캐릭터 삭제에 실패했습니다.");
+      if (targetCard) targetCard.classList.remove("removing"); // 실패 시 복구
     }
+  }, 400);
 }
 
 // 캐릭터 편집 함수
@@ -259,22 +272,22 @@ function closeModal() {
 
 getEl("closeCharacterModalButton").onclick = closeModal;
 getEl("cancelCharacterButton").onclick = closeModal;
-    getEl("modalCharacterPower").onchange = (e) => {
-        const power = Number(e.target.value);
-        const rangeText = getPowerRange(power);
-
-        let hintEl = document.querySelector('.modal-power-hint');
-        if (!hintEl) {
-            hintEl = document.createElement('div');
-            hintEl.className = 'modal-power-hint';
-            hintEl.style.fontSize = '12px';
-            hintEl.style.color = 'var(--text-sub)';
-            hintEl.style.marginTop = '4px';
-            getEl('modalCharacterPower').parentElement.appendChild(hintEl);
-        }
-
-        hintEl.textContent = `전투력 구간: ${rangeText}`;
-    };
+getEl("modalCharacterPower").oninput = (e) => {
+    const power = e.target.value;
+    const rangeText = getPowerRange(power); // 50단위 구간 계산
+    
+    // 안내 문구를 띄울 요소를 찾거나 생성합니다.
+    let hintEl = getEl("powerRangeHint");
+    if (!hintEl) {
+        hintEl = document.createElement("div");
+        hintEl.id = "powerRangeHint";
+        hintEl.className = "input-hint"; // CSS로 스타일링 가능
+        getEl("modalCharacterPower").after(hintEl);
+    }
+    
+    hintEl.textContent = `현재 구간: ${rangeText}`;
+    hintEl.style.color = "#6cb9ff"; // 포인트 컬러 적용
+};
 // 버튼 연결
 getEl("goAvailabilityButton").onclick = () => movePage("availability.html");
 getEl("goPartyButton").onclick = () => movePage("party.html");

@@ -43,6 +43,19 @@
         </article>
 
         <article class="main-card admin-card-full">
+          <div class="card-head"><h2 class="section-title">유저 캐릭터 관리</h2></div>
+          <div class="form-group">
+            <label class="input-label">유저 계정 ID</label>
+            <input type="text" id="userAccountIdInput" class="main-input" placeholder="예: user123" />
+          </div>
+          <div class="admin-action-row">
+            <button class="btn btn-primary" id="searchUserButton">유저 검색</button>
+          </div>
+          <div class="page-message" id="userMessage">계정 ID를 입력하고 검색하세요.</div>
+          <div class="admin-list" id="userCharacterList"></div>
+        </article>
+
+        <article class="main-card admin-card-full">
           <div class="card-head"><h2 class="section-title">등록된 일정 목록</h2></div>
           <div class="admin-list" id="scheduleList"></div>
         </article>

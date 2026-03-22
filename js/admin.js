@@ -87,4 +87,79 @@ getEl("checkSchemaButton").onclick = async () => {
 };
 getEl("backButton").onclick = () => movePage("main.html");
 
+getEl("searchUserButton").onclick = async () => {
+  const targetAccountId = getEl("userAccountIdInput").value.trim();
+  if (!targetAccountId) return alert("계정 ID를 입력하세요.");
+  await openUserCharacterManager(targetAccountId);
+};
+
 loadAdminSchedule();
+
+// 특정 유저의 캐릭터 정보를 불러와서 편집 모달 띄우기
+async function openUserCharacterManager(targetAccountId) {
+  const data = await callApi({ 
+    action: "getCharacters", 
+    accountId: targetAccountId 
+  });
+  
+  if (!data.ok) {
+    getEl("userMessage").textContent = "유저를 찾을 수 없습니다.";
+    getEl("userCharacterList").innerHTML = "";
+    return;
+  }
+
+  getEl("userMessage").textContent = `${targetAccountId}의 캐릭터 목록 (${data.items.length}개)`;
+
+  const list = getEl("userCharacterList");
+  list.innerHTML = data.items.map(c => `
+    <div class="character-card">
+      <div class="character-left">
+        <div class="character-name">${escapeHtml(c.name)}</div>
+        <div class="character-sub">
+          <span class="chip chip-class ${escapeHtml(c.className)}">${escapeHtml(c.className)}</span>
+          <span class="chip chip-type">${escapeHtml(c.type)}</span>
+        </div>
+      </div>
+      <div class="character-right">
+        <div class="character-power">${getPowerRange(c.power)}</div>
+        <div class="character-actions">
+          <button class="character-edit-btn" onclick="editUserCharacter('${escapeHtml(targetAccountId)}', '${escapeHtml(c.name)}', '${escapeHtml(c.className)}', '${escapeHtml(c.type)}', '${escapeHtml(c.power)}')">편집</button>
+        </div>
+      </div>
+    </div>
+  `).join("");
+}
+
+// 유저 캐릭터 편집 모달 (간단한 prompt 사용)
+function editUserCharacter(accountId, originalName, className, type, power) {
+  const newName = prompt("캐릭터 이름", originalName);
+  if (!newName) return;
+
+  const newClass = prompt("직업", className);
+  if (!newClass) return;
+
+  const newType = prompt("타입 (본캐/부캐)", type);
+  if (!newType) return;
+
+  const newPower = prompt("전투력", power);
+  if (!newPower) return;
+
+  // updateCharacterByAdmin 호출
+  callApi({
+    action: "updateCharacterByAdmin",
+    adminCode: getAdminCode(),
+    targetAccountId: accountId,
+    originalName: originalName,
+    newName: newName,
+    newClass: newClass,
+    newType: newType,
+    newPower: newPower
+  }).then(res => {
+    if (res.ok) {
+      alert("수정되었습니다.");
+      openUserCharacterManager(accountId); // 목록 새로고침
+    } else {
+      alert(res.message || "수정 실패");
+    }
+  });
+}

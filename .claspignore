@@ -1,0 +1,13 @@
+# Clasp ignore file
+# Ignore client-side files
+js/
+css/
+images/
+*.html
+deploy.bat
+deploy.sh
+package.json
+.git/
+.gitattributes
+README.md
+.claspignore

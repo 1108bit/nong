@@ -376,37 +376,43 @@ a {
 /* =========================
    직업별 고유 색상 (아이온2)
 ========================= */
+.chip-class, .party-chip {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-size: 11px;
+  font-weight: 500;
+  border: 1px solid transparent;
+}
+
+/* 파란색 계열: 수호성, 검성 */
 .chip-class.수호성, .party-chip.수호성,
-.chip-class.검성, .party-chip.검성 {
-  background: rgba(59, 130, 246, 0.2);
-  color: #bfdbfe;
-  border-color: rgba(59, 130, 246, 0.4);
+.chip-class.검성, .party-chip.검성 { 
+  background: rgba(59, 130, 246, 0.15); color: #bfdbfe; border-color: rgba(59, 130, 246, 0.3); 
 }
 
+/* 초록색 계열: 살성, 궁성 */
 .chip-class.살성, .party-chip.살성,
-.chip-class.궁성, .party-chip.궁성 {
-  background: rgba(16, 185, 129, 0.2);
-  color: #a7f3d0;
-  border-color: rgba(16, 185, 129, 0.4);
+.chip-class.궁성, .party-chip.궁성 { 
+  background: rgba(16, 185, 129, 0.15); color: #a7f3d0; border-color: rgba(16, 185, 129, 0.3); 
 }
 
+/* 보라색 계열: 마도성, 정령성 */
 .chip-class.마도성, .party-chip.마도성,
-.chip-class.정령성, .party-chip.정령성 {
-  background: rgba(168, 85, 247, 0.2);
-  color: #e9d5ff;
-  border-color: rgba(168, 85, 247, 0.4);
+.chip-class.정령성, .party-chip.정령성 { 
+  background: rgba(168, 85, 247, 0.15); color: #e9d5ff; border-color: rgba(168, 85, 247, 0.3); 
 }
 
-.chip-class.호법성, .party-chip.호법성 {
-  background: rgba(249, 115, 22, 0.2);
-  color: #ffedd5;
-  border-color: rgba(249, 115, 22, 0.4);
+/* 주황색 계열: 호법성 */
+.chip-class.호법성, .party-chip.호법성 { 
+  background: rgba(249, 115, 22, 0.15); color: #ffedd5; border-color: rgba(249, 115, 22, 0.3); 
 }
 
-.chip-class.치유성, .party-chip.치유성 {
-  background: rgba(250, 204, 21, 0.2);
-  color: #fef9c3;
-  border-color: rgba(250, 204, 21, 0.4);
+/* 노란색 계열: 치유성 (힐러 강조) */
+.chip-class.치유성, .party-chip.치유성 { 
+  background: rgba(250, 204, 21, 0.15); color: #fef9c3; border-color: rgba(250, 204, 21, 0.3); 
   font-weight: 900;
 }
 
@@ -433,6 +439,33 @@ a {
 /* =========================
    입력
 ========================= */
+
+.character-actions {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+}
+
+.character-edit-btn, .character-delete-btn, .character-toggle-btn {
+  width: 28px;
+  height: 28px;
+  border-radius: 6px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(255, 255, 255, 0.03); /* 투명한 배경 */
+  color: var(--text-sub);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+/* 버튼 마우스 호버(Hover) 효과 */
+.character-edit-btn:hover { background: rgba(59, 130, 246, 0.2); color: #93c5fd; border-color: rgba(59, 130, 246, 0.4); }
+.character-delete-btn:hover { background: rgba(244, 63, 94, 0.2); color: #fda4af; border-color: rgba(244, 63, 94, 0.4); }
+.character-toggle-btn:hover { background: rgba(168, 85, 247, 0.2); color: #e9d5ff; border-color: rgba(168, 85, 247, 0.4); }
+
 
 .admin-card-risk {
   border: 1px solid rgba(251, 113, 133, 0.5) !important;
@@ -1190,12 +1223,6 @@ a {
   font-weight: 800;
 }
 
-.chip-class {
-  background: rgba(67, 217, 255, 0.15);
-  border: 1px solid rgba(67, 217, 255, 0.25);
-  color: #8ef3ff;
-}
-
 .chip-type {
   background: rgba(168, 85, 247, 0.14);
   border: 1px solid rgba(168, 85, 247, 0.25);
@@ -1571,6 +1598,57 @@ body.modal-open {
   font-weight: 900;
   letter-spacing: -0.02em;
   word-break: break-all;
+}
+
+/* 스켈레톤 애니메이션 */
+.skeleton {
+  position: relative;
+  overflow: hidden;
+  background: rgba(255, 255, 255, 0.05) !important;
+  border-color: rgba(255, 255, 255, 0.05) !important;
+  pointer-events: none;
+}
+
+.skeleton::after {
+  content: "";
+  position: absolute;
+  top: 0; left: 0; width: 100%; height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.08), transparent);
+  animation: skeleton-shimmer 1.5s infinite;
+}
+
+@keyframes skeleton-shimmer {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(100%); }
+}
+
+/* 부드러운 나타남 효과 */
+.character-card {
+  animation: card-fade-in 0.4s ease-out;
+}
+
+@keyframes card-fade-in {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* 캐릭터 카드 삭제 애니메이션 */
+.character-card.removing {
+  animation: card-slide-out 0.4s ease-in forwards;
+  pointer-events: none; /* 삭제 중 클릭 방지 */
+}
+
+@keyframes card-slide-out {
+  0% {
+    transform: translateX(0);
+    opacity: 1;
+  }
+  100% {
+    transform: translateX(-100%);
+    opacity: 0;
+    margin-bottom: -86px; /* 아래 카드들이 부드럽게 올라오도록 설정 */
+  }
+}
 }
 
 .party-member-chips {

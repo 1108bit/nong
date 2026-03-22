@@ -520,6 +520,44 @@ function updateCharacter(e) {
   };
 }
 
+/**
+ * [운영자 전용] 특정 계정의 모든 캐릭터 정보를 수정합니다.
+ */
+function updateCharacterByAdmin(e) {
+  validateAdminCode(e.parameter.adminCode); // 관리자 인증 확인
+  
+  const accountId = normalizeValue(e.parameter.targetAccountId);
+  const originalName = normalizeValue(e.parameter.originalName);
+  const newName = normalizeValue(e.parameter.newName);
+  const newClass = normalizeValue(e.parameter.newClass);
+  const newType = normalizeValue(e.parameter.newType);
+  const newPower = normalizeValue(e.parameter.newPower);
+
+  const sheet = getSheet(SHEET_NAMES.CHARACTERS);
+  const values = sheet.getDataRange().getValues();
+  const headers = values[0].map(v => String(v).trim());
+
+  const accCol = headers.indexOf('account_id');
+  const nameCol = headers.indexOf('name');
+  const classCol = headers.indexOf('class_name');
+  const typeCol = headers.indexOf('type');
+  const powerCol = headers.indexOf('power');
+
+  for (let i = 1; i < values.length; i++) {
+    if (normalizeCompareValue(values[i][accCol]) === normalizeCompareValue(accountId) &&
+        normalizeCompareValue(values[i][nameCol]) === normalizeCompareValue(originalName)) {
+      
+      if (nameCol > -1) sheet.getRange(i + 1, nameCol + 1).setValue(newName);
+      if (classCol > -1) sheet.getRange(i + 1, classCol + 1).setValue(newClass);
+      if (typeCol > -1) sheet.getRange(i + 1, typeCol + 1).setValue(newType);
+      if (powerCol > -1) sheet.getRange(i + 1, powerCol + 1).setValue(newPower);
+
+      return { ok: true, message: '관리자 권한으로 수정되었습니다.' };
+    }
+  }
+  return { ok: false, message: '캐릭터를 찾을 수 없습니다.' };
+}
+
 function updateAccountMainName(accountId, newMainName) {
   accountId = normalizeValue(accountId);
   newMainName = normalizeValue(newMainName);
@@ -1166,6 +1204,9 @@ function doGet(e) {
 
       case 'adminLogin':
         return outputJson(adminLogin(e.parameter.adminCode));
+
+      case 'updateCharacterByAdmin':
+        return outputJson(updateCharacterByAdmin(e));
 
       default:
         return outputJson({
