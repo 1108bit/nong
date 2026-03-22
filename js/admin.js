@@ -1,3 +1,43 @@
+// 날짜 칩 자동 생성 로직 (오늘부터 14일)
+function initDateChips() {
+  const group = getEl("dateChipGroup");
+  if (!group) return;
+  
+  const days = ["일", "월", "화", "수", "목", "금", "토"];
+  const today = new Date();
+  let html = "";
+  
+  for(let i = 0; i < 14; i++) {
+    const d = new Date(today);
+    d.setDate(today.getDate() + i);
+    const yyyy = d.getFullYear();
+    const mm = String(d.getMonth() + 1).padStart(2, '0');
+    const dd = String(d.getDate()).padStart(2, '0');
+    const dayStr = days[d.getDay()];
+    
+    const dateVal = `${yyyy}-${mm}-${dd}`;
+    const displayVal = `${mm}.${dd} (${dayStr})`;
+    
+    const isWeekend = (dayStr === '토' || dayStr === '일') ? 'color: var(--blue-1);' : '';
+    const isSelected = i === 0 ? "selected" : "";
+    
+    html += `<button type="button" class="chip-btn ${isSelected}" data-date="${dateVal}" data-day="${dayStr}" style="white-space: nowrap; ${isWeekend}">${displayVal}</button>`;
+    
+    if (i === 0) {
+        getEl("dateInput").value = dateVal;
+        getEl("dayInput").value = dayStr;
+    }
+  }
+  group.innerHTML = html;
+  
+  group.addEventListener("click", e => {
+     const btn = e.target.closest(".chip-btn");
+     if(!btn) return;
+     getEl("dateInput").value = btn.dataset.date;
+     getEl("dayInput").value = btn.dataset.day;
+  });
+}
+
 async function loadAdminSchedule() {
   const adminCode = getAdminCode();
   if (!adminCode) return movePage("admin-login.html");
@@ -70,8 +110,21 @@ function editSchedule(date, day, time, note) {
   getEl("dayInput").value = day;
   getEl("timeSlotInput").value = time;
   getEl("noteInput").value = note;
+
+  // 칩 시각적 연동
+  const dateGroup = getEl("dateChipGroup");
+  if (dateGroup) dateGroup.querySelectorAll(".chip-btn").forEach(b => b.classList.toggle("selected", b.dataset.date === date));
+  
+  const timeGroup = document.querySelector(`[data-target="timeSlotInput"]`);
+  if (timeGroup) timeGroup.querySelectorAll(".chip-btn").forEach(b => b.classList.toggle("selected", b.dataset.value === time));
+
   window.scrollTo(0, 0);
 }
+
+getEl("timeSlotInput").addEventListener("input", (e) => {
+   const timeGroup = document.querySelector(`[data-target="timeSlotInput"]`);
+   if (timeGroup) timeGroup.querySelectorAll(".chip-btn").forEach(b => b.classList.toggle("selected", b.dataset.value === e.target.value));
+});
 
 getEl("saveButton").onclick = saveSchedule;
 getEl("refreshButton").onclick = loadAdminSchedule;
@@ -93,6 +146,7 @@ getEl("searchUserButton").onclick = async () => {
   await openUserCharacterManager(targetAccountId);
 };
 
+initDateChips();
 loadAdminSchedule();
 
 // 특정 유저의 캐릭터 정보를 불러와서 편집 모달 띄우기

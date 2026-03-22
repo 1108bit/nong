@@ -24,16 +24,25 @@
         <article class="main-card admin-card-full">
           <div class="card-head"><h2 class="section-title">일정 등록/수정</h2></div>
           <div class="admin-form-grid">
-            <div class="form-group"><label class="input-label">날짜</label><input type="date" id="dateInput" class="main-input" /></div>
-            <div class="form-group">
-              <label class="input-label">요일</label>
-              <select id="dayInput" class="character-select">
-                <option value="수">수</option><option value="목">목</option><option value="금">금</option>
-                <option value="토">토</option><option value="일">일</option><option value="월">월</option><option value="화">화</option>
-              </select>
+            <div class="form-group" style="grid-column: 1 / -1;">
+              <label class="input-label">일자 선택</label>
+              <div class="chip-select-group horizontal-scroll-chips" id="dateChipGroup"></div>
+              <input type="hidden" id="dateInput" />
+              <input type="hidden" id="dayInput" />
             </div>
-            <div class="form-group"><label class="input-label">시간</label><input type="text" id="timeSlotInput" class="main-input" placeholder="예: 21:00" /></div>
-            <div class="form-group"><label class="input-label">메모</label><input type="text" id="noteInput" class="main-input" placeholder="예: 본캐 위주" /></div>
+            <div class="form-group" style="grid-column: 1 / -1;">
+              <label class="input-label">시간 선택</label>
+              <div class="chip-select-group" data-target="timeSlotInput" style="margin-bottom: 8px;">
+                <button type="button" class="chip-btn" data-value="20:00">20:00</button>
+                <button type="button" class="chip-btn selected" data-value="21:00">21:00</button>
+                <button type="button" class="chip-btn" data-value="21:30">21:30</button>
+                <button type="button" class="chip-btn" data-value="22:00">22:00</button>
+                <button type="button" class="chip-btn" data-value="23:00">23:00</button>
+                <button type="button" class="chip-btn" data-value="24:00">24:00</button>
+              </div>
+              <input type="time" id="timeSlotInput" class="main-input" value="21:00" style="color-scheme: dark;" />
+            </div>
+            <div class="form-group" style="grid-column: 1 / -1;"><label class="input-label">메모</label><input type="text" id="noteInput" class="main-input" placeholder="예: 본캐 위주" /></div>
           </div>
           <div class="admin-action-row">
             <button class="btn btn-primary" id="saveButton">일정 저장</button>

@@ -1563,6 +1563,18 @@ body.modal-open {
   margin-top: 6px;
 }
 
+/* 가로 스크롤 전용 칩 그룹 (앱스타일 UI) */
+.horizontal-scroll-chips {
+  flex-wrap: nowrap;
+  overflow-x: auto;
+  padding-bottom: 6px;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none; /* Firefox */
+}
+.horizontal-scroll-chips::-webkit-scrollbar {
+  display: none; /* Chrome, Safari */
+}
+
 .chip-btn {
   cursor: pointer;
   opacity: 0.4;
