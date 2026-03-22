@@ -62,6 +62,21 @@ function initDateChips() {
   }
 }
 
+// 캘린더 아이콘 날짜 선택 연동
+const customDateInput = getEl("customDateInput");
+if (customDateInput) {
+    customDateInput.addEventListener("change", (e) => {
+        const selectedDate = e.target.value;
+        if (selectedDate) {
+            const d = new Date(selectedDate);
+            const days = ["일", "월", "화", "수", "목", "금", "토"];
+            getEl("dateInput").value = selectedDate;
+            getEl("dayInput").value = days[d.getDay()];
+            document.querySelectorAll("#dateChipGroup .chip-btn").forEach(b => b.classList.remove("selected"));
+        }
+    });
+}
+
 // 구글 시트의 ISO 8601 시간 오차(1899-12-30T...)를 완벽히 필터링하는 함수
 function formatDisplayTime(ts) {
   if (!ts) return "";
@@ -110,20 +125,15 @@ async function loadAdminSchedule() {
 
     return `
       <div class="admin-list-row ${riskClass}">
-        <div class="row-info-group">
+        <div class="row-info-group" style="cursor: pointer;" onclick="openPartyDetail('${escapeHtml(i.date)}', '${escapeHtml(i.day)}', '${escapeHtml(timeFormatted)}')">
           <div class="row-time">
             <span class="row-date">${shortDate} (${i.day})</span>
             <span class="row-hhmm">${timeFormatted}</span>
           </div>
-          <div style="display:flex; align-items:center; gap: 14px;">
-            <div class="participant-dots" title="인원: ${count}명">
-              ${Array(8).fill(0).map((_, idx) => `<div class="dot ${idx < count ? 'filled' : ''}"></div>`).join('')}
-            </div>
-            <div class="participant-dots" title="치유성: ${hasHealer ? 'O' : 'X'}">
-              <span style="font-size:11px; color:var(--text-muted); font-weight:700; margin-right:2px;">치유</span>
-              <div class="dot ${hasHealer ? 'healer' : (count > 0 ? 'warn' : '')}"></div>
-            </div>
+          <div class="participant-dots" title="인원: ${count}명">
+            ${Array(8).fill(0).map((_, idx) => `<div class="dot ${idx < count ? 'filled' : ''}"></div>`).join('')}
           </div>
+          <div class="dot ${hasHealer ? 'healer' : (count > 0 ? 'warn' : '')}" title="치유성: ${hasHealer ? 'O' : 'X'}" style="margin-left: 8px;"></div>
           ${i.note ? `<div class="row-note" title="${escapeHtml(i.note)}">${escapeHtml(i.note)}</div>` : ''}
         </div>
         <div class="row-action-group">
@@ -149,13 +159,29 @@ async function saveSchedule() {
   btn.disabled = true;
   btn.innerHTML = `<span style="display:inline-block; animation: spin 1s linear infinite;">⏳</span> 저장 중...`;
 
+  // 지능형 넘버링 (N차 파티 생성 로직)
+  let targetNote = getEl("noteInput").value;
+  const summaryData = await callApi({ action: "getAvailabilitySummary" });
+  if (summaryData.ok && summaryData.items) {
+      const targetDate = getEl("dateInput").value;
+      const targetTime = getEl("timeSlotInput").value;
+      const sameSlotCount = summaryData.items.filter(s => s.date === targetDate && s.time_slot === targetTime).length;
+      
+      if (sameSlotCount >= 8) {
+          const suffix = `(${Math.floor(sameSlotCount / 8) + 1})`;
+          if (!targetNote.includes(suffix)) {
+              targetNote = targetNote ? `${targetNote} ${suffix}` : suffix;
+          }
+      }
+  }
+
   const res = await callApi({
     action: "saveRaidSchedule",
     adminCode: getAdminCode(),
     date: getEl("dateInput").value,
     day: getEl("dayInput").value,
     timeSlot: getEl("timeSlotInput").value,
-    note: getEl("noteInput").value,
+    note: targetNote,
     openYn: "Y", status: "OPEN"
   });
   

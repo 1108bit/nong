@@ -13,7 +13,7 @@
     <div class="main-shell">
       <section class="main-header-hero">
         <div class="main-hero-top">
-          <h1 class="main-page-title">일정 관리</h1>
+          <h1 class="main-page-title" style="font-weight: 900;">👑 관리 페이지</h1>
           <div>
             <button class="btn btn-secondary" id="backButton" style="padding: 0 16px; min-height: 40px; border-radius: 12px; font-size: 13px;">← 메인으로</button>
           </div>
@@ -47,7 +47,13 @@
               <div class="card-head"><h2 class="section-title">새 일정 등록</h2></div>
               <div class="admin-form-grid">
                 <div class="form-group" style="margin-bottom: 0;">
-                  <label class="input-label">일자 선택</label>
+                  <label class="input-label" style="display: flex; justify-content: space-between; align-items: center;">
+                    일자 선택
+                    <div style="position: relative;">
+                      <span id="customDateIcon" style="cursor: pointer; font-size: 16px;">📅</span>
+                      <input type="date" id="customDateInput" style="position: absolute; right: 0; top: 0; opacity: 0; width: 24px; height: 24px; cursor: pointer;" />
+                    </div>
+                  </label>
                   <div class="chip-select-group horizontal-scroll-chips" id="dateChipGroup" style="margin-top: 0;"></div>
                   <input type="hidden" id="dateInput" />
                   <input type="hidden" id="dayInput" />
@@ -61,12 +67,12 @@
                   </div>
                   <div style="display: flex; align-items: center; background: rgba(255,255,255,0.05); border-radius: 12px; padding: 0 12px; height: 38px; border: 1px solid rgba(255,255,255,0.08); margin-top: 8px;">
                     <span style="font-size: 14px; margin-right: 6px; opacity: 0.8;">⏰</span>
-                    <input type="time" id="timeSlotInput" value="21:00" style="background: transparent; border: none; color: var(--text-main); font-weight: 800; font-size: 15px; outline: none; color-scheme: dark; font-family: inherit; width: 100%;" />
+                    <input type="time" id="timeSlotInput" value="21:00" step="1800" style="background: transparent; border: none; color: var(--text-main); font-weight: 800; font-size: 15px; outline: none; color-scheme: dark; font-family: inherit; width: 100%;" />
                   </div>
                 </div>
                 <div class="form-group" style="grid-column: 1 / -1;">
                   <label class="input-label">메모 (선택)</label>
-                  <input type="text" id="noteInput" class="main-input" autocomplete="off" placeholder="예: 본캐 위주" />
+                  <input type="text" id="noteInput" class="main-input" autocomplete="off" placeholder="예) 본캐 위주 등" />
                 </div>
               </div>
               <div class="admin-action-row" style="margin: 20px auto 0; display: block;">
@@ -196,12 +202,12 @@
                 </div>
                 <div style="display: flex; align-items: center; background: rgba(255,255,255,0.05); border-radius: 12px; padding: 0 12px; height: 38px; border: 1px solid rgba(255,255,255,0.08); margin-top: 8px;">
                   <span style="font-size: 14px; margin-right: 6px; opacity: 0.8;">⏰</span>
-                  <input type="time" id="editTimeSlotInput" value="21:00" style="background: transparent; border: none; color: var(--text-main); font-weight: 800; font-size: 15px; outline: none; color-scheme: dark; font-family: inherit; width: 100%;" />
+                    <input type="time" id="editTimeSlotInput" value="21:00" step="1800" style="background: transparent; border: none; color: var(--text-main); font-weight: 800; font-size: 15px; outline: none; color-scheme: dark; font-family: inherit; width: 100%;" />
                 </div>
               </div>
               <div class="form-group" style="grid-column: 1 / -1;">
                 <label class="input-label">메모 변경</label>
-                <input type="text" id="editNoteInput" class="main-input" autocomplete="off" />
+                  <input type="text" id="editNoteInput" class="main-input" autocomplete="off" placeholder="예) 본캐 위주 등" />
               </div>
             </div>
             <div class="admin-action-row" style="margin: 20px auto 0; display: flex; justify-content: center; gap: 12px;">
@@ -211,6 +217,20 @@
           </div>
         </div>
       </div>
+
+      <!-- 파티 상세 구성 모달 -->
+      <div class="modal-overlay" id="partyDetailModal">
+        <div class="modal-sheet">
+          <div class="modal-head">
+            <h3 class="modal-title" id="partyDetailTitle">파티 상세 구성</h3>
+            <button class="modal-close-btn" id="closePartyDetailBtn">닫기</button>
+          </div>
+          <div class="modal-form" style="max-height: 60vh; overflow-y: auto;">
+            <div id="partyDetailContent">불러오는 중...</div>
+          </div>
+        </div>
+      </div>
+
     </div>
   </main>
   <script src="./js/common.js?v=4"></script>
