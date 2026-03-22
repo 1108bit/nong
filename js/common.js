@@ -15,8 +15,7 @@ async function callApi(params) {
 // URL 정보 추출 (accountId, mainName 등)
 function getParams() { return new URLSearchParams(location.search); }
 function getAccountId() { return getParams().get("accountId") || ""; }
-function getMainName() { return getParams().get("mainName") || ""; }
-
+function getMainName() { return decodeURIComponent(getParams().get("mainName") || ""); }function getAdminCode() { return sessionStorage.getItem("adminCode") || ""; }
 // 요소 선택 및 텍스트 설정
 function getEl(id) { return document.getElementById(id); }
 function setText(id, value) { 
@@ -43,4 +42,12 @@ function applyTouchPop() {
 // 페이지 이동 (파라미터 유지)
 function movePage(url) {
   location.href = `${url}?${getParams().toString()}`;
+}
+
+// 숫자를 50 단위 구간 텍스트로 변환하는 함수
+function getPowerRange(power) {
+  const p = Number(power) || 0;
+  const start = Math.floor(p / 50) * 50;
+  const end = start + 50;
+  return `${start} 이상 ~ ${end} 미만`;
 }

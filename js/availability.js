@@ -21,13 +21,18 @@ function renderList(items) {
     const key = `${i.day}__${i.time_slot}`;
     const isSelected = selectedMap.has(key);
     return `
-      <button class="availability-item ${isSelected ? 'active' : ''}" onclick="toggleTime('${i.day}', '${i.time_slot}')">
-        <div class="availability-time">${i.date} ${i.day} ${i.time_slot}</div>
+      <button class="availability-item ${isSelected ? 'active' : ''}" data-day="${escapeHtml(i.day)}" data-time="${escapeHtml(i.time_slot)}">
+        <div class="availability-time">${escapeHtml(i.date)} ${escapeHtml(i.day)} ${escapeHtml(i.time_slot)}</div>
         <div class="availability-note">${escapeHtml(i.note)}</div>
         <div class="availability-foot">${isSelected ? '선택됨' : '미선택'}</div>
       </button>
     `;
   }).join("");
+  
+  // 버튼 클릭 이벤트 리스너 추가
+  document.querySelectorAll(".availability-item").forEach(btn => {
+    btn.onclick = () => toggleTime(btn.dataset.day, btn.dataset.time);
+  });
   applyTouchPop();
 }
 

@@ -14,27 +14,39 @@ async function loadMain() {
   // 등록된 캐릭터 중 '본캐'가 있는지 확인
   hasMainCharacter = data.characters?.some(c => c.type === "본캐");
 
+  renderCharacters(data.characters || []);
+  applyTouchPop();
+}
+
+// 캐릭터 목록 그리기 (전투력 구간 반영)
+function renderCharacters(items) {
   const list = getEl("characterList");
-  if (!data.characters?.length) {
+  if (!items || items.length === 0) {
     list.innerHTML = `<div class="character-empty">등록된 캐릭터가 없습니다</div>`;
-  } else {
-    list.innerHTML = data.characters.map(c => `
+    return;
+  }
+
+  list.innerHTML = items.map(c => {
+    const powerValue = Number(c.power) || 0;
+    const powerRange = getPowerRange(powerValue); // 구간 계산 호출
+
+    return `
       <div class="character-card">
         <div class="character-left">
-          <div class="character-name">${escapeHtml(c.character_name)}</div>
+          <div class="character-name">${escapeHtml(c.character_name || c.name)}</div>
           <div class="character-sub">
-            <span class="chip chip-class">${escapeHtml(c.class)}</span>
+            <span class="chip chip-class">${escapeHtml(c.class || c.className)}</span>
             <span class="chip chip-type">${escapeHtml(c.type)}</span>
           </div>
         </div>
         <div class="character-right">
-          <div class="character-power">${Number(c.power).toLocaleString()}</div>
-          <div class="character-state ${c.use_yn === 'Y' ? 'on' : 'off'}">${c.use_yn === 'Y' ? '사용중' : '미사용'}</div>
+          <div class="character-power">${powerRange}</div> <div class="character-state ${c.use_yn === 'Y' ? 'on' : 'off'}">
+            ${c.use_yn === 'Y' ? '사용중' : '미사용'}
+          </div>
         </div>
       </div>
-    `).join("");
-  }
-  applyTouchPop();
+    `;
+  }).join("");
 }
 
 // 모달 열기 로직 개선
@@ -56,7 +68,7 @@ getEl("addCharacterButton").onclick = () => {
         typeSelect.value = "부캐";
         typeSelect.disabled = false;
         
-        // 부캐 추가 시 '본캐' 선택 못하게 옵션 숨기기 (선택 사항)
+        // 부캐 추가 시 '본캐' 선택 못하게 옵션 숨기기
         Array.from(typeSelect.options).forEach(opt => {
             if(opt.value === "본캐") opt.disabled = true;
         });

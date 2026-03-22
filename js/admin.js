@@ -1,6 +1,5 @@
-const adminCode = getParams().get("adminCode");
-
 async function loadAdminSchedule() {
+  const adminCode = getAdminCode();
   if (!adminCode) return movePage("admin-login.html");
 
   const data = await callApi({ action: "getRaidScheduleAdmin", adminCode });
@@ -15,11 +14,19 @@ async function loadAdminSchedule() {
       </div>
       <div class="admin-card-note">${escapeHtml(i.note)}</div>
       <div class="admin-card-actions">
-        <button class="mini-btn" onclick="editSchedule('${i.date}','${i.day}','${i.time_slot}','${i.note}')">수정</button>
-        <button class="mini-btn danger" onclick="deleteSchedule('${i.date}','${i.day}','${i.time_slot}')">삭제</button>
+        <button class="mini-btn edit-btn" data-date="${escapeHtml(i.date)}" data-day="${escapeHtml(i.day)}" data-time="${escapeHtml(i.time_slot)}" data-note="${escapeHtml(i.note)}">수정</button>
+        <button class="mini-btn danger delete-btn" data-date="${escapeHtml(i.date)}" data-day="${escapeHtml(i.day)}" data-time="${escapeHtml(i.time_slot)}">삭제</button>
       </div>
     </div>
   `).join("");
+  
+  // 버튼 클릭 이벤트 리스너 추가
+  document.querySelectorAll(".edit-btn").forEach(btn => {
+    btn.onclick = () => editSchedule(btn.dataset.date, btn.dataset.day, btn.dataset.time, btn.dataset.note);
+  });
+  document.querySelectorAll(".delete-btn").forEach(btn => {
+    btn.onclick = () => deleteSchedule(btn.dataset.date, btn.dataset.day, btn.dataset.time);
+  });
 }
 
 async function saveSchedule() {

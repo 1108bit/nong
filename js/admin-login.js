@@ -4,9 +4,9 @@ async function loginAdmin() {
 
   const data = await callApi({ action: "adminLogin", adminCode });
   if (data.ok) {
-    // 인증 성공 시 adminCode를 주소에 담아 이동
+    // 인증 성공 시 adminCode를 sessionStorage에 저장 (URL 노출 방지)
+    sessionStorage.setItem("adminCode", adminCode);
     const params = getParams();
-    params.set("adminCode", adminCode);
     location.href = `./admin.html?${params.toString()}`;
   } else {
     alert(data.message);
