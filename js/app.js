@@ -10,7 +10,11 @@ window.addEventListener("DOMContentLoaded", () => {
       const adminCode = localStorage.getItem("autoAdminCode");
       if (adminCode) sessionStorage.setItem("adminCode", adminCode);
     }
-    location.href = `./main.html?mainName=${encodeURIComponent(autoMainName)}&accountId=${autoAccountId}`;
+    if (autoAccountId === "MASTER_ADMIN") {
+      location.href = `./admin.html?mainName=${encodeURIComponent(autoMainName)}&accountId=${autoAccountId}`;
+    } else {
+      location.href = `./main.html?mainName=${encodeURIComponent(autoMainName)}&accountId=${autoAccountId}`;
+    }
   }
 });
 
@@ -62,7 +66,11 @@ async function login() {
       localStorage.removeItem("autoAdminCode");
     }
 
-    location.href = `./main.html?mainName=${encodeURIComponent(data.mainName)}&accountId=${data.accountId}`;
+    if (data.accountId === "MASTER_ADMIN") {
+      location.href = `./admin.html?mainName=${encodeURIComponent(data.mainName)}&accountId=${data.accountId}`;
+    } else {
+      location.href = `./main.html?mainName=${encodeURIComponent(data.mainName)}&accountId=${data.accountId}`;
+    }
   } else {
     resultEl.textContent = data.message || "입장에 실패했습니다.";
     resultEl.classList.add("error");
@@ -97,7 +105,7 @@ if (adminSecretBtn) {
       if (res.ok) {
         sessionStorage.setItem("isAdmin", "true");
         sessionStorage.setItem("adminCode", code);
-        location.href = `./main.html?mainName=${encodeURIComponent('👑 마스터')}&accountId=MASTER_ADMIN`;
+        location.href = `./admin.html?mainName=${encodeURIComponent('👑 마스터')}&accountId=MASTER_ADMIN`;
       } else {
         alert("관리자 코드가 일치하지 않습니다.");
       }

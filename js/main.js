@@ -10,6 +10,7 @@ let characters = []; // 전역 변수 제거, 로컬로 관리
 async function loadMain() {
   const accountId = getAccountId();
   if (!accountId) return location.href = "index.html";
+  if (accountId === "MASTER_ADMIN") return location.href = "admin.html";
 
   const list = getEl("characterList");
   // 데이터를 가져오기 전 가짜 카드를 보여줌
