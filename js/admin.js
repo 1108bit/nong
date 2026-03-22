@@ -131,11 +131,15 @@ async function openUserCharacterManager(targetAccountId) {
       </div>
       <div class="character-right">
         <div class="character-actions">
-          <button class="character-edit-btn" title="편집" onclick="editUserCharacter('${escapeHtml(targetAccountId)}', '${escapeHtml(c.name)}', '${escapeHtml(c.className)}', '${escapeHtml(c.type)}', '${escapeHtml(c.power)}')">✎</button>
+          <button class="character-edit-btn user-char-edit-btn" title="편집" data-acc="${escapeHtml(targetAccountId)}" data-name="${escapeHtml(c.name)}" data-class="${escapeHtml(c.className)}" data-type="${escapeHtml(c.type)}" data-power="${escapeHtml(c.power)}">✎</button>
         </div>
       </div>
     </div>
   `).join("");
+  
+  list.querySelectorAll(".user-char-edit-btn").forEach(btn => {
+    btn.onclick = () => editUserCharacter(btn.dataset.acc, btn.dataset.name, btn.dataset.class, btn.dataset.type, btn.dataset.power);
+  });
 }
 
 // 유저 캐릭터 편집 모달 열기
