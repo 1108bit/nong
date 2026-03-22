@@ -2587,6 +2587,20 @@ body.modal-open {
   background: rgba(67, 217, 255, 0.15) !important;
   border-color: var(--cyan-2) !important;
 }
+.drop-zone.full {
+  border-style: solid !important;
+  border-color: var(--red-1) !important;
+  background: rgba(251, 113, 133, 0.05) !important;
+}
+.draggable-char {
+  transition: transform 0.2s ease, opacity 0.2s ease, box-shadow 0.2s ease;
+}
+.draggable-char.dragging {
+  opacity: 0.5;
+  transform: scale(1.05) translateY(-2px);
+  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.4);
+  z-index: 100;
+}
 .draggable-char:active {
   cursor: grabbing !important;
 }

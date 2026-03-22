@@ -659,14 +659,23 @@ window.openPartyDetail = openPartyDetail;
 // =========================
 window.handleDragStart = function(e) {
   e.dataTransfer.setData("text/plain", e.target.id);
-  setTimeout(() => { e.target.style.opacity = "0.4"; }, 0);
+  e.target.classList.add("dragging");
 };
 window.handleDragEnd = function(e) {
-  e.target.style.opacity = "1";
+  e.target.classList.remove("dragging");
+  document.querySelectorAll('.drop-zone').forEach(z => z.classList.remove('drag-over'));
 };
 window.handleDragOver = function(e) {
   e.preventDefault(); // 드롭 허용 (필수)
   const zone = e.target.closest('.drop-zone');
+  // 8명 정원 체크 (대기열은 제외)
+  if (zone && zone.id !== "unassignedZone") {
+    const count = zone.querySelectorAll('.character-card').length;
+    if (count >= 8) {
+      e.dataTransfer.dropEffect = "none";
+      return; 
+    }
+  }
   if (zone) zone.classList.add('drag-over');
 };
 window.handleDragLeave = function(e) {
@@ -681,9 +690,48 @@ window.handleDrop = function(e) {
     const id = e.dataTransfer.getData("text/plain");
     const draggableElement = document.getElementById(id);
     if (draggableElement) {
+      if (zone.id !== "unassignedZone") {
+        const count = zone.querySelectorAll('.character-card').length;
+        if (count >= 8) {
+          alert("이 파티는 8명 정원이 가득 찼습니다.");
+          return;
+        }
+      }
       zone.appendChild(draggableElement);
+      updatePartyCounts();
     }
   }
+};
+
+window.updatePartyCounts = function() {
+  document.querySelectorAll('.drop-zone').forEach(zone => {
+    const count = zone.querySelectorAll('.character-card').length;
+    if (zone.id !== "unassignedZone") {
+      if (count >= 8) zone.classList.add('full');
+      else zone.classList.remove('full');
+    }
+    const title = zone.querySelector('.zone-title');
+    if (title) {
+      const partyName = title.textContent.split('(')[0].trim();
+      title.textContent = count >= 8 ? `${partyName} (Full)` : `${partyName} (${count}명)`;
+    }
+  });
+};
+
+window.savePartyComposition = function() {
+  const zones = document.querySelectorAll('.drop-zone:not(#unassignedZone)');
+  const composition = {};
+  zones.forEach((zone, index) => {
+    const partyNum = index + 1;
+    const members = Array.from(zone.querySelectorAll('.character-card')).map(c => c.dataset.name);
+    composition[`party${partyNum}`] = members;
+  });
+  const title = getEl("partyDetailTitle").textContent;
+  // 로컬 스토리지에 파티 정보 임시 저장 (페이지 새로고침 전까지 유지)
+  localStorage.setItem(`party_comp_${title}`, JSON.stringify(composition));
+  
+  alert(`[${title}]\n현재 파티 구성이 성공적으로 임시 저장되었습니다.\n\n1파티: ${composition.party1.length}명\n2파티: ${composition.party2.length}명`);
+  getEl('closePartyDetailBtn').click();
 };
 
 applyDragScroll();
