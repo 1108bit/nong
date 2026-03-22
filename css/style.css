@@ -1154,7 +1154,7 @@ a {
 ========================= */
 #scheduleList {
   flex: 1;
-  min-height: 300px;
+  max-height: 500px;
   overflow-y: auto;
   padding-right: 6px;
   scrollbar-width: thin;
@@ -1619,8 +1619,7 @@ body.modal-open {
 .horizontal-scroll-chips {
   flex-wrap: nowrap;
   overflow-x: auto;
-  padding-bottom: 6px;
-  padding: 10px 16px 10px 4px; /* 확대/그림자 효과 시 상하 잘림 방지 및 우측 여백 확보 */
+  padding: 8px 16px 14px 4px !important; /* 하단 여백 충분히 확보 및 칩 잘림 방지 */
   -webkit-overflow-scrolling: touch;
   scrollbar-width: none; /* Firefox */
 }
@@ -2035,6 +2034,12 @@ body.modal-open {
 .admin-card-actions {
   display: flex;
   gap: 8px;
+  flex-shrink: 0;
+}
+
+.row-action-group {
+  display: flex;
+  gap: 6px;
   flex-shrink: 0;
 }
 
