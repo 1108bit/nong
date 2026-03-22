@@ -2435,7 +2435,7 @@ body.modal-open {
 }
 
 /* =========================
-   긴급 복구: 등록된 일정 목록 가로 한 줄 강제 교정
+   긴급 복구: 일정 목록 레이아웃 완벽 고정
 ========================= */
 #scheduleList .admin-list-row, 
 #scheduleList .admin-card-item {
@@ -2443,34 +2443,39 @@ body.modal-open {
   flex-direction: row !important; /* 가로 배치 강제 */
   align-items: center !important;
   justify-content: space-between !important;
-  padding: 10px 16px !important;
-  height: auto !important;
-  min-height: 60px !important;
-  background: rgba(255, 255, 255, 0.03) !important;
+  padding: 12px 16px !important;
+  height: 64px !important; /* 높이 고정으로 슬림화 */
+  background: var(--card-soft) !important;
   border-radius: 12px !important;
   margin-bottom: 8px !important;
   gap: 15px !important;
 }
 
-/* 좌측 날짜/시간 영역 */
-#scheduleList .row-time,
-#scheduleList .admin-card-top {
+/* 정보 영역 (클릭 시 팝업) */
+#scheduleList .info-area {
+  display: flex !important;
+  flex-direction: row !important;
+  align-items: center !important;
+  flex: 1 !important;
+  gap: 20px !important;
+  cursor: pointer !important;
+}
+
+#scheduleList .row-time {
   margin: 0 !important;
   display: flex !important;
   flex-direction: column !important;
   align-items: flex-start !important;
   justify-content: center !important;
-  min-width: 80px;
+  min-width: 70px !important;
 }
 
-/* 중앙 인원 점(Dot) 영역 가로 정렬 */
-#scheduleList .row-dots-group {
+/* 치유성/인원 점 그룹 */
+#scheduleList .status-indicator {
   display: flex !important;
-  flex-direction: row !important;
   align-items: center !important;
-  gap: 12px !important;
+  gap: 10px !important;
   flex: 1 !important;
-  overflow: hidden !important;
 }
 
 /* 3. 인원 현황 점(Dot) 캡슐화 강제 */
@@ -2482,9 +2487,22 @@ body.modal-open {
   margin: 0 !important;
 }
 
+/* 금색 치유성 닷 */
+#scheduleList .healer-dot {
+  width: 10px !important; 
+  height: 10px !important; 
+  background: #ffd700 !important; 
+  border-radius: 50% !important;
+  box-shadow: 0 0 8px #ffd700 !important;
+  flex-shrink: 0 !important;
+}
+#scheduleList .healer-dot.off {
+  background: rgba(255, 255, 255, 0.1) !important;
+  box-shadow: none !important;
+}
+
 /* 우측 수정/삭제 버튼 그룹 */
-#scheduleList .row-action-group,
-#scheduleList .admin-card-actions {
+#scheduleList .action-area {
   display: flex !important;
   flex-direction: row !important;
   gap: 8px !important;
