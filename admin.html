@@ -50,8 +50,8 @@
                   <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
                     <label class="input-label" style="margin: 0;">일자 선택</label>
                     <div style="position: relative;">
-                      <button type="button" class="mini-btn">📅 직접 선택</button>
-                      <input type="date" id="calendarPicker" style="position: absolute; right: 0; top: 0; width: 100%; height: 100%; opacity: 0; cursor: pointer;" />
+                      <button type="button" class="mini-btn" onclick="document.getElementById('calendarPicker').showPicker()">📅 직접 선택</button>
+                      <input type="date" id="calendarPicker" style="position: absolute; right: 0; top: 0; width: 100%; height: 100%; opacity: 0; cursor: pointer; z-index: 2;" />
                     </div>
                   </div>
                   <div class="chip-select-group horizontal-scroll-chips" id="dateChipGroup" style="margin-top: 0;"></div>
@@ -62,8 +62,8 @@
                   <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
                     <label class="input-label" style="margin: 0;">시간 선택</label>
                     <div style="position: relative;">
-                      <button type="button" class="mini-btn">⏰ 직접 선택</button>
-                      <input type="time" id="timeSlotInput" value="21:00" step="3600" style="position: absolute; right: 0; top: 0; width: 100%; height: 100%; opacity: 0; cursor: pointer;" />
+                      <button type="button" class="mini-btn" onclick="document.getElementById('timeSlotInput').showPicker()">⏰ 직접 선택</button>
+                      <input type="time" id="timeSlotInput" value="21:00" step="3600" style="position: absolute; right: 0; top: 0; width: 100%; height: 100%; opacity: 0; cursor: pointer; z-index: 2;" />
                     </div>
                   </div>
                   <div class="chip-select-group horizontal-scroll-chips" id="timeChipGroup" data-target="timeSlotInput" style="margin-top: 0;"></div>
@@ -189,8 +189,8 @@
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
                   <label class="input-label" style="margin: 0;">일자 변경</label>
                   <div style="position: relative;">
-                    <button type="button" class="mini-btn">📅 직접 선택</button>
-                    <input type="date" id="editCalendarPicker" style="position: absolute; right: 0; top: 0; width: 100%; height: 100%; opacity: 0; cursor: pointer;" />
+                    <button type="button" class="mini-btn" onclick="document.getElementById('editCalendarPicker').showPicker()">📅 직접 선택</button>
+                    <input type="date" id="editCalendarPicker" style="position: absolute; right: 0; top: 0; width: 100%; height: 100%; opacity: 0; cursor: pointer; z-index: 2;" />
                   </div>
                 </div>
                 <div class="chip-select-group horizontal-scroll-chips" id="editDateChipGroup" style="margin-top: 0;"></div>
@@ -201,8 +201,8 @@
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
                   <label class="input-label" style="margin: 0;">시간 변경</label>
                   <div style="position: relative;">
-                    <button type="button" class="mini-btn">⏰ 직접 선택</button>
-                    <input type="time" id="editTimeSlotInput" value="21:00" step="3600" style="position: absolute; right: 0; top: 0; width: 100%; height: 100%; opacity: 0; cursor: pointer;" />
+                    <button type="button" class="mini-btn" onclick="document.getElementById('editTimeSlotInput').showPicker()">⏰ 직접 선택</button>
+                    <input type="time" id="editTimeSlotInput" value="21:00" step="3600" style="position: absolute; right: 0; top: 0; width: 100%; height: 100%; opacity: 0; cursor: pointer; z-index: 2;" />
                   </div>
                 </div>
                 <div class="chip-select-group horizontal-scroll-chips" id="editTimeChipGroup" data-target="editTimeSlotInput" style="margin-top: 0;"></div>

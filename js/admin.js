@@ -87,6 +87,41 @@ function initTimeChips() {
   if (group2) group2.innerHTML = html;
 }
 
+const editCalPicker = getEl("editCalendarPicker");
+if (editCalPicker) {
+  editCalPicker.onchange = (e) => {
+    const val = e.target.value;
+    if (!val) return;
+    const d = new Date(val);
+    const days = ["일", "월", "화", "수", "목", "금", "토"];
+    getEl("editDateInput").value = val;
+    getEl("editDayInput").value = days[d.getDay()];
+    document.querySelectorAll("#editDateChipGroup .chip-btn").forEach(b => {
+      b.classList.toggle("selected", b.dataset.date === val);
+    });
+  };
+}
+
+// 시간 입력창 정각 보정 및 칩 연동 로직
+function syncTimeInputToChip(inputId, groupSelector) {
+  const inputEl = getEl(inputId);
+  if (inputEl) {
+    inputEl.addEventListener("change", (e) => {
+      if (!e.target.value) return;
+      let [h, m] = e.target.value.split(":");
+      m = "00"; // 1시간 단위 강제 정각 고정
+      e.target.value = `${h}:${m}`;
+      
+      const timeGroup = document.querySelector(groupSelector);
+      if (timeGroup) {
+        timeGroup.querySelectorAll(".chip-btn").forEach(b => b.classList.toggle("selected", b.dataset.value === `${h}:${m}`));
+      }
+    });
+  }
+}
+syncTimeInputToChip("timeSlotInput", `[data-target="timeSlotInput"]`);
+syncTimeInputToChip("editTimeSlotInput", `[data-target="editTimeSlotInput"]`);
+
 // 구글 시트의 ISO 8601 시간 오차(1899-12-30T...)를 완벽히 필터링하는 함수
 function formatDisplayTime(ts) {
   if (!ts) return "";
