@@ -29,6 +29,7 @@ function doGet(e) {
       case 'getMainData': return outputJson(getMainData(e.parameter.accountId));
       case 'validateDatabaseSchema': return outputJson(validateDatabaseSchema());
       case 'getPartyComposition': return outputJson(getPartyComposition(e.parameter.weekKey, e.parameter.day, e.parameter.time_slot));
+      case 'savePartyComposition': return outputJson(savePartyComposition(e.parameter.adminCode, e.parameter.date, e.parameter.timeSlot, e.parameter.partyList));
       case 'adminLogin': return outputJson(adminLogin(e.parameter.adminCode));
       case 'updateCharacterByAdmin': return outputJson(updateCharacterByAdmin(e));
       case 'updateAdminCodeSetting': return outputJson(updateAdminCodeSetting(e.parameter.adminCode, e.parameter.newAdminCode, e.parameter.callerAccountId));
@@ -50,4 +51,38 @@ function doPost(e) {
 function outputJson(data) {
   return ContentService.createTextOutput(JSON.stringify(data))
     .setMimeType(ContentService.MimeType.JSON);
+}
+
+/**
+ * 파티 구성을 RAID_SCHEDULE 시트의 I~P열(9~16번째 열)에 저장합니다.
+ */
+function savePartyComposition(adminCode, targetDate, targetTime, partyListJson) {
+  try {
+    const partyArray = JSON.parse(partyListJson); // 8명의 닉네임 배열 파싱
+
+    const ss = SpreadsheetApp.getActiveSpreadsheet(); // 환경에 따라 openById로 변경이 필요할 수 있습니다.
+    const sheet = ss.getSheetByName("RAID_SCHEDULE");
+    if (!sheet) return { ok: false, message: "'RAID_SCHEDULE' 시트를 찾을 수 없습니다." };
+
+    const values = sheet.getDataRange().getValues();
+    let foundRow = -1;
+
+    for (let i = 1; i < values.length; i++) {
+      const rowDate = Utilities.formatDate(new Date(values[i][1]), "GMT+9", "yyyy-MM-dd");
+      const rowTime = values[i][3].toString(); // 시간 데이터 형식 (주의: 시트 포맷에 따라 보정이 필요할 수 있음)
+      if (rowDate === targetDate && rowTime === targetTime) {
+        foundRow = i + 1;
+        break;
+      }
+    }
+
+    if (foundRow !== -1) {
+      // I열(9)부터 8칸(1행 8열)에 배열의 값을 그대로 덮어씁니다.
+      sheet.getRange(foundRow, 9, 1, 8).setValues([partyArray]);
+      return { ok: true, message: "성공적으로 저장되었습니다." };
+    }
+    return { ok: false, message: "해당 일정을 찾을 수 없습니다." };
+  } catch (err) {
+    return { ok: false, message: "저장 중 오류 발생: " + err.message };
+  }
 }
