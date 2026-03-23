@@ -2778,9 +2778,26 @@ body.modal-open {
    파티 조율 에디터 (Party Editor)
 ========================= */
 
-/* 파티 조율 모달만 가로로 넓게 확장 */
+/* 파티 조율 모달만 가로로 넓게 확장 & 스크롤 최적화 */
 #partyDetailModal .modal-sheet {
-  max-width: 880px; 
+  max-width: 880px;
+  max-height: 90vh; /* 화면 높이 90% 제한 */
+  display: flex;
+  flex-direction: column;
+}
+
+#partyDetailModal .modal-form {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  overflow: hidden !important; /* 이중 스크롤 원천 차단 */
+}
+
+#partyDetailContent {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0; /* 내부 flex 높이 버그 방지 */
 }
 
 #partyEditor {
@@ -2788,7 +2805,8 @@ body.modal-open {
   gap: 16px;
   margin-top: 10px;
   align-items: stretch;
-  min-height: 440px;
+  flex: 1; /* 남은 영역 꽉 채우기 */
+  min-height: 0; 
 }
 
 /* 좌측 대기열 (40%) */
@@ -2798,8 +2816,20 @@ body.modal-open {
   border: 1px solid rgba(255, 255, 255, 0.08);
   border-radius: 16px;
   padding: 16px;
-  overflow-y: auto;
-  max-height: 60vh;
+  overflow-y: auto; /* 대기열만 독립 스크롤 */
+  max-height: 100%;
+}
+
+/* 세련된 다크 모드 스크롤바 */
+#waitingList::-webkit-scrollbar {
+  width: 6px;
+}
+#waitingList::-webkit-scrollbar-thumb {
+  background: rgba(138, 188, 233, 0.2);
+  border-radius: 10px;
+}
+#waitingList::-webkit-scrollbar-track {
+  background: transparent;
 }
 
 .waiting-list-title {
