@@ -168,7 +168,8 @@ function getAvailabilitySummary(weekKey) {
     return {
       account_id: row.account_id, main_name: row.main_name, character_name: row.character_name,
       day: row.day, date: calcDate, time_slot: formatTime(row.time_slot),
-      className: character ? character.class_name : '', power: character ? character.power : '', power_value: character ? Number(character.power || 0) : 0
+      className: character ? character.class_name : '', power: character ? character.power : '', power_value: character ? Number(character.power || 0) : 0,
+      type: character ? character.type : ''
     };
   });
   return { ok: true, weekKey: currentWeek, items };
