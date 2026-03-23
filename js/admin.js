@@ -143,6 +143,17 @@ function formatDisplayTime(ts) {
   return ts;
 }
 
+// ==========================================
+// 날짜 표준화 및 완벽 비교 헬퍼 ("2026. 3. 8" -> "2026-03-08")
+function normalizeDateStr(val) {
+  if (!val) return '';
+  let text = String(val).replace(/[\.\/]/g, '-').replace(/\s/g, '').trim();
+  if (text.includes('-')) text = text.split('-').map(p => p.padStart(2, '0')).join('-');
+  return text;
+}
+const isSameDate = (d1, d2) => normalizeDateStr(d1) === normalizeDateStr(d2);
+// ==========================================
+
 let allSchedules = [];
 let allSummaries = [];
 let selectedDashboardDate = null;
@@ -196,9 +207,12 @@ function renderCalendar() {
   
   let selectedIndex = 0; // 진행 바를 위한 인덱스 추적
   
+
   // 1. 반복문 밖에서 날짜별 신청 인원수를 미리 계산하여 Map 형태로 저장 (수십 배 빠른 렌더링 성능)
   const countsByDate = allSummaries.reduce((acc, s) => {
     acc[s.date] = (acc[s.date] || 0) + 1;
+    const cleanDate = normalizeDateStr(s.date);
+    acc[cleanDate] = (acc[cleanDate] || 0) + 1;
     return acc;
   }, {});
 
@@ -210,14 +224,18 @@ function renderCalendar() {
     const dd = String(d.getDate()).padStart(2, '0');
     const dayStr = days[d.getDay()];
     const dateVal = `${yyyy}-${mm}-${dd}`;
+    const cleanDateVal = normalizeDateStr(dateVal);
     
     const isWeekend = (dayStr === '토' || dayStr === '일') ? 'color: var(--blue-1);' : '';
     const isActive = dateVal === selectedDashboardDate ? 'active' : '';
+    const isActive = isSameDate(dateVal, selectedDashboardDate) ? 'active' : '';
     if (isActive) selectedIndex = i; // 현재 선택된 날짜의 인덱스 저장
     const hasData = allSchedules.some(s => s.date === dateVal) ? 'has-data' : '';
+    const hasData = allSchedules.some(s => isSameDate(s.date, dateVal)) ? 'has-data' : '';
     
     // 2. 미리 계산해둔 객체에서 값만 쏙 뽑아오기 (데이터가 수천 개여도 렉 없음)
     const totalApplicants = countsByDate[dateVal] || 0;
+    const totalApplicants = countsByDate[cleanDateVal] || 0;
     
     let badgeHtml = "";
     let highlightClass = "";
@@ -270,6 +288,7 @@ function renderScheduleList(dateStr) {
   if (!list) return;
   
   const filtered = allSchedules.filter(s => s.date === dateStr);
+  const filtered = allSchedules.filter(s => isSameDate(s.date, dateStr));
   list.innerHTML = "";
   
   if (filtered.length === 0) {
@@ -282,6 +301,7 @@ function renderScheduleList(dateStr) {
   let html = "";
   filtered.forEach((i, idx) => {
     const participants = allSummaries.filter(s => s.date === i.date && s.time_slot === i.time_slot);
+    const participants = allSummaries.filter(s => isSameDate(s.date, i.date) && String(s.time_slot).trim() === String(i.time_slot).trim());
     const count = participants.length;
     const maxCount = 8;
     const progressPercent = Math.min(100, Math.round((count / maxCount) * 100));
@@ -893,6 +913,7 @@ function renderPartyEditor(date, time) {
 
   // 3. 저장된 파티 데이터 및 이번 주차 중복 참여자 데이터 수집
   const targetSchedule = allSchedules.find(s => s.date === date && s.time_slot === time);
+  const targetSchedule = allSchedules.find(s => isSameDate(s.date, date) && String(s.time_slot).trim() === String(time).trim());
   const savedParty = targetSchedule && targetSchedule.partyList ? targetSchedule.partyList : [];
   const currentWeekKey = targetSchedule ? targetSchedule.week_key : null;
   let waitingList = [...participants]; // 슬롯에 배치될 인원은 여기서 뺄 예정
@@ -901,9 +922,11 @@ function renderPartyEditor(date, time) {
   if (currentWeekKey) {
     allSchedules.forEach(s => {
       if (s.week_key === currentWeekKey && !(s.date === date && s.time_slot === time)) {
+      if (isSameDate(s.week_key, currentWeekKey) && !(isSameDate(s.date, date) && String(s.time_slot).trim() === String(time).trim())) {
         if (Array.isArray(s.partyList)) {
           s.partyList.forEach(name => {
             if (name) alreadyPlacedNames.add(name);
+            if (name) alreadyPlacedNames.add(name.trim());
           });
         }
       }
@@ -945,6 +968,7 @@ function renderPartyEditor(date, time) {
     if (savedName) {
       // 저장된 이름이 있으면 대기열에서 빼서 슬롯에 배치
       const idx = waitingList.findIndex(p => p.name === savedName);
+      const idx = waitingList.findIndex(p => p.name.trim() === savedName.trim());
       if (idx !== -1) matchedParticipant = waitingList.splice(idx, 1)[0];
     } else if (!savedParty.some(n => n) && i === 8 && slot8Data) {
       // 저장된 파티가 아예 없고(최초 렌더링), 치유성이 딱 1명이면 8번 슬롯 자동 배치
