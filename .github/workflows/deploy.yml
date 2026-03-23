@@ -29,6 +29,9 @@ jobs:
         run: |
           echo '${{ secrets.CLASPRC_JSON }}' > ~/.clasprc.json
 
-      # 5. 구글 서버로 코드 강제 전송 (기존 코드 덮어쓰기)
+      # 5. 구글 서버로 코드 업로드 및 라이브 사이트 강제 업데이트
       - name: Deploy to App Script
-        run: clasp push --force
+        run: |
+          clasp push --force
+          clasp version "Auto Update via GitHub Actions"
+          clasp deploy -i AKfycbyTEOXemEy0q67fjn2yqxnNlxobfCD9yIf0hcrbF6jvy3q1YSevu5T8kGDiTX7qX9bWpw
