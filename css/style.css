@@ -2724,3 +2724,180 @@ body.modal-open {
   padding-right: 6px;
   scrollbar-width: thin;
 }
+
+/* =========================
+   파티 조율 에디터 (Party Editor)
+========================= */
+
+/* 파티 조율 모달만 가로로 넓게 확장 */
+#partyDetailModal .modal-sheet {
+  max-width: 880px; 
+}
+
+#partyEditor {
+  display: flex;
+  gap: 16px;
+  margin-top: 10px;
+  align-items: stretch;
+  min-height: 440px;
+}
+
+/* 좌측 대기열 (40%) */
+#waitingList {
+  flex: 0 0 40%;
+  background: #0f172a;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 16px;
+  padding: 16px;
+  overflow-y: auto;
+  max-height: 60vh;
+}
+
+.waiting-list-title {
+  font-size: 14px;
+  font-weight: 800;
+  color: var(--text-main);
+  margin-bottom: 12px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+/* 우측 파티 슬롯 (60% - 2행 4열) */
+#partyContainer {
+  flex: 0 0 calc(60% - 16px);
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  grid-template-rows: repeat(2, 1fr);
+  gap: 10px;
+}
+
+.party-slot {
+  background: #1e293b;
+  border: 2px dashed rgba(255, 255, 255, 0.15);
+  border-radius: 12px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  transition: all 0.2s ease;
+  min-height: 120px;
+  padding: 6px;
+}
+
+.party-slot-num {
+  position: absolute;
+  top: 8px;
+  left: 10px;
+  font-size: 12px;
+  font-weight: 800;
+  color: rgba(255, 255, 255, 0.25);
+  z-index: 1;
+}
+
+.empty-slot-text {
+  color: #64748b;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+/* 슬롯에 카드가 들어오면 점선 제거 및 배경색 강조 (:has 선택자 활용) */
+.party-slot:has(.applicant-card) {
+  border-style: solid;
+  border-color: rgba(67, 217, 255, 0.3);
+  background: rgba(15, 23, 42, 0.6);
+}
+.party-slot:has(.applicant-card) .empty-slot-text {
+  display: none;
+}
+
+/* 신청자 카드 공통 디자인 */
+.applicant-card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 14px;
+  background: #1e293b;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  border-radius: 12px;
+  margin-bottom: 8px;
+  cursor: grab;
+  transition: background 0.2s ease, transform 0.1s ease;
+  width: 100%;
+  position: relative;
+  z-index: 2;
+}
+
+.applicant-card:hover {
+  background: #334155;
+}
+
+.applicant-card:active {
+  cursor: grabbing;
+  transform: scale(0.98);
+}
+
+.applicant-info {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+}
+
+.applicant-card .drag-handle {
+  color: #475569;
+  font-size: 18px;
+  cursor: grab;
+  margin-right: 4px;
+  line-height: 1;
+}
+
+.applicant-card:active .drag-handle {
+  cursor: grabbing;
+}
+
+.applicant-name {
+  font-size: 14px;
+  font-weight: 800;
+  color: var(--text-main);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.applicant-meta {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 4px;
+  flex-shrink: 0;
+}
+
+/* 파티 슬롯 내부에 들어간 카드는 공간에 맞게 자동 압축(세로 배치) */
+#partyContainer .applicant-card {
+  flex-direction: column;
+  padding: 14px 4px 8px;
+  gap: 6px;
+  margin: 0;
+  height: 100%;
+}
+#partyContainer .drag-handle {
+  display: none;
+}
+#partyContainer .applicant-meta {
+  align-items: center;
+}
+
+/* 모바일 화면에서는 세로로 분할 유지 */
+@media (max-width: 768px) {
+  #partyEditor {
+    flex-direction: column;
+  }
+  #waitingList, #partyContainer {
+    flex: none;
+    width: 100%;
+  }
+  #partyContainer {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}

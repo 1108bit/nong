@@ -816,8 +816,10 @@ async function openPartyDetail(date, day, time) {
   if (modal) modal.classList.add("show");
   document.body.classList.add("modal-open");
 
-  // TODO: 실제 파티 구성 데이터를 백엔드에서 불러와서 그리는 로직을 이곳에 추가해야 합니다.
-  if (content) content.innerHTML = `<div class="admin-empty-state">해당 시간의 파티 상세 구성 화면입니다.<br>(현재 UI 구현 진행 중)</div>`;
+  // 약간의 딜레이 후 렌더링 (자연스러운 모달 팝업 연출)
+  setTimeout(() => {
+    renderPartyEditor(date, time);
+  }, 50);
 }
 
 // 동적으로 생성된 HTML(innerHTML)의 인라인 이벤트를 위한 전역 스코프 함수 노출
@@ -907,3 +909,93 @@ window.savePartyComposition = function() {
   alert(`[${title}]\n현재 파티 구성이 성공적으로 임시 저장되었습니다.\n\n1파티: ${composition.party1.length}명\n2파티: ${composition.party2.length}명`);
   getEl('closePartyDetailBtn').click();
 };
+
+// =========================
+// 파티 조율 에디터 렌더링 (하단 추가)
+// =========================
+function renderPartyEditor(date, time) {
+  const content = getEl("partyDetailContent");
+  if (!content) return;
+
+  // 해당 날짜/시간의 신청자 필터링 (allSummaries 데이터 활용)
+  const participants = allSummaries.filter(s => s.date === date && s.time_slot === time);
+
+  let waitingHtml = `<div class="waiting-list-title">신청자 대기열 (${participants.length}명)</div>`;
+
+  if (participants.length === 0) {
+    waitingHtml += `<div class="admin-empty-state" style="margin-top:20px;">해당 타임에 신청자가 없습니다.</div>`;
+  } else {
+    participants.forEach(p => {
+      // 직업 아이콘 텍스트/이모지 매핑
+      const classIconMap = {
+        '검성': '⚔️', '수호성': '🛡️', '살성': '🗡️', '궁성': '🏹',
+        '마도성': '🔥', '정령성': '💨', '치유성': '✨', '호법성': '📿'
+      };
+      const icon = classIconMap[p.className] || '👤';
+      const typeBadge = p.type === '본캐' ? '<span class="chip chip-type main">본캐</span>' : '<span class="chip chip-type sub">부캐</span>';
+
+      waitingHtml += `
+        <div class="applicant-card draggable-char" draggable="true" id="char_${p.accountId}_${p.name}" data-name="${escapeHtml(p.name)}">
+          <div class="applicant-info">
+            <span class="drag-handle">⠿</span>
+            <span style="font-size: 16px;">${icon}</span>
+            <span class="applicant-name">${escapeHtml(p.name)}</span>
+          </div>
+          <div class="applicant-meta">
+            ${typeBadge}
+            <span class="applicant-power">${getPowerRange(p.power)}</span>
+          </div>
+        </div>
+      `;
+    });
+  }
+
+  // 우측 8개의 빈 슬롯 생성
+  let slotsHtml = "";
+  for (let i = 1; i <= 8; i++) {
+    slotsHtml += `
+      <div class="party-slot drop-zone" id="partySlot${i}">
+        <span class="party-slot-num">${i}</span>
+        <div class="empty-slot-text">비어있음</div>
+      </div>
+    `;
+  }
+
+  content.innerHTML = `
+    <div id="partyEditor">
+      <div id="waitingList" class="drop-zone">
+        ${waitingHtml}
+      </div>
+      <div id="partyContainer">
+        ${slotsHtml}
+      </div>
+    </div>
+  `;
+
+  // 파티 조율 전용 드래그 앤 드롭 이벤트 연결
+  document.querySelectorAll('.draggable-char').forEach(el => {
+    el.addEventListener('dragstart', window.handleDragStart);
+    el.addEventListener('dragend', window.handleDragEnd);
+  });
+  document.querySelectorAll('.drop-zone').forEach(el => {
+    el.addEventListener('dragover', (e) => { e.preventDefault(); e.target.closest('.drop-zone').classList.add('drag-over'); });
+    el.addEventListener('dragleave', (e) => { e.target.closest('.drop-zone').classList.remove('drag-over'); });
+    el.addEventListener('drop', (e) => {
+      e.preventDefault();
+      const zone = e.target.closest('.drop-zone');
+      if (!zone) return;
+      zone.classList.remove('drag-over');
+      
+      const id = e.dataTransfer.getData("text/plain");
+      const elDrag = document.getElementById(id);
+      if (!elDrag) return;
+      
+      // 1칸 1명 룰: 비어있지 않으면 기존 인원을 밀어내고 대기열로 되돌림
+      if (zone.id !== "waitingList") {
+        const existing = zone.querySelector('.applicant-card');
+        if (existing) getEl('waitingList').appendChild(existing);
+      }
+      zone.appendChild(elDrag);
+    });
+  });
+}
