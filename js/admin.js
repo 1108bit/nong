@@ -839,8 +839,17 @@ function renderPartyEditor(date, time) {
 
   // 해당 날짜/시간의 신청자 필터링 (allSummaries 데이터 활용)
   const participants = allSummaries.filter(s => s.date === date && s.time_slot === time);
+  let participants = allSummaries.filter(s => s.date === date && s.time_slot === time);
 
   let waitingHtml = `<div class="waiting-list-title">신청자 대기열 (${participants.length}명)</div>`;
+  // 1. 직업 우선순위 정렬 (수호/검성(1) > 살/궁(2) > 마/정(3) > 호법(4) > 치유(5) + 같은 직업 내 전투력 내림차순)
+  const classPriority = {
+    '수호성': 1, '검성': 1,
+    '살성': 2, '궁성': 2,
+    '마도성': 3, '정령성': 3,
+    '호법성': 4,
+    '치유성': 5
+  };
 
   if (participants.length === 0) {
     waitingHtml += `<div class="admin-empty-state" style="margin-top:20px;">해당 타임에 신청자가 없습니다.</div>`;
@@ -853,6 +862,12 @@ function renderPartyEditor(date, time) {
       };
       const icon = classIconMap[p.className] || '👤';
       const typeBadge = p.type === '본캐' ? '<span class="chip chip-type main">본캐</span>' : '<span class="chip chip-type sub">부캐</span>';
+  participants.sort((a, b) => {
+    const pA = classPriority[a.className] || 99;
+    const pB = classPriority[b.className] || 99;
+    if (pA !== pB) return pA - pB;
+    return (parseInt(b.power, 10) || 0) - (parseInt(a.power, 10) || 0);
+  });
 
       waitingHtml += `
         <div class="applicant-card draggable-char" id="char_${p.accountId}_${p.name}" data-name="${escapeHtml(p.name)}" data-class="${escapeHtml(p.className)}" data-power="${p.power}">
@@ -865,23 +880,71 @@ function renderPartyEditor(date, time) {
             ${typeBadge}
             <span class="applicant-power">${getPowerRange(p.power)}</span>
           </div>
+  // 2. 치유성 1명일 경우 자동 배치 로직 (8번 슬롯)
+  const healers = participants.filter(p => p.className === '치유성');
+  let autoPlacedHealerId = null;
+  let slot8Data = null;
+  
+  if (healers.length === 1) {
+    slot8Data = healers[0];
+    autoPlacedHealerId = slot8Data.accountId;
+  }
+
+  // 카드 생성 헬퍼 함수
+  const createCardHtml = (p) => {
+    const classIconMap = {
+      '검성': '⚔️', '수호성': '🛡️', '살성': '🗡️', '궁성': '🏹',
+      '마도성': '🔥', '정령성': '💨', '치유성': '✨', '호법성': '📿'
+    };
+    const icon = classIconMap[p.className] || '👤';
+    const typeBadge = p.type === '본캐' ? '<span class="chip chip-type main">본캐</span>' : '<span class="chip chip-type sub">부캐</span>';
+
+    return `
+      <div class="applicant-card draggable-char" id="char_${p.accountId}_${p.name}" data-name="${escapeHtml(p.name)}" data-class="${escapeHtml(p.className)}" data-power="${p.power}">
+        <div class="applicant-info">
+          <span class="drag-handle">⠿</span>
+          <span style="font-size: 16px;">${icon}</span>
+          <span class="applicant-name">${escapeHtml(p.name)}</span>
         </div>
       `;
     });
+        <div class="applicant-meta">
+          ${typeBadge}
+          <span class="applicant-power">${getPowerRange(p.power)}</span>
+        </div>
+      </div>
+    `;
+  };
+
+  // 3. 대기열 HTML 생성 (자동 배치된 유저 제외)
+  const waitingList = participants.filter(p => p.accountId !== autoPlacedHealerId);
+  let waitingHtml = `<div class="waiting-list-title">신청자 대기열 (${waitingList.length}명)</div>`;
+  
+  if (waitingList.length === 0) {
+    waitingHtml += `<div class="admin-empty-state" style="margin-top:20px;">대기열이 비어있습니다.</div>`;
+  } else {
+    waitingList.forEach(p => { waitingHtml += createCardHtml(p); });
   }
 
   // 우측 8개의 빈 슬롯 생성
+  // 4. 우측 8개의 슬롯 생성
   let slotsHtml = "";
   for (let i = 1; i <= 8; i++) {
+    let slotContent = `<div class="empty-slot-text">비어있음</div>`;
+    if (i === 8 && slot8Data) {
+      slotContent = createCardHtml(slot8Data);
+    }
     slotsHtml += `
       <div class="party-slot drop-zone" id="partySlot${i}">
         <span class="party-slot-num">${i}</span>
         <div class="empty-slot-text">비어있음</div>
+        ${slotContent}
       </div>
     `;
   }
 
   // 시너지 계산기 UI와 파티 저장 버튼 추가
+  // 5. 전체 에디터 UI 렌더링
   content.innerHTML = `
     <div class="synergy-board" id="synergyBoard">
       <div class="synergy-stat">평균 전투력 <span id="avgPower">0K</span></div>
@@ -901,6 +964,7 @@ function renderPartyEditor(date, time) {
   `;
 
   // 실시간 시너지 계산 함수
+  // 6. 실시간 시너지 계산 함수
   const updateSynergy = () => {
     let totalPower = 0, count = 0;
     let roles = { tank: 0, heal: 0, dps: 0 };
@@ -922,10 +986,12 @@ function renderPartyEditor(date, time) {
   };
 
   // SortableJS 공통 옵션 (모바일 터치 딜레이 100ms 적용)
+  // 7. SortableJS 활성화 (모바일 터치 딜레이 적용)
   const sortableOptions = {
     group: 'party',
     animation: 150,
     delay: 100, // 모바일에서 스크롤과 겹치지 않게 꾹 눌러야 드래그되도록 설정
+    delay: 100, // 모바일에서 꾹 눌러야 드래그
     delayOnTouchOnly: true,
     ghostClass: 'sortable-ghost',
     dragClass: 'sortable-drag',
@@ -945,6 +1011,7 @@ function renderPartyEditor(date, time) {
         const cards = slot.querySelectorAll('.applicant-card');
         if (cards.length > 1) {
           // 새로 들어온 카드(evt.item) 말고 기존에 있던 카드를 대기열로 돌려보냄
+          // 1칸 1명 밀어내기: 기존 카드를 대기열로 되돌림
           const oldCard = Array.from(cards).find(c => c !== evt.item);
           if (oldCard) document.getElementById('waitingList').appendChild(oldCard);
         }
@@ -954,6 +1021,7 @@ function renderPartyEditor(date, time) {
   }
 
   // 파티 구성 저장 이벤트
+  // 8. 파티 저장 기능 연동
   document.getElementById('savePartyBtn').onclick = async () => {
     const btn = document.getElementById('savePartyBtn');
     const originalText = btn.textContent;
