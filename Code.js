@@ -2,6 +2,9 @@
  * 99. 라우팅 허브 (Routes)
  ************************************************/
 function doGet(e) {
+  // 디버깅용 로그: 실제로 어떤 데이터가 들어오고 있는지 GAS 실행 로그에 남깁니다.
+  console.log("들어온 파라미터 전체:", JSON.stringify(e));
+
   const action = (e && e.parameter && e.parameter.action) ? e.parameter.action : '';
 
   if (!action) {
