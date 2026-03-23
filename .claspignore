@@ -1,11 +1,19 @@
-# 구글 앱스 스크립트(GAS)에 올리지 않을 프론트엔드/설정 파일 차단
+# 1. 일단 모든 파일을 차단 목록에 넣습니다.
+**/*
+
+# 2. 하지만 아래 필수 파일들은 '예외(!)'로 두어 무조건 올립니다.
+!Code.gs
+!index.html
+!appsscript.json
+
+# 3. 추가로 .gs나 .html 확장자를 가진 파일이 더 있다면 허용합니다.
+!*.gs
+!*.html
+
+# 4. (중요) 절대 올라가면 안 되는 설정 파일들은 다시 차단합니다.
 .git/
-.github/
-css/
-images/
-js/
+node_modules/
+clasp.json
+.clasprc.json
 *.bat
 *.sh
-*.json
-!appsscript.json
-!.clasp.json
