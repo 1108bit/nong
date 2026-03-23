@@ -2449,9 +2449,11 @@ body.modal-open {
   display: grid;
   grid-template-columns: repeat(7, 1fr);
   gap: 8px;
-  margin-bottom: 16px;
-  padding-bottom: 16px;
-  border-bottom: 1px solid var(--line-1);
+  margin-bottom: 20px;
+  padding: 12px;
+  background: rgba(255, 255, 255, 0.03);
+  border-radius: 16px;
+  border: 1px solid rgba(255, 255, 255, 0.05);
 }
 
 .cal-day-cell {
@@ -2478,11 +2480,16 @@ body.modal-open {
 }
 
 .cal-day-cell.active {
-  background: rgba(67, 217, 255, 0.15);
-  border-color: rgba(67, 217, 255, 0.4);
+  background: var(--blue-1);
+  border-color: var(--blue-1);
   box-shadow: 0 4px 12px rgba(67, 217, 255, 0.15);
   transform: scale(1.05);
   z-index: 2;
+}
+
+.cal-day-cell.active .cal-dow,
+.cal-day-cell.active .cal-date {
+  color: #fff !important;
 }
 
 .cal-dow {
@@ -2511,8 +2518,8 @@ body.modal-open {
 
 .cal-day-cell.active.has-data::after {
   bottom: 3px;
-  width: 5px;
-  height: 5px;
+  background: #fff;
+  box-shadow: 0 0 6px rgba(255, 255, 255, 0.8);
 }
 
 /* 슬림형 일정 리스트 카드 */
