@@ -2523,6 +2523,8 @@ body.modal-open {
   -webkit-overflow-scrolling: touch;
   scrollbar-width: none;
   white-space: nowrap !important;
+  scroll-snap-type: x mandatory !important; /* 애플 스타일 가로 스크롤 스냅 */
+  scroll-padding-left: 8px !important;
 }
 
 .horizontal-scroll-chips::-webkit-scrollbar {
@@ -2542,6 +2544,7 @@ body.modal-open {
   background: rgba(255, 255, 255, 0.05) !important;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
   color: var(--text-muted) !important;
+  scroll-snap-align: center !important; /* 넘길 때 아이템이 자석처럼 가운데 정렬되게 함 */
 }
 
 .chip-btn:active, .main-button:active {

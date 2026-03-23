@@ -587,9 +587,17 @@ function applyDragScroll() {
       isDraggingScroll = false;
       startX = e.pageX - slider.offsetLeft;
       scrollLeft = slider.scrollLeft;
+      // 마우스 드래그 중에는 스크롤 스냅을 꺼서 부드럽게 움직이도록 함
+      slider.style.setProperty('scroll-snap-type', 'none', 'important');
     });
-    slider.addEventListener('mouseleave', () => { isDown = false; });
-    slider.addEventListener('mouseup', () => { isDown = false; });
+    slider.addEventListener('mouseleave', () => { 
+      isDown = false; 
+      slider.style.removeProperty('scroll-snap-type'); 
+    });
+    slider.addEventListener('mouseup', () => { 
+      isDown = false; 
+      slider.style.removeProperty('scroll-snap-type'); 
+    });
     slider.addEventListener('mousemove', (e) => {
       if (!isDown) return;
       e.preventDefault();
@@ -599,6 +607,14 @@ function applyDragScroll() {
       slider.scrollLeft = scrollLeft - walk;
     });
     
+    // 마우스 휠(세로 스크롤) 작동 시 가로 스크롤로 변환
+    slider.addEventListener('wheel', (e) => {
+      if (e.deltaY !== 0) {
+        e.preventDefault();
+        slider.scrollLeft += e.deltaY;
+      }
+    }, { passive: false });
+
     // 드래그가 끝났을 때 원치 않게 칩이 클릭되는 현상 방지
     slider.addEventListener('click', (e) => {
       if (isDraggingScroll) {
