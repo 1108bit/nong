@@ -22,7 +22,7 @@ echo.
 echo [o] 새로운 버전 생성 중...
 call clasp version "Auto Update"
 echo [o] 배포 업데이트 중...
-call clasp deploy -i AKfycbyTEOXemEy0q67fjn2yqxnNlxobfCD9yIf0hcrbF6jvy3q1YSevu5T8kGDiTX7qX9bWpw
+call clasp deploy -i AKfycbxgoannrkzyrAaIF8FeJP-ZJyFUrhdtT1d_iJdrY0JiJwqebPYbToS5r-nUYp6Ow-2fYw
 
 if errorlevel 1 (
     echo.
@@ -33,6 +33,6 @@ if errorlevel 1 (
 
 echo.
 echo [OK] 배포 완료!
-echo [>>] 앱 바로가기: https://script.google.com/macros/s/AKfycbyTEOXemEy0q67fjn2yqxnNlxobfCD9yIf0hcrbF6jvy3q1YSevu5T8kGDiTX7qX9bWpw/exec
+echo [>>] 앱 바로가기: https://script.google.com/macros/s/AKfycbxgoannrkzyrAaIF8FeJP-ZJyFUrhdtT1d_iJdrY0JiJwqebPYbToS5r-nUYp6Ow-2fYw/exec
 echo.
 pause

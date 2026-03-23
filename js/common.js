@@ -1,4 +1,4 @@
-const API_URL = "https://script.google.com/macros/s/AKfycbyTEOXemEy0q67fjn2yqxnNlxobfCD9yIf0hcrbF6jvy3q1YSevu5T8kGDiTX7qX9bWpw/exec";
+const API_URL = "https://script.google.com/macros/s/AKfycbxgoannrkzyrAaIF8FeJP-ZJyFUrhdtT1d_iJdrY0JiJwqebPYbToS5r-nUYp6Ow-2fYw/exec";
 
 // 서버 통신 함수
 async function callApi(params) {
