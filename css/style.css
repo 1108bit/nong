@@ -352,9 +352,11 @@ a {
     opacity 0.16s ease;
 }
 
-html, body {
+html {
   /* 전체 페이지의 고무줄 효과 방지 */
   overscroll-behavior-y: none; 
+}
+body {
   background-color: #000; /* 배경색을 앱 테마와 맞추면 흰색이 안 보입니다 */
   overflow-x: hidden;
 }
@@ -2574,23 +2576,25 @@ body.modal-open {
   opacity: 1 !important;
 }
 
-/* 5. 스크롤 인디케이터 (Apple Style) */
+/* 5. 스크롤 인디케이터 (Progress Bar Style) */
 .scroll-indicator {
-  width: 36px;
+  width: 60px; /* 진행도를 잘 볼 수 있게 살짝 넓힘 */
   height: 4px;
   background: rgba(255, 255, 255, 0.1);
   border-radius: 2px;
   position: relative;
   overflow: hidden;
+  margin: 0 auto; /* 중앙 정렬 */
 }
 .scroll-indicator-dot {
-  width: 12px;
+  width: 0%; /* JS에서 스크롤 양에 따라 %로 조절합니다. */
   height: 100%;
   background: var(--cyan-1);
   border-radius: 2px;
   position: absolute;
   left: 0;
   top: 0;
+  transition: width 0.1s ease-out; /* 부드러운 게이지 효과 */
 }
 
 /* 6. 드래그 앤 드롭 상호작용 */

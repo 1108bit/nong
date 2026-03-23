@@ -572,267 +572,128 @@ if (changeAdminCodeBtn) {
   };
 }
 
-// 드래그 클릭 판별용 상태 변수
-let isDraggingScroll = false;
+// =========================
+// 애플 스타일 가로 스크롤 & 프로그레스 바 완결판
+// =========================
+let isDraggingScroll = false; // 드래그 클릭 방지용
 
-// 마우스 드래그로 가로 스크롤을 구현하는 애플 스타일 로직
-function applyDragScroll() {
-  // 가로 스크롤 영역 전체를 타겟팅 (일정/시간 영역 누락 문제 해결!)
-  const sliders = document.querySelectorAll('.horizontal-scroll-chips, .chip-select-group, #dateChipGroup, #timeChipGroup, #editDateChipGroup, #editTimeChipGroup');
+function setupAppleScroll(scrollBoxId, indicatorId) {
+  const slider = document.getElementById(scrollBoxId);
+  const indicatorWrap = document.getElementById(indicatorId);
+  if (!slider) return;
+  
+  const indicator = indicatorWrap ? indicatorWrap.querySelector('.scroll-indicator-dot') : null;
 
-  sliders.forEach(slider => {
-    let isDown = false;
-    let startX;
-    let scrollLeft;
-
-    slider.addEventListener('mousedown', (e) => {
-      isDown = true;
-      isDraggingScroll = false;
-      startX = e.pageX - slider.offsetLeft;
-      startY = e.pageY - slider.offsetTop;
-      scrollLeft = slider.scrollLeft;
-      // 마우스 드래그 중에는 스크롤 스냅을 꺼서 부드럽게 움직이도록 함
-      slider.style.setProperty('scroll-snap-type', 'none', 'important');
-      slider.style.setProperty('scroll-behavior', 'smooth', 'important');
-      slider.style.setProperty('scroll-behavior', 'auto', 'important');
-    });
-    slider.addEventListener('mouseleave', () => { 
-      isDown = false; 
-      slider.style.removeProperty('scroll-snap-type'); 
-      slider.style.removeProperty('scroll-behavior');
-    });
-    slider.addEventListener('mouseup', () => { 
-      isDown = false; 
-      slider.style.removeProperty('scroll-snap-type'); 
-      slider.style.removeProperty('scroll-behavior');
-    });
-    slider.addEventListener('mousemove', (e) => {
-      if (!isDown) return;
-      e.preventDefault();
-
-            // Calculate the distance the mouse has moved in both X and Y directions
-            const x = e.pageX - slider.offsetLeft;
-            const y = e.pageY - slider.offsetTop;
-            const walkX = (x - startX) * 2; // Scroll speed multiplier for X direction
-
-            // Only trigger horizontal drag if the horizontal movement is significantly larger than vertical
-            if (Math.abs(walkX) > 5 ) {
-                slider.scrollLeft = scrollLeft - walkX;
-            }
-    });
-    
-    // 마우스 휠(세로 스크롤) 작동 시 가로 스크롤로 변환
-    slider.addEventListener('wheel', (e) => {
-      // 세로 휠 굴림을 가로 이동으로 변환 (자석 스냅과 부드럽게 연동)
-      if (Math.abs(e.deltaY) > Math.abs(e.deltaX)) {
-        e.preventDefault();
-        slider.scrollBy({
-          left: e.deltaY > 0 ? 150 : -150, // 마우스 휠 한 틱당 이동량
-          behavior: 'smooth'
-        });
-      }
-    }, { passive: false });
-
-    // 드래그가 끝났을 때 원치 않게 칩이 클릭되는 현상 방지
-    slider.addEventListener('click', (e) => {
-      if (isDraggingScroll) {
-        e.preventDefault();
-        e.stopPropagation();
-      }
-    }, true);
-  });
-}
-
-
-
-// PC 환경에서 마우스 휠 스크롤을 가로 스크롤로 변환
-const scrollContainers = document.querySelectorAll('.horizontal-scroll-chips');
-scrollContainers.forEach(container => {
-  container.addEventListener('wheel', (e) => {
-    if (e.deltaY !== 0) {
-      e.preventDefault();
-      // 세로 휠 이동량을 가로 스크롤(scrollLeft)로 변환
-      container.scrollLeft += e.deltaY; 
-    }
-  });
-});
-
-//적용
-const scrollContainers = document.querySelectorAll('.horizontal-scroll-chips'); // 가로 스크롤 박스 클래스명
-
-scrollContainers.forEach(container => {
- container.addEventListener('wheel', (e) => {
-   if (e.deltaY !== 0) {
-     e.preventDefault();
-     // 세로 휠 이동량을 가로 스크롤(scrollLeft)로 변환
-     container.scrollLeft += e.deltaY; 
-   }
- });
-});
-
-
-function enableAppleScroll(container) {
   let isDown = false;
   let startX;
   let scrollLeft;
   let velX = 0;
   let momentumID;
 
-  // 1. 마우스 휠 지원 (PC)
-  container.addEventListener('wheel', (e) => {
-    e.preventDefault();
-    container.scrollLeft += e.deltaY;
-    cancelAnimationFrame(momentumID);
-    snapToCenter(container); // 휠 멈추면 중앙 정렬
-  });
-
-  // 2. 드래그 시작
-  container.addEventListener('mousedown', (e) => {
-    isDown = true;
-    container.classList.add('active');
-    startX = e.pageX - container.offsetLeft;
-    scrollLeft = container.scrollLeft;
-    cancelAnimationFrame(momentumID); // 드래그 시작 시 관성 멈춤
-  });
-
-  // 3. 드래그 중
-  container.addEventListener('mousemove', (e) => {
-    if (!isDown) return;
-    e.preventDefault();
-    const x = e.pageX - container.offsetLeft;
-    const walk = (x - startX) * 2; // 스크롤 속도 조절
-    const prevScrollLeft = container.scrollLeft;
-    container.scrollLeft = scrollLeft - walk;
-    velX = container.scrollLeft - prevScrollLeft; // 속도 계산
-  });
-
-  // 4. 드래그 종료 (관성 시작)
-  container.addEventListener('mouseup', () => {
-    isDown = false;
-    beginMomentum();
-  });
-  container.addEventListener('mouseleave', () => {
-    isDown = false;
-  });
-
-  // 5. 관성 스크롤 로직 (애플 스타일)
-  function beginMomentum() {
-    cancelAnimationFrame(momentumID);
-    velX *= 0.95; // 마찰력 (작을수록 빨리 멈춤)
-    container.scrollLeft += velX;
-
-    if (Math.abs(velX) > 0.5) {
-      momentumID = requestAnimationFrame(beginMomentum);
-    } else {
-      snapToCenter(container); // 멈추기 직전에 중앙으로 자석처럼 붙기
-    }
-  }
-
-  // 6. 클릭 시 중앙 정렬 (회원님이 요청하신 기능)
-  container.querySelectorAll('.chip-btn').forEach(item => {
-    item.addEventListener('click', () => {
-      item.scrollIntoView({
-        behavior: 'smooth',
-        inline: 'center',
-        block: 'nearest'
-      });
-    });
-  });
-
-  // 7. 자석처럼 중앙 정렬 (스냅)
-  function snapToCenter(container) {
-    // 가장 중앙에 가까운 요소를 찾아 부드럽게 이동시키는 로직 추가 가능
-    // 간단하게는 현재 스크롤 멈춘 위치에서 가장 가까운 아이템으로 scrollIntoView
-  }
-}
-
-//적용
-enableAppleScroll(document.querySelector('#dateChipGroup'));
-enableAppleScroll(document.querySelector('#timeChipGroup'));
-enableAppleScroll(document.querySelector('#editDateChipGroup'));
-enableAppleScroll(document.querySelector('#editTimeChipGroup'));
-
-function handleItemClick(event) {
-  const item = event.currentTarget;
-  
-  // 1. 선택 표시(흰색 박스) 클래스 교체
-  document.querySelectorAll('.item').forEach(el => el.classList.remove('active'));
-  item.classList.add('active');
-
-  // 2. 중앙으로 부드럽게 이동
-  item.scrollIntoView({
-    behavior: 'smooth',
-    inline: 'center',
-    block: 'nearest'
-  });
-}
-
-
-// 칩 버튼 클릭 이벤트 위임 (관리자용)
-document.querySelectorAll('.chip-select-group').forEach(group => {
-  group.addEventListener('click', e => {
-    if (isDraggingScroll) return; // 드래그 중엔 클릭 무시
-        const btn = e.target.closest('.chip-btn');
-        if (!btn || btn.disabled) return;
-        
-        //중앙으로 스크롤
-        btn.scrollIntoView({
-            behavior: 'smooth',
-            inline: 'center',
-            block: 'nearest'
-        });
-
-        group.querySelectorAll('.chip-btn').forEach(b => b.classList.remove('selected'));
-        btn.classList.add('selected');
-        
-        const hiddenId = group.dataset.target;
-        if (hiddenId) getEl(hiddenId).value = btn.dataset.value;
-  });
-});
-
-// 칩 버튼 클릭 이벤트 위임 (관리자용)
-document.querySelectorAll('.chip-select-group').forEach(group => {
-  group.addEventListener('click', e => {
-    if (isDraggingScroll) return; // 드래그 중엔 클릭 무시
-        const btn = e.target.closest('.chip-btn');
-        if (!btn || btn.disabled) return;
-        
-        //가운데로 스크롤하는 로직
-        btn.scrollIntoView({
-            behavior: 'smooth',
-            inline: 'center',
-            block: 'nearest'
-        });
-
-       group.querySelectorAll('.chip-btn').forEach(b => b.classList.remove('selected'));
-        btn.classList.add('selected');
-        
-        const hiddenId = group.dataset.target;
-        if (hiddenId) getEl(hiddenId).value = btn.dataset.value;
-    });
-});
-
-// 스크롤 인디케이터 동기화 로직
-function syncScrollIndicator(scrollBoxId, indicatorId) {
-  const box = getEl(scrollBoxId);
-  const ind = getEl(indicatorId);
-  if (!box || !ind) return;
-  const dot = ind.querySelector('.scroll-indicator-dot');
-  if (!dot) return;
-
-  const updateDot = () => {
-    const maxScroll = box.scrollWidth - box.clientWidth;
+  // 1. 스크롤 위치에 따라 파란 바(프로그레스 게이지) 채우기
+  const updateIndicator = () => {
+    if (!indicator) return;
+    const maxScroll = slider.scrollWidth - slider.clientWidth;
     if (maxScroll <= 0) {
-      dot.style.transform = `translateX(0px)`;
+      indicator.style.width = '0%';
       return;
     }
-    const ratio = box.scrollLeft / maxScroll;
-    const moveX = ratio * (ind.clientWidth - dot.clientWidth);
-    dot.style.transform = `translateX(${moveX}px)`;
+    const scrollPercent = (slider.scrollLeft / maxScroll) * 100;
+    indicator.style.width = `${scrollPercent}%`; 
   };
-  box.addEventListener('scroll', updateDot);
-  setTimeout(updateDot, 100);
+
+  slider.addEventListener('scroll', updateIndicator);
+  setTimeout(updateIndicator, 100);
+
+  // 2. 마우스 휠 지원 (PC)
+  slider.addEventListener('wheel', (e) => {
+    if (e.deltaY !== 0) {
+      e.preventDefault();
+      slider.scrollLeft += e.deltaY;
+      cancelAnimationFrame(momentumID);
+    }
+  });
+
+  // 3. 드래그 시작 (마우스)
+  slider.addEventListener('mousedown', (e) => {
+    isDown = true;
+    isDraggingScroll = false;
+    slider.style.scrollSnapType = 'none'; // 드래그 중 스냅 해제
+    slider.style.scrollBehavior = 'auto'; // 즉각적인 반응
+    startX = e.pageX - slider.offsetLeft;
+    scrollLeft = slider.scrollLeft;
+    cancelAnimationFrame(momentumID);
+  });
+
+  // 4. 드래그 중
+  slider.addEventListener('mousemove', (e) => {
+    if (!isDown) return;
+    e.preventDefault();
+    const x = e.pageX - slider.offsetLeft;
+    const walk = (x - startX) * 2; // 스크롤 속도 배율
+    if (Math.abs(walk) > 5) isDraggingScroll = true; // 5px 이상 드래그 시 클릭 무시용 트리거 작동
+    const prevScroll = slider.scrollLeft;
+    slider.scrollLeft = scrollLeft - walk;
+    velX = slider.scrollLeft - prevScroll; // 속도 계산
+  });
+
+  // 5. 드래그 종료 -> 관성 시작
+  const handleMouseUp = () => {
+    if (!isDown) return;
+    isDown = false;
+    slider.style.scrollSnapType = 'x mandatory'; // 스냅 복구
+    slider.style.scrollBehavior = 'smooth';
+    beginMomentum();
+  };
+
+  slider.addEventListener('mouseup', handleMouseUp);
+  slider.addEventListener('mouseleave', handleMouseUp);
+
+  // 관성 스크롤 로직 (애플 스타일)
+  function beginMomentum() {
+    velX *= 0.95; // 부드럽게 멈추는 마찰력
+    slider.scrollLeft += velX;
+    if (Math.abs(velX) > 0.5) {
+      momentumID = requestAnimationFrame(beginMomentum);
+    }
+  }
 }
+
+// 6. 칩 버튼 클릭 이벤트 위임 (단 한 번만 선언하여 중복 충돌 방지)
+document.querySelectorAll('.chip-select-group').forEach(group => {
+  group.addEventListener('click', e => {
+    if (isDraggingScroll) {
+      e.preventDefault();
+      e.stopPropagation();
+      return; // 드래그 중엔 클릭 무시
+    }
+    const btn = e.target.closest('.chip-btn');
+    if (!btn || btn.disabled) return;
+    
+    // 아이템 클릭 시 화면 중앙으로 스르륵 이동
+    btn.scrollIntoView({
+      behavior: 'smooth',
+      inline: 'center',
+      block: 'nearest'
+    });
+
+    group.querySelectorAll('.chip-btn').forEach(b => b.classList.remove('selected'));
+    btn.classList.add('selected');
+    
+    // 숨겨진 input 연동 로직
+    const hiddenId = group.dataset.target;
+    if (hiddenId) {
+      const hiddenEl = document.getElementById(hiddenId);
+      if (hiddenEl) hiddenEl.value = btn.dataset.value || btn.dataset.date;
+    }
+  }, true);
+});
+
+// 7. 실행! (마법의 함수 연동)
+setupAppleScroll('dateChipGroup', 'dateScrollInd');
+setupAppleScroll('timeChipGroup', 'timeScrollInd');
+setupAppleScroll('editDateChipGroup', 'editDateScrollInd');
+setupAppleScroll('editTimeChipGroup', 'editTimeScrollInd');
 
 // 동적으로 생성된 HTML(innerHTML)의 인라인 이벤트를 위한 전역 스코프 함수 노출
 window.toggleUserAdmin = toggleUserAdmin;
@@ -921,10 +782,3 @@ window.savePartyComposition = function() {
   alert(`[${title}]\n현재 파티 구성이 성공적으로 임시 저장되었습니다.\n\n1파티: ${composition.party1.length}명\n2파티: ${composition.party2.length}명`);
   getEl('closePartyDetailBtn').click();
 };
-
-applyDragScroll();
-
-syncScrollIndicator("dateChipGroup", "dateScrollInd"); 
-syncScrollIndicator("timeChipGroup", "timeScrollInd");
-syncScrollIndicator("editDateChipGroup", "editDateScrollInd");
-syncScrollIndicator("editTimeChipGroup", "editTimeScrollInd");
