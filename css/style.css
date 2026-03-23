@@ -2781,7 +2781,7 @@ body.modal-open {
 /* 파티 조율 모달만 가로로 넓게 확장 & 스크롤 최적화 */
 #partyDetailModal .modal-sheet {
   max-width: 880px;
-  max-height: 90vh; /* 화면 높이 90% 제한 */
+  max-height: 85vh; /* 화면 높이 85% 제한 (하단 버튼 짤림 완벽 방지) */
   display: flex;
   flex-direction: column;
 }
