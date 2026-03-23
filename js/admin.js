@@ -188,6 +188,8 @@ function renderCalendar() {
   const today = new Date();
   let html = "";
   
+  let selectedIndex = 0; // 진행 바를 위한 인덱스 추적
+  
   for(let i = 0; i < 14; i++) {
     const d = new Date(today);
     d.setDate(today.getDate() + i);
@@ -199,10 +201,11 @@ function renderCalendar() {
     
     const isWeekend = (dayStr === '토' || dayStr === '일') ? 'color: var(--blue-1);' : '';
     const isActive = dateVal === selectedDashboardDate ? 'active' : '';
+    if (isActive) selectedIndex = i; // 현재 선택된 날짜의 인덱스 저장
     const hasData = allSchedules.some(s => s.date === dateVal) ? 'has-data' : '';
     
     html += `
-      <div class="cal-day-cell ${isActive} ${hasData}" data-date="${dateVal}">
+      <div class="cal-day-cell ${isActive} ${hasData}" data-date="${dateVal}" data-index="${i}">
         <div class="cal-dow" style="${isWeekend}">${dayStr}</div>
         <div class="cal-date">${dd}</div>
       </div>
@@ -211,11 +214,26 @@ function renderCalendar() {
   
   calEl.innerHTML = html;
   
+  // 최초 로드 시 상단 파란색 인디케이터 게이지 채우기
+  const progress = getEl("dashboardProgress");
+  if (progress) {
+    const percent = (selectedIndex / 13) * 100;
+    progress.style.width = `${percent}%`;
+  }
+  
   calEl.querySelectorAll('.cal-day-cell').forEach(cell => {
     cell.addEventListener('click', () => {
       calEl.querySelectorAll('.cal-day-cell').forEach(c => c.classList.remove('active'));
       cell.classList.add('active');
       selectedDashboardDate = cell.dataset.date;
+      
+      // 클릭 시 인디케이터 부드럽게 이동
+      if (progress) {
+        const idx = parseInt(cell.dataset.index, 10);
+        const percent = (idx / 13) * 100;
+        progress.style.width = `${percent}%`;
+      }
+      
       renderScheduleList(selectedDashboardDate);
     });
   });

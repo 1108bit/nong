@@ -99,7 +99,13 @@
 
           <!-- 우측 패널 (일정 대시보드 - 60%) -->
           <article class="main-card list-section" style="display: flex; flex-direction: column;">
-            <div class="card-head"><h2 class="section-title">일정 대시보드</h2></div>
+            <div class="card-head" style="flex-direction: column; gap: 12px; margin-bottom: 16px;">
+              <h2 class="section-title">📅 2주 일정 대시보드</h2>
+              <!-- 2주 기간 중 현재 위치를 보여주는 파란색 진행 바 -->
+              <div class="scroll-indicator" style="width: 100%; height: 4px; margin: 0; background: rgba(255, 255, 255, 0.05);">
+                <div class="scroll-indicator-dot" id="dashboardProgress" style="width: 0%; background: linear-gradient(90deg, var(--blue-1), var(--cyan-1)); transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1);"></div>
+              </div>
+            </div>
             <div class="mini-calendar-grid" id="miniCalendar"></div>
             <div class="admin-list slim-scroll-list" id="scheduleList" style="flex: 1;"></div>
           </article>
