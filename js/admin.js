@@ -143,6 +143,10 @@ function formatDisplayTime(ts) {
   return ts;
 }
 
+let allSchedules = [];
+let allSummaries = [];
+let selectedDashboardDate = null;
+
 async function loadAdminSchedule() {
   const adminCode = getAdminCode();
   if (!adminCode) return movePage("index.html");
@@ -161,46 +165,113 @@ async function loadAdminSchedule() {
   if (!scheduleData.ok) return movePage("index.html");
   if (!summaryData.ok) return alert("참여 현황을 가져오는데 실패했습니다.");
 
-  const list = getEl("scheduleList");
+  allSchedules = scheduleData.items || [];
+  allSummaries = summaryData.items || [];
+
+  if (!selectedDashboardDate) {
+    const today = new Date();
+    const yyyy = today.getFullYear();
+    const mm = String(today.getMonth() + 1).padStart(2, '0');
+    const dd = String(today.getDate()).padStart(2, '0');
+    selectedDashboardDate = `${yyyy}-${mm}-${dd}`;
+  }
+
+  renderCalendar();
+  renderScheduleList(selectedDashboardDate);
+}
+
+function renderCalendar() {
+  const calEl = getEl("miniCalendar");
+  if (!calEl) return;
   
-  if (!scheduleData.items || scheduleData.items.length === 0) {
-    list.innerHTML = `<div class="admin-empty-state">📅 등록된 일정이 없습니다.<br>위에서 새 일정을 등록해 주세요.</div>`;
+  const days = ["일", "월", "화", "수", "목", "금", "토"];
+  const today = new Date();
+  let html = "";
+  
+  for(let i = 0; i < 14; i++) {
+    const d = new Date(today);
+    d.setDate(today.getDate() + i);
+    const yyyy = d.getFullYear();
+    const mm = String(d.getMonth() + 1).padStart(2, '0');
+    const dd = String(d.getDate()).padStart(2, '0');
+    const dayStr = days[d.getDay()];
+    const dateVal = `${yyyy}-${mm}-${dd}`;
+    
+    const isWeekend = (dayStr === '토' || dayStr === '일') ? 'color: var(--blue-1);' : '';
+    const isActive = dateVal === selectedDashboardDate ? 'active' : '';
+    const hasData = allSchedules.some(s => s.date === dateVal) ? 'has-data' : '';
+    
+    html += `
+      <div class="cal-day-cell ${isActive} ${hasData}" data-date="${dateVal}">
+        <div class="cal-dow" style="${isWeekend}">${dayStr}</div>
+        <div class="cal-date">${dd}</div>
+      </div>
+    `;
+  }
+  
+  calEl.innerHTML = html;
+  
+  calEl.querySelectorAll('.cal-day-cell').forEach(cell => {
+    cell.addEventListener('click', () => {
+      calEl.querySelectorAll('.cal-day-cell').forEach(c => c.classList.remove('active'));
+      cell.classList.add('active');
+      selectedDashboardDate = cell.dataset.date;
+      renderScheduleList(selectedDashboardDate);
+    });
+  });
+}
+
+function renderScheduleList(dateStr) {
+  const list = getEl("scheduleList");
+  if (!list) return;
+  
+  const filtered = allSchedules.filter(s => s.date === dateStr);
+  list.innerHTML = "";
+  
+  if (filtered.length === 0) {
+    list.innerHTML = `<div class="admin-empty-state">📅 선택한 날짜에 등록된 일정이 없습니다.</div>`;
     return;
   }
   
-  list.innerHTML = scheduleData.items.map(i => {
-    const participants = summaryData.items.filter(s => s.day === i.day && s.time_slot === i.time_slot);
+  filtered.sort((a, b) => a.time_slot.localeCompare(b.time_slot));
+  
+  let html = "";
+  filtered.forEach((i, idx) => {
+    const participants = allSummaries.filter(s => s.date === i.date && s.time_slot === i.time_slot);
     const count = participants.length;
-    const hasHealer = participants.some(p => p.className === "치유성");
+    const maxCount = 8;
+    const progressPercent = Math.min(100, Math.round((count / maxCount) * 100));
     
-    // 1명이라도 참여했는데 8명 미만이거나 치유성이 없을 때만 Risk(빨간 테두리) 표시
-    const isRisk = count > 0 && (count < 8 || !hasHealer); 
-    const riskClass = isRisk ? "risk" : "";
+    const hasHealer = participants.some(p => p.className === "치유성");
+    const isRisk = count > 0 && (count < maxCount || !hasHealer); 
+    const riskBorder = isRisk ? "border: 1px solid rgba(251, 113, 133, 0.4);" : "";
+    const fillClass = hasHealer ? "" : "healer-missing";
+    
     const timeFormatted = formatDisplayTime(i.time_slot);
-    const shortDate = i.date && i.date.length >= 10 ? i.date.substring(5).replace('-', '.') : i.date;
+    const title = i.note ? i.note : "레이드 일정";
+    const animDelay = idx * 0.05;
 
-    return `
-      <div class="admin-card-item ${riskClass}">
-        <div class="info-area" onclick="openPartyDetail('${escapeHtml(i.date)}', '${escapeHtml(i.day)}', '${escapeHtml(timeFormatted)}')">
-          <div class="row-time">
-            <span class="row-date">${shortDate} (${i.day})</span>
-            <span class="row-hhmm">${timeFormatted}</span>
-          </div>
-          <div class="status-indicator">
-            <div class="participant-dots" title="인원: ${count}명">
-              ${Array(8).fill(0).map((_, idx) => `<div class="dot ${idx < count ? 'filled' : ''}"></div>`).join('')}
+    html += `
+      <div class="slim-schedule-card" style="animation-delay: ${animDelay}s; ${riskBorder}">
+        <div class="slim-time" style="cursor:pointer;" onclick="openPartyDetail('${escapeHtml(i.date)}', '${escapeHtml(i.day)}', '${escapeHtml(timeFormatted)}')">${timeFormatted}</div>
+        <div class="slim-info" style="cursor:pointer;" onclick="openPartyDetail('${escapeHtml(i.date)}', '${escapeHtml(i.day)}', '${escapeHtml(timeFormatted)}')">
+          <div class="slim-title">${escapeHtml(title)}</div>
+          <div class="slim-progress-wrapper">
+            <div class="slim-progress-bar">
+              <div class="slim-progress-fill ${fillClass}" style="width: ${progressPercent}%;"></div>
             </div>
-            <div class="healer-dot ${hasHealer ? '' : 'off'}" title="치유성: ${hasHealer ? 'O' : 'X'}"></div>
-            ${i.note ? `<div class="row-note" title="${escapeHtml(i.note)}">${escapeHtml(i.note)}</div>` : ''}
+            <div class="slim-count">${count}/${maxCount}</div>
           </div>
         </div>
-        <div class="action-area">
+        <div class="slim-actions">
           <button type="button" class="icon-btn edit-btn" title="수정" onclick="editSchedule('${escapeHtml(i.date)}', '${escapeHtml(i.day)}', '${escapeHtml(timeFormatted)}', '${escapeHtml(i.note)}')">✏️</button>
           <button type="button" class="icon-btn delete-btn" title="삭제" onclick="deleteSchedule('${escapeHtml(i.date)}', '${escapeHtml(i.day)}', '${escapeHtml(timeFormatted)}')">🗑️</button>
         </div>
       </div>
     `;
-  }).join("");
+  });
+  
+  list.innerHTML = html;
 }
 
 async function saveSchedule() {
@@ -275,6 +346,19 @@ function editSchedule(date, day, time, note) {
   if (editCal) editCal.value = date;
 
   // 칩 시각적 연동
+  // [추가할 코드] 상단 안내 문구 업데이트
+  const infoText = `${date} [${time}] 일정을 수정 중입니다.`;
+  const infoElement = document.getElementById('editScheduleInfo');
+  if (infoElement) {
+    infoElement.innerText = infoText;
+  }
+
+  const infoText = `${date} [${time}] 일정을 수정합니다.`;
+  const editScheduleInfo = document.getElementById('editScheduleInfo');
+    if (editScheduleInfo) {
+        editScheduleInfo.innerText = infoText;
+    }
+
   const dateGroup = getEl("editDateChipGroup");
   if (dateGroup) {
     dateGroup.querySelectorAll(".chip-btn").forEach(b => b.classList.toggle("selected", b.dataset.date === date));
@@ -384,6 +468,14 @@ getEl("searchUserButton").onclick = async () => {
 initDateChips();
 initTimeChips();
 loadAdminSchedule();
+
+// 칩 생성 직후 스크롤 및 인디케이터 기능 활성화 (안전하게 0.1초 대기)
+setTimeout(() => {
+  setupAppleScroll('dateChipGroup', 'dateScrollInd');
+  setupAppleScroll('timeChipGroup', 'timeScrollInd');
+  setupAppleScroll('editDateChipGroup', 'editDateScrollInd');
+  setupAppleScroll('editTimeChipGroup', 'editTimeScrollInd');
+}, 100);
 
 
 // 특정 유저의 캐릭터 정보를 불러와서 편집 모달 띄우기
@@ -618,6 +710,7 @@ function setupAppleScroll(scrollBoxId, indicatorId) {
   slider.addEventListener('mousedown', (e) => {
     isDown = true;
     isDraggingScroll = false;
+    slider.classList.add('grabbing'); // 커서 모양 변경
     slider.style.scrollSnapType = 'none'; // 드래그 중 스냅 해제
     slider.style.scrollBehavior = 'auto'; // 즉각적인 반응
     startX = e.pageX - slider.offsetLeft;
@@ -641,6 +734,7 @@ function setupAppleScroll(scrollBoxId, indicatorId) {
   const handleMouseUp = () => {
     if (!isDown) return;
     isDown = false;
+    slider.classList.remove('grabbing'); // 커서 모양 복구
     slider.style.scrollSnapType = 'x mandatory'; // 스냅 복구
     slider.style.scrollBehavior = 'smooth';
     beginMomentum();
@@ -688,12 +782,6 @@ document.querySelectorAll('.chip-select-group').forEach(group => {
     }
   }, true);
 });
-
-// 7. 실행! (마법의 함수 연동)
-setupAppleScroll('dateChipGroup', 'dateScrollInd');
-setupAppleScroll('timeChipGroup', 'timeScrollInd');
-setupAppleScroll('editDateChipGroup', 'editDateScrollInd');
-setupAppleScroll('editTimeChipGroup', 'editTimeScrollInd');
 
 // 동적으로 생성된 HTML(innerHTML)의 인라인 이벤트를 위한 전역 스코프 함수 노출
 window.toggleUserAdmin = toggleUserAdmin;

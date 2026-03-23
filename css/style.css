@@ -1621,8 +1621,7 @@ body.modal-open {
   display: none; /* Chrome, Safari */
 }
 
-.horizontal-scroll-chips:active {
-  cursor: grabbing;
+.horizontal-scroll-chips:active
 }
 
 .chip-btn {
@@ -2444,79 +2443,165 @@ body.modal-open {
   }
 }
 
-/* =========================
-   긴급 복구: 일정 목록 레이아웃 완벽 고정
-========================= */
-#scheduleList .admin-list-row, 
-#scheduleList .admin-card-item {
-  display: flex !important;
-  flex-direction: row !important; /* 가로 배치 강제 */
-  align-items: center !important;
-  justify-content: space-between !important;
-  padding: 12px 16px !important;
-  height: 64px !important; /* 높이 고정으로 슬림화 */
-  background: var(--card-soft) !important;
-  border-radius: 12px !important;
-  margin-bottom: 8px !important;
-  gap: 15px !important;
+/* 2주 미니 달력 대시보드 */
+.mini-calendar-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 8px;
+  margin-bottom: 16px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid var(--line-1);
 }
 
-/* 정보 영역 (클릭 시 팝업) */
-#scheduleList .info-area {
-  display: flex !important;
-  flex-direction: row !important;
-  align-items: center !important;
-  flex: 1 !important;
-  gap: 20px !important;
-  cursor: pointer !important;
+.cal-day-cell {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 10px 4px;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid transparent;
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  position: relative;
+  user-select: none;
 }
 
-#scheduleList .row-time {
-  margin: 0 !important;
-  display: flex !important;
-  flex-direction: column !important;
-  align-items: flex-start !important;
-  justify-content: center !important;
-  min-width: 70px !important;
+.cal-day-cell:active {
+  transform: scale(0.92);
 }
 
-/* 치유성/인원 점 그룹 */
-#scheduleList .status-indicator {
-  display: flex !important;
-  align-items: center !important;
-  gap: 10px !important;
-  flex: 1 !important;
+.cal-day-cell:hover {
+  background: rgba(255, 255, 255, 0.08);
 }
 
-/* 3. 인원 현황 점(Dot) 캡슐화 강제 */
-#scheduleList .participant-dots {
-  display: flex !important;
-  flex-direction: row !important; /* 점(Dot) 가로 정렬 강제 */
-  align-items: center !important;
-  gap: 4px !important;
-  margin: 0 !important;
+.cal-day-cell.active {
+  background: rgba(67, 217, 255, 0.15);
+  border-color: rgba(67, 217, 255, 0.4);
+  box-shadow: 0 4px 12px rgba(67, 217, 255, 0.15);
+  transform: scale(1.05);
+  z-index: 2;
 }
 
-/* 금색 치유성 닷 */
-#scheduleList .healer-dot {
-  width: 10px !important; 
-  height: 10px !important; 
-  background: #ffd700 !important; 
-  border-radius: 50% !important;
-  box-shadow: 0 0 8px #ffd700 !important;
-  flex-shrink: 0 !important;
-}
-#scheduleList .healer-dot.off {
-  background: rgba(255, 255, 255, 0.1) !important;
-  box-shadow: none !important;
+.cal-dow {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--text-muted);
+  margin-bottom: 4px;
 }
 
-/* 우측 수정/삭제 버튼 그룹 */
-#scheduleList .action-area {
-  display: flex !important;
-  flex-direction: row !important;
-  gap: 8px !important;
-  margin: 0 !important;
+.cal-date {
+  font-size: 15px;
+  font-weight: 900;
+  color: var(--text-main);
+}
+
+.cal-day-cell.has-data::after {
+  content: "";
+  position: absolute;
+  bottom: 4px;
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: var(--cyan-1);
+  box-shadow: 0 0 6px var(--cyan-1);
+}
+
+.cal-day-cell.active.has-data::after {
+  bottom: 3px;
+  width: 5px;
+  height: 5px;
+}
+
+/* 슬림형 일정 리스트 카드 */
+.slim-schedule-card {
+  display: flex;
+  align-items: center;
+  padding: 14px 16px;
+  background: var(--card-soft);
+  border-radius: 14px;
+  margin-bottom: 8px;
+  gap: 16px;
+  border: 1px solid rgba(255,255,255,0.05);
+  opacity: 0;
+  animation: fadeInList 0.4s ease forwards;
+  transition: transform 0.2s ease, background 0.2s ease;
+}
+
+.slim-schedule-card:hover {
+  background: rgba(255, 255, 255, 0.08);
+  transform: translateY(-2px);
+}
+
+@keyframes fadeInList {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.slim-time {
+  font-size: 16px;
+  font-weight: 900;
+  color: var(--cyan-2);
+  min-width: 48px;
+  text-align: center;
+}
+
+.slim-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 0;
+}
+
+.slim-title {
+  font-size: 14px;
+  font-weight: 800;
+  color: var(--text-main);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.slim-progress-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.slim-progress-bar {
+  flex: 1;
+  height: 6px;
+  background: rgba(0, 0, 0, 0.4);
+  border-radius: 3px;
+  overflow: hidden;
+  position: relative;
+}
+
+.slim-progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--blue-1), var(--cyan-1));
+  border-radius: 3px;
+  transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.slim-progress-fill.healer-missing {
+  background: linear-gradient(90deg, var(--gold-2), var(--gold-1));
+}
+
+.slim-count {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--text-sub);
+  min-width: 28px;
+  text-align: right;
+}
+
+.slim-actions {
+  display: flex;
+  gap: 6px;
+  flex-shrink: 0;
 }
 
 /* 4. 애플 감성 가로 스크롤 & 칩 잘림 원천 차단 */
