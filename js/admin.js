@@ -371,12 +371,6 @@ function editSchedule(date, day, time, note) {
     infoElement.innerText = infoText;
   }
 
-  const infoText = `${date} [${time}] 일정을 수정합니다.`;
-  const editScheduleInfo = document.getElementById('editScheduleInfo');
-    if (editScheduleInfo) {
-        editScheduleInfo.innerText = infoText;
-    }
-
   const dateGroup = getEl("editDateChipGroup");
   if (dateGroup) {
     dateGroup.querySelectorAll(".chip-btn").forEach(b => b.classList.toggle("selected", b.dataset.date === date));
@@ -800,6 +794,31 @@ document.querySelectorAll('.chip-select-group').forEach(group => {
     }
   }, true);
 });
+
+// =========================
+// 파티 상세 구성 모달 열기/닫기 로직 (복구됨)
+// =========================
+function closePartyDetailModal() {
+  const modal = getEl("partyDetailModal");
+  if (modal) modal.classList.remove("show");
+  document.body.classList.remove("modal-open");
+}
+if (getEl("closePartyDetailBtn")) getEl("closePartyDetailBtn").onclick = closePartyDetailModal;
+
+async function openPartyDetail(date, day, time) {
+  const modal = getEl("partyDetailModal");
+  const title = getEl("partyDetailTitle");
+  const content = getEl("partyDetailContent");
+  
+  if (title) title.textContent = `${date} (${day}) ${time} 파티 구성`;
+  if (content) content.innerHTML = `<div style="text-align:center; padding: 30px; color: var(--cyan-2);"><span style="display:inline-block; animation: spin 1s linear infinite;">⏳</span> 데이터를 불러오는 중...</div>`;
+  
+  if (modal) modal.classList.add("show");
+  document.body.classList.add("modal-open");
+
+  // TODO: 실제 파티 구성 데이터를 백엔드에서 불러와서 그리는 로직을 이곳에 추가해야 합니다.
+  if (content) content.innerHTML = `<div class="admin-empty-state">해당 시간의 파티 상세 구성 화면입니다.<br>(현재 UI 구현 진행 중)</div>`;
+}
 
 // 동적으로 생성된 HTML(innerHTML)의 인라인 이벤트를 위한 전역 스코프 함수 노출
 window.toggleUserAdmin = toggleUserAdmin;
