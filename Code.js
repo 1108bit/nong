@@ -45,3 +45,9 @@ function doGet(e) {
 function doPost(e) {
   return doGet(e);
 }
+
+// JSON 응답을 반환하고 CORS 에러를 방지하는 필수 함수
+function outputJson(data) {
+  return ContentService.createTextOutput(JSON.stringify(data))
+    .setMimeType(ContentService.MimeType.JSON);
+}
