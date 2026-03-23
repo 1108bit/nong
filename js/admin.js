@@ -925,11 +925,6 @@ function renderPartyEditor(date, time) {
 
   // 카드 생성 헬퍼 함수
   const createCardHtml = (p, isPlaced = false) => {
-    const classIconMap = {
-      '검성': '⚔️', '수호성': '🛡️', '살성': '🗡️', '궁성': '🏹',
-      '마도성': '🔥', '정령성': '💨', '치유성': '✨', '호법성': '📿'
-    };
-    const icon = classIconMap[p.className] || '👤';
     const typeBadge = p.type === '본캐' ? '<span class="chip chip-type main">본캐</span>' : '<span class="chip chip-type sub">부캐</span>';
     const classBadge = `<span class="chip chip-class ${escapeHtml(p.className)}">${escapeHtml(p.className)}</span>`;
     const placedClass = isPlaced ? 'already-placed' : 'draggable-char';
@@ -938,7 +933,6 @@ function renderPartyEditor(date, time) {
       <div class="applicant-card ${placedClass}" id="char_${p.account_id}_${p.character_name}" data-name="${escapeHtml(p.character_name)}" data-class="${escapeHtml(p.className)}" data-power="${p.power}">
         <div class="applicant-info">
           <span class="drag-handle">⠿</span>
-          <span style="font-size: 16px;">${icon}</span>
           <span class="applicant-name">${escapeHtml(p.character_name)}</span>
         </div>
         <div class="applicant-meta">
