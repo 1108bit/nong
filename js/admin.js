@@ -576,12 +576,14 @@ let isDraggingScroll = false;
 
 // 마우스 드래그로 가로 스크롤을 구현하는 애플 스타일 로직
 function applyDragScroll() {
-  const sliders = document.querySelectorAll('.horizontal-scroll-chips');
-  let isDown = false;
-  let startX;
-  let scrollLeft;
+  // 가로 스크롤 영역 전체를 타겟팅 (일정/시간 영역 누락 문제 해결!)
+  const sliders = document.querySelectorAll('.horizontal-scroll-chips, .chip-select-group, #dateChipGroup, #timeChipGroup, #editDateChipGroup, #editTimeChipGroup');
 
   sliders.forEach(slider => {
+    let isDown = false;
+    let startX;
+    let scrollLeft;
+
     slider.addEventListener('mousedown', (e) => {
       isDown = true;
       isDraggingScroll = false;
@@ -589,14 +591,17 @@ function applyDragScroll() {
       scrollLeft = slider.scrollLeft;
       // 마우스 드래그 중에는 스크롤 스냅을 꺼서 부드럽게 움직이도록 함
       slider.style.setProperty('scroll-snap-type', 'none', 'important');
+      slider.style.setProperty('scroll-behavior', 'auto', 'important');
     });
     slider.addEventListener('mouseleave', () => { 
       isDown = false; 
       slider.style.removeProperty('scroll-snap-type'); 
+      slider.style.removeProperty('scroll-behavior');
     });
     slider.addEventListener('mouseup', () => { 
       isDown = false; 
       slider.style.removeProperty('scroll-snap-type'); 
+      slider.style.removeProperty('scroll-behavior');
     });
     slider.addEventListener('mousemove', (e) => {
       if (!isDown) return;
@@ -609,9 +614,13 @@ function applyDragScroll() {
     
     // 마우스 휠(세로 스크롤) 작동 시 가로 스크롤로 변환
     slider.addEventListener('wheel', (e) => {
-      if (e.deltaY !== 0) {
+      // 세로 휠 굴림을 가로 이동으로 변환 (자석 스냅과 부드럽게 연동)
+      if (Math.abs(e.deltaY) > Math.abs(e.deltaX)) {
         e.preventDefault();
-        slider.scrollLeft += e.deltaY;
+        slider.scrollBy({
+          left: e.deltaY > 0 ? 150 : -150, // 마우스 휠 한 틱당 이동량
+          behavior: 'smooth'
+        });
       }
     }, { passive: false });
 
