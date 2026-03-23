@@ -837,11 +837,8 @@ function renderPartyEditor(date, time) {
   const content = getEl("partyDetailContent");
   if (!content) return;
 
-  // 해당 날짜/시간의 신청자 필터링 (allSummaries 데이터 활용)
-  const participants = allSummaries.filter(s => s.date === date && s.time_slot === time);
   let participants = allSummaries.filter(s => s.date === date && s.time_slot === time);
 
-  let waitingHtml = `<div class="waiting-list-title">신청자 대기열 (${participants.length}명)</div>`;
   // 1. 직업 우선순위 정렬 (수호/검성(1) > 살/궁(2) > 마/정(3) > 호법(4) > 치유(5) + 같은 직업 내 전투력 내림차순)
   const classPriority = {
     '수호성': 1, '검성': 1,
@@ -851,17 +848,6 @@ function renderPartyEditor(date, time) {
     '치유성': 5
   };
 
-  if (participants.length === 0) {
-    waitingHtml += `<div class="admin-empty-state" style="margin-top:20px;">해당 타임에 신청자가 없습니다.</div>`;
-  } else {
-    participants.forEach(p => {
-      // 직업 아이콘 텍스트/이모지 매핑
-      const classIconMap = {
-        '검성': '⚔️', '수호성': '🛡️', '살성': '🗡️', '궁성': '🏹',
-        '마도성': '🔥', '정령성': '💨', '치유성': '✨', '호법성': '📿'
-      };
-      const icon = classIconMap[p.className] || '👤';
-      const typeBadge = p.type === '본캐' ? '<span class="chip chip-type main">본캐</span>' : '<span class="chip chip-type sub">부캐</span>';
   participants.sort((a, b) => {
     const pA = classPriority[a.className] || 99;
     const pB = classPriority[b.className] || 99;
@@ -869,17 +855,6 @@ function renderPartyEditor(date, time) {
     return (parseInt(b.power, 10) || 0) - (parseInt(a.power, 10) || 0);
   });
 
-      waitingHtml += `
-        <div class="applicant-card draggable-char" id="char_${p.accountId}_${p.name}" data-name="${escapeHtml(p.name)}" data-class="${escapeHtml(p.className)}" data-power="${p.power}">
-          <div class="applicant-info">
-            <span class="drag-handle">⠿</span>
-            <span style="font-size: 16px;">${icon}</span>
-            <span class="applicant-name">${escapeHtml(p.name)}</span>
-          </div>
-          <div class="applicant-meta">
-            ${typeBadge}
-            <span class="applicant-power">${getPowerRange(p.power)}</span>
-          </div>
   // 2. 치유성 1명일 경우 자동 배치 로직 (8번 슬롯)
   const healers = participants.filter(p => p.className === '치유성');
   let autoPlacedHealerId = null;
@@ -906,8 +881,6 @@ function renderPartyEditor(date, time) {
           <span style="font-size: 16px;">${icon}</span>
           <span class="applicant-name">${escapeHtml(p.name)}</span>
         </div>
-      `;
-    });
         <div class="applicant-meta">
           ${typeBadge}
           <span class="applicant-power">${getPowerRange(p.power)}</span>
@@ -926,7 +899,6 @@ function renderPartyEditor(date, time) {
     waitingList.forEach(p => { waitingHtml += createCardHtml(p); });
   }
 
-  // 우측 8개의 빈 슬롯 생성
   // 4. 우측 8개의 슬롯 생성
   let slotsHtml = "";
   for (let i = 1; i <= 8; i++) {
@@ -937,13 +909,11 @@ function renderPartyEditor(date, time) {
     slotsHtml += `
       <div class="party-slot drop-zone" id="partySlot${i}">
         <span class="party-slot-num">${i}</span>
-        <div class="empty-slot-text">비어있음</div>
         ${slotContent}
       </div>
     `;
   }
 
-  // 시너지 계산기 UI와 파티 저장 버튼 추가
   // 5. 전체 에디터 UI 렌더링
   content.innerHTML = `
     <div class="synergy-board" id="synergyBoard">
@@ -963,7 +933,6 @@ function renderPartyEditor(date, time) {
     </div>
   `;
 
-  // 실시간 시너지 계산 함수
   // 6. 실시간 시너지 계산 함수
   const updateSynergy = () => {
     let totalPower = 0, count = 0;
@@ -985,12 +954,10 @@ function renderPartyEditor(date, time) {
     document.getElementById('classDist').textContent = `탱커 ${roles.tank} | 힐러(서폿) ${roles.heal} | 딜러 ${roles.dps}`;
   };
 
-  // SortableJS 공통 옵션 (모바일 터치 딜레이 100ms 적용)
   // 7. SortableJS 활성화 (모바일 터치 딜레이 적용)
   const sortableOptions = {
     group: 'party',
     animation: 150,
-    delay: 100, // 모바일에서 스크롤과 겹치지 않게 꾹 눌러야 드래그되도록 설정
     delay: 100, // 모바일에서 꾹 눌러야 드래그
     delayOnTouchOnly: true,
     ghostClass: 'sortable-ghost',
@@ -999,10 +966,8 @@ function renderPartyEditor(date, time) {
     onRemove: updateSynergy
   };
 
-  // 대기열 초기화
   Sortable.create(document.getElementById('waitingList'), sortableOptions);
 
-  // 8개 슬롯 초기화 (1칸 1명 밀어내기 로직 적용)
   for (let i = 1; i <= 8; i++) {
     Sortable.create(document.getElementById(`partySlot${i}`), {
       ...sortableOptions,
@@ -1010,7 +975,6 @@ function renderPartyEditor(date, time) {
         const slot = evt.to;
         const cards = slot.querySelectorAll('.applicant-card');
         if (cards.length > 1) {
-          // 새로 들어온 카드(evt.item) 말고 기존에 있던 카드를 대기열로 돌려보냄
           // 1칸 1명 밀어내기: 기존 카드를 대기열로 되돌림
           const oldCard = Array.from(cards).find(c => c !== evt.item);
           if (oldCard) document.getElementById('waitingList').appendChild(oldCard);
@@ -1020,7 +984,6 @@ function renderPartyEditor(date, time) {
     });
   }
 
-  // 파티 구성 저장 이벤트
   // 8. 파티 저장 기능 연동
   document.getElementById('savePartyBtn').onclick = async () => {
     const btn = document.getElementById('savePartyBtn');
@@ -1034,7 +997,6 @@ function renderPartyEditor(date, time) {
       partyData.push(card ? card.dataset.name : "");
     }
 
-    // GitHub Pages 환경을 위한 callApi 규격 사용
     const res = await callApi({
       action: 'savePartyComposition',
       adminCode: getAdminCode(),
@@ -1054,6 +1016,5 @@ function renderPartyEditor(date, time) {
     }
   };
 
-  // 최초 로드 시 시너지 계산 1회 실행
   updateSynergy();
 }
