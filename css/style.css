@@ -2506,6 +2506,34 @@ body.modal-open {
   color: var(--text-main);
 }
 
+/* 날짜 박스 내 인원 표시 배지 */
+.applicant-badge {
+  position: absolute;
+  top: -4px;
+  right: -4px;
+  background: var(--cyan-1);
+  color: #000;
+  font-size: 10px;
+  padding: 2px 5px;
+  border-radius: 6px;
+  font-weight: 900;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+  z-index: 10;
+  pointer-events: none;
+}
+
+/* 신청 인원이 16명 이상일 때 배경 강조 */
+.cal-day-cell.high-demand {
+  background: rgba(46, 143, 255, 0.15); 
+  border-color: rgba(46, 143, 255, 0.3);
+}
+.cal-day-cell.high-demand:hover {
+  background: rgba(46, 143, 255, 0.25);
+}
+.cal-day-cell.active.high-demand {
+  background: var(--blue-1); /* 선택 시엔 기본 active 스타일 유지 */
+}
+
 .cal-day-cell.has-data::after {
   content: "";
   position: absolute;
@@ -2515,6 +2543,27 @@ body.modal-open {
   border-radius: 50%;
   background: var(--cyan-1);
   box-shadow: 0 0 6px var(--cyan-1);
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+/* 신청자가 있는 날 표시 점 */
+.cal-day-cell.has-applicants::before {
+  content: '';
+  position: absolute;
+  bottom: 4px;
+  left: calc(50% - 6px);
+  transform: translateX(-50%);
+  width: 4px;
+  height: 4px;
+  background: #60a5fa;
+  border-radius: 50%;
+  box-shadow: 0 0 5px #60a5fa;
+}
+
+/* 일정(data)과 신청자(applicants)가 둘 다 있는 경우 점 두 개를 나란히 배치 */
+.cal-day-cell.has-data.has-applicants::after {
+  left: calc(50% + 6px);
 }
 
 .cal-day-cell.active.has-data::after {

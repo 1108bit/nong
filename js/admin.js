@@ -204,8 +204,23 @@ function renderCalendar() {
     if (isActive) selectedIndex = i; // 현재 선택된 날짜의 인덱스 저장
     const hasData = allSchedules.some(s => s.date === dateVal) ? 'has-data' : '';
     
+    // 해당 날짜의 총 신청 인원 계산
+    const dailySummaries = allSummaries.filter(s => s.date === dateVal);
+    const totalApplicants = dailySummaries.length;
+    
+    let badgeHtml = "";
+    let highlightClass = "";
+    let dotClass = "";
+
+    if (totalApplicants > 0) {
+      badgeHtml = `<div class="applicant-badge">${totalApplicants}</div>`;
+      dotClass = "has-applicants";
+      if (totalApplicants >= 16) highlightClass = "high-demand"; // 2파티(16명) 이상 시 강조
+    }
+    
     html += `
-      <div class="cal-day-cell ${isActive} ${hasData}" data-date="${dateVal}" data-index="${i}">
+      <div class="cal-day-cell ${isActive} ${hasData} ${dotClass} ${highlightClass}" data-date="${dateVal}" data-index="${i}">
+        ${badgeHtml}
         <div class="cal-dow" style="${isWeekend}">${dayStr}</div>
         <div class="cal-date">${dd}</div>
       </div>
