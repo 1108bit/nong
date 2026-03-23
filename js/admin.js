@@ -330,7 +330,7 @@ if(getEl("submitScheduleModalBtn")) {
     });
 
     btn.disabled = false;
-    btn.textContent = "수정 완료하기";
+    btn.textContent = "완료";
 
     if (res.ok) {
        alert("일정이 성공적으로 수정되었습니다.");
@@ -339,15 +339,15 @@ if(getEl("submitScheduleModalBtn")) {
     } else {
        alert(res.message || "수정에 실패했습니다.");
     }
-  };
+  }; 
 }
 
-getEl("saveButton").onclick = saveSchedule;
+getEl("saveButton").onclick = saveSchedule; 
 getEl("checkSchemaButton").onclick = async () => {
   const res = await callApi({ action: "validateDatabaseSchema" });
   if (!res.ok) return alert(res.message || "검증에 실패했습니다.");
 
-  if (res.isValid) {
+  if (res.isValid) { 
     alert("DB 스키마가 정상입니다.");
   } else {
     alert("DB 스키마 오류:\n" + (res.errors || []).join("\n"));
@@ -511,7 +511,7 @@ getEl("submitAdminCharacterButton").onclick = async () => {
 
   btn.disabled = false;
   btn.textContent = originalText;
-
+ 
   if (res.ok) {
     alert("수정되었습니다.");
     closeAdminModal();
@@ -662,7 +662,7 @@ function setupAppleScroll(scrollBoxId, indicatorId) {
 // 6. 칩 버튼 클릭 이벤트 위임 (단 한 번만 선언하여 중복 충돌 방지)
 document.querySelectorAll('.chip-select-group').forEach(group => {
   group.addEventListener('click', e => {
-    if (isDraggingScroll) {
+    if (isDraggingScroll) { 
       e.preventDefault();
       e.stopPropagation();
       return; // 드래그 중엔 클릭 무시
