@@ -1,12 +1,30 @@
-- name: Deploy to App Script & Update Live Site
-        run: |
-          # 1. 코드를 구글 서버로 전송
-          clasp push --force
-          
-          # 2. 지정된 배포 ID로 즉시 라이브 업데이트 (버전 자동 생성)
-          # 배포 ID: AKfycbxgoannrkzyrAaIF8FeJP-ZJyFUrhdtT1d_iJdrY0JiJwqebPYbToS5r-nUYp6Ow-2fYw
-          clasp deploy -i AKfycbxgoannrkzyrAaIF8FeJP-ZJyFUrhdtT1d_iJdrY0JiJwqebPYbToS5r-nUYp6Ow-2fYw -d "Release v100+ Auto Update"
+name: Deploy to Google Apps Script
 
-      - name: 배포 실패 알림
-        if: failure()
-        run: echo "🚨 배포에 실패했습니다! VS Code에서 로그를 확인하거나 clasp login 상태를 점검하세요."
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+
+      - name: Install clasp
+        run: npm install -g @google/clasp
+
+      - name: Create clasprc file
+        run: |
+          echo "${{ secrets.CLASPRC_JSON }}" > ~/.clasprc.json
+
+      - name: Deploy to App Script & Update Live Site
+        run: |
+          clasp push --force
+          clasp deploy -i AKfycbxgoannrkzyrAaIF8FeJP-ZJyFUrhdtT1d_iJdrY0JiJwqebPYbToS5r-nUYp6Ow-2fYw -d "Auto Update via GitHub Actions"
