@@ -1,4 +1,4 @@
-name: Deploy to Google Apps Script
+name: GAS_Deploy
 
 on:
   push:
@@ -9,22 +9,15 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v3
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v3
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
         with:
           node-version: '18'
-
       - name: Install clasp
         run: npm install -g @google/clasp
-
-      - name: Create clasprc file
-        run: |
-          echo "${{ secrets.CLASPRC_JSON }}" > ~/.clasprc.json
-
-      - name: Deploy to App Script & Update Live Site
+      - name: Create clasprc
+        run: echo "${{ secrets.CLASPRC_JSON }}" > ~/.clasprc.json
+      - name: Push and Deploy
         run: |
           clasp push --force
-          clasp deploy -i AKfycbxgoannrkzyrAaIF8FeJP-ZJyFUrhdtT1d_iJdrY0JiJwqebPYbToS5r-nUYp6Ow-2fYw -d "Auto Update via GitHub Actions"
+          clasp deploy -i AKfycbxgoannrkzyrAaIF8FeJP-ZJyFUrhdtT1d_iJdrY0JiJwqebPYbToS5r-nUYp6Ow-2fYw -d "Auto Update"
