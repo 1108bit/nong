@@ -911,7 +911,7 @@ window.savePartyComposition = function() {
 };
 
 // =========================
-// 파티 조율 에디터 렌더링 (하단 추가)
+// 파티 조율 에디터 렌더링 (모바일 완벽 대응 + 저장 기능)
 // =========================
 function renderPartyEditor(date, time) {
   const content = getEl("partyDetailContent");
@@ -935,7 +935,7 @@ function renderPartyEditor(date, time) {
       const typeBadge = p.type === '본캐' ? '<span class="chip chip-type main">본캐</span>' : '<span class="chip chip-type sub">부캐</span>';
 
       waitingHtml += `
-        <div class="applicant-card draggable-char" draggable="true" id="char_${p.accountId}_${p.name}" data-name="${escapeHtml(p.name)}">
+        <div class="applicant-card draggable-char" id="char_${p.accountId}_${p.name}" data-name="${escapeHtml(p.name)}" data-class="${escapeHtml(p.className)}" data-power="${p.power}">
           <div class="applicant-info">
             <span class="drag-handle">⠿</span>
             <span style="font-size: 16px;">${icon}</span>
@@ -961,7 +961,12 @@ function renderPartyEditor(date, time) {
     `;
   }
 
+  // 시너지 계산기 UI와 파티 저장 버튼 추가
   content.innerHTML = `
+    <div class="synergy-board" id="synergyBoard">
+      <div class="synergy-stat">평균 전투력 <span id="avgPower">0K</span></div>
+      <div class="synergy-stat">직업 분포 <span id="classDist">탱커 0 | 서폿 0 | 딜러 0</span></div>
+    </div>
     <div id="partyEditor">
       <div id="waitingList" class="drop-zone">
         ${waitingHtml}
@@ -970,32 +975,97 @@ function renderPartyEditor(date, time) {
         ${slotsHtml}
       </div>
     </div>
+    <div class="admin-action-row" style="margin-top: 16px;">
+      <button class="btn btn-primary" id="savePartyBtn" style="width: 100%;">파티 구성 저장</button>
+    </div>
   `;
 
-  // 파티 조율 전용 드래그 앤 드롭 이벤트 연결
-  document.querySelectorAll('.draggable-char').forEach(el => {
-    el.addEventListener('dragstart', window.handleDragStart);
-    el.addEventListener('dragend', window.handleDragEnd);
-  });
-  document.querySelectorAll('.drop-zone').forEach(el => {
-    el.addEventListener('dragover', (e) => { e.preventDefault(); e.target.closest('.drop-zone').classList.add('drag-over'); });
-    el.addEventListener('dragleave', (e) => { e.target.closest('.drop-zone').classList.remove('drag-over'); });
-    el.addEventListener('drop', (e) => {
-      e.preventDefault();
-      const zone = e.target.closest('.drop-zone');
-      if (!zone) return;
-      zone.classList.remove('drag-over');
-      
-      const id = e.dataTransfer.getData("text/plain");
-      const elDrag = document.getElementById(id);
-      if (!elDrag) return;
-      
-      // 1칸 1명 룰: 비어있지 않으면 기존 인원을 밀어내고 대기열로 되돌림
-      if (zone.id !== "waitingList") {
-        const existing = zone.querySelector('.applicant-card');
-        if (existing) getEl('waitingList').appendChild(existing);
+  // 실시간 시너지 계산 함수
+  const updateSynergy = () => {
+    let totalPower = 0, count = 0;
+    let roles = { tank: 0, heal: 0, dps: 0 };
+
+    for (let i = 1; i <= 8; i++) {
+      const card = document.getElementById(`partySlot${i}`).querySelector('.applicant-card');
+      if (card) {
+        count++;
+        totalPower += parseInt(card.dataset.power, 10) || 0;
+        const cls = card.dataset.class;
+        if (['수호성', '검성'].includes(cls)) roles.tank++;
+        else if (['치유성', '호법성'].includes(cls)) roles.heal++;
+        else roles.dps++;
       }
-      zone.appendChild(elDrag);
+    }
+    const avg = count > 0 ? Math.floor(totalPower / count) : 0;
+    document.getElementById('avgPower').textContent = `${avg}K`;
+    document.getElementById('classDist').textContent = `탱커 ${roles.tank} | 힐러(서폿) ${roles.heal} | 딜러 ${roles.dps}`;
+  };
+
+  // SortableJS 공통 옵션 (모바일 터치 딜레이 100ms 적용)
+  const sortableOptions = {
+    group: 'party',
+    animation: 150,
+    delay: 100, // 모바일에서 스크롤과 겹치지 않게 꾹 눌러야 드래그되도록 설정
+    delayOnTouchOnly: true,
+    ghostClass: 'sortable-ghost',
+    dragClass: 'sortable-drag',
+    onAdd: updateSynergy,
+    onRemove: updateSynergy
+  };
+
+  // 대기열 초기화
+  Sortable.create(document.getElementById('waitingList'), sortableOptions);
+
+  // 8개 슬롯 초기화 (1칸 1명 밀어내기 로직 적용)
+  for (let i = 1; i <= 8; i++) {
+    Sortable.create(document.getElementById(`partySlot${i}`), {
+      ...sortableOptions,
+      onAdd: function (evt) {
+        const slot = evt.to;
+        const cards = slot.querySelectorAll('.applicant-card');
+        if (cards.length > 1) {
+          // 새로 들어온 카드(evt.item) 말고 기존에 있던 카드를 대기열로 돌려보냄
+          const oldCard = Array.from(cards).find(c => c !== evt.item);
+          if (oldCard) document.getElementById('waitingList').appendChild(oldCard);
+        }
+        updateSynergy();
+      }
     });
-  });
+  }
+
+  // 파티 구성 저장 이벤트
+  document.getElementById('savePartyBtn').onclick = async () => {
+    const btn = document.getElementById('savePartyBtn');
+    const originalText = btn.textContent;
+    btn.disabled = true;
+    btn.textContent = "저장 중...";
+
+    const partyData = [];
+    for (let i = 1; i <= 8; i++) {
+      const card = document.getElementById(`partySlot${i}`).querySelector('.applicant-card');
+      partyData.push(card ? card.dataset.name : "");
+    }
+
+    // GitHub Pages 환경을 위한 callApi 규격 사용
+    const res = await callApi({
+      action: 'savePartyComposition',
+      adminCode: getAdminCode(),
+      date: date,
+      timeSlot: time,
+      partyList: JSON.stringify(partyData)
+    });
+
+    btn.disabled = false;
+    btn.textContent = originalText;
+
+    if (res.ok) {
+      alert("파티 구성이 성공적으로 저장되었습니다!");
+      closePartyDetailModal();
+    } else {
+      alert(res.message || "파티 구성 저장에 실패했습니다.");
+    }
+  };
+
+  // 최초 로드 시 시너지 계산 1회 실행
+  updateSynergy();
 }
