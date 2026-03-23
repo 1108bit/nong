@@ -75,7 +75,7 @@ function initTimeChips() {
     
     const valueH = h === 24 ? "00" : String(h).padStart(2, '0');
     const dateVal = `${valueH}:${m}`;
-    const isSelected = dateVal === "21:00" ? "selected" : "";
+    const isSelected = h === 9 ? "selected" : "";
     
     const appleDisplay = `<span style="font-size:11px; font-weight:700;">${ampm}</span><span style="font-size:16px; font-weight:900; margin-top:4px;">${displayH}:${m}</span>`;
     html += `<button type="button" class="chip-btn date-chip ${isSelected}" data-value="${dateVal}">${appleDisplay}</button>`;
@@ -589,9 +589,11 @@ function applyDragScroll() {
       isDown = true;
       isDraggingScroll = false;
       startX = e.pageX - slider.offsetLeft;
+      startY = e.pageY - slider.offsetTop;
       scrollLeft = slider.scrollLeft;
       // 마우스 드래그 중에는 스크롤 스냅을 꺼서 부드럽게 움직이도록 함
       slider.style.setProperty('scroll-snap-type', 'none', 'important');
+      slider.style.setProperty('scroll-behavior', 'smooth', 'important');
       slider.style.setProperty('scroll-behavior', 'auto', 'important');
     });
     slider.addEventListener('mouseleave', () => { 
@@ -607,10 +609,16 @@ function applyDragScroll() {
     slider.addEventListener('mousemove', (e) => {
       if (!isDown) return;
       e.preventDefault();
-      const x = e.pageX - slider.offsetLeft;
-      const walk = (x - startX) * 2; // 스크롤 속도 배율
-      if (Math.abs(walk) > 5) isDraggingScroll = true; // 5px 이상 드래그 시 클릭 무시용 트리거 작동
-      slider.scrollLeft = scrollLeft - walk;
+
+            // Calculate the distance the mouse has moved in both X and Y directions
+            const x = e.pageX - slider.offsetLeft;
+            const y = e.pageY - slider.offsetTop;
+            const walkX = (x - startX) * 2; // Scroll speed multiplier for X direction
+
+            // Only trigger horizontal drag if the horizontal movement is significantly larger than vertical
+            if (Math.abs(walkX) > 5 ) {
+                slider.scrollLeft = scrollLeft - walkX;
+            }
     });
     
     // 마우스 휠(세로 스크롤) 작동 시 가로 스크롤로 변환
