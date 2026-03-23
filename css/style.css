@@ -1,6 +1,18 @@
-/* =========================
-   기본
-========================= */
+/* ==========================================
+   [ NoStepBack 스타일 시트 목차 ]
+   
+   1. GLOBAL & VARIABLES (전역 설정, 색상 변수, 폰트)
+   2. BACKGROUNDS & LAYOUT (배경 그래픽, 공통 쉘/그리드)
+   3. COMPONENTS (버튼, 입력창, 공통 카드, 직업별 칩, 모달)
+   4. PAGE: LOGIN (로그인 화면 전용)
+   5. PAGE: MAIN (내 정보, 캐릭터 목록, 일정 가용성)
+   6. PAGE: ADMIN (대시보드, 미니 달력, 파티 조율 에디터)
+   7. UTILITIES & ANIMATIONS (스켈레톤, 터치 피드백, 스크롤바)
+========================================== */
+
+/* ==========================================
+   1. GLOBAL & VARIABLES
+========================================== */
 
 * {
   box-sizing: border-box;
@@ -89,9 +101,9 @@ a {
   text-decoration: none;
 }
 
-/* =========================
-   배경
-========================= */
+/* ==========================================
+   2. BACKGROUNDS & LAYOUT
+========================================== */
 
 .bg-logo {
   position: fixed;
@@ -115,10 +127,6 @@ a {
   pointer-events: none;
   z-index: 1;
 }
-
-/* =========================
-   공통 레이아웃
-========================= */
 
 .page,
 .app-page {
@@ -148,9 +156,9 @@ a {
   width: 100%;
 }
 
-/* =========================
-   공통 카드
-========================= */
+/* ==========================================
+   3. COMPONENTS
+========================================== */
 
 .main-card {
   position: relative;
@@ -195,10 +203,6 @@ a {
   color: var(--text-muted);
   text-align: right;
 }
-
-/* =========================
-   헤더 / 히어로
-========================= */
 
 .main-header {
   display: flex;
@@ -332,10 +336,6 @@ a {
   background: rgba(142, 243, 255, 0.15);
 }
 
-/* =========================
-   버튼
-========================= */
-
 .btn,
 .main-button,
 .mini-btn {
@@ -423,9 +423,6 @@ body {
   transform: translateY(-1px);
 }
 
-/* =========================
-   직업별 고유 색상 (아이온2)
-========================= */
 .chip-class, .party-chip {
   display: inline-flex;
   align-items: center;
@@ -486,10 +483,6 @@ body {
 .mini-btn:hover {
   background: rgba(39, 66, 92, 0.98);
 }
-
-/* =========================
-   입력
-========================= */
 
 .character-actions {
   display: flex;
@@ -624,9 +617,9 @@ body {
   padding-right: 40px;
 }
 
-/* =========================
-   로그인
-========================= */
+/* ==========================================
+   4. PAGE: LOGIN
+========================================== */
 
 .login-shell {
   max-width: 460px;
@@ -733,9 +726,9 @@ body {
   color: var(--text-muted);
 }
 
-/* =========================
-   정보 리스트
-========================= */
+/* ==========================================
+   5. PAGE: MAIN
+========================================== */
 
 .info-list {
   display: flex;
@@ -766,10 +759,6 @@ body {
   font-weight: 800;
   text-align: right;
 }
-
-/* =========================
-   summary
-========================= */
 
 .summary-list {
   display: flex;
@@ -811,10 +800,6 @@ body {
   line-height: 1.48;
   color: var(--text-sub);
 }
-
-/* =========================
-   캐릭터
-========================= */
 
 .character-list {
   display: flex;
@@ -880,10 +865,6 @@ body {
   font-size: 13px;
 }
 
-/* =========================
-   빠른 이동
-========================= */
-
 .quick-menu {
   display: grid;
   gap: 10px;
@@ -893,10 +874,6 @@ body {
   width: 100%;
   justify-content: center;
 }
-
-/* =========================
-   availability
-========================= */
 
 .availability-top-actions {
   display: flex;
@@ -1035,10 +1012,6 @@ body {
   font-size: 13px;
 }
 
-/* =========================
-   party
-========================= */
-
 .single-action {
   margin-top: 14px;
 }
@@ -1073,9 +1046,9 @@ body {
   color: var(--text-sub);
 }
 
-/* =========================
-   admin
-========================= */
+/* ==========================================
+   6. PAGE: ADMIN & PARTY EDITOR
+========================================== */
 
 .admin-form-grid {
   display: grid;
@@ -1121,10 +1094,6 @@ body {
   flex-shrink: 0;
 }
 
-/* =========================
-   상태 메시지
-========================= */
-
 .page-message {
   display: flex;
   align-items: center;
@@ -1138,9 +1107,6 @@ body {
   color: var(--cyan-2);
 }
 
-/* =========================
-   스크롤 가능한 일정 목록 (Compact View)
-========================= */
 #scheduleList {
   flex: 1;
   max-height: 560px;
@@ -1461,10 +1427,6 @@ body {
   padding-bottom: 110px;
 }
 
-/* =========================
-   모달
-========================= */
-
 body.modal-open {
   overflow: hidden;
 }
@@ -1696,9 +1658,9 @@ body.modal-open {
   }
 }
 
-/* =========================
-   admin extra tone
-========================= */
+/* ==========================================
+   7. UTILITIES & ANIMATIONS
+========================================== */
 
 .admin-grid .summary-item,
 .admin-grid .admin-item {
@@ -2184,10 +2146,6 @@ body.modal-open {
   box-shadow: 0 0 10px rgba(246, 211, 122, 0.4);
 }
 
-/* =========================
-   skeleton
-========================= */
-
 .skeleton-block {
   position: relative;
   overflow: hidden;
@@ -2236,10 +2194,6 @@ body.modal-open {
   height: 62px;
 }
 
-/* =========================
-   loading state polish
-========================= */
-
 .page-message.loading {
   color: var(--cyan-2);
 }
@@ -2262,10 +2216,6 @@ body.modal-open {
   border: 1px solid var(--line-1);
   margin-top: 10px;
 }
-
-/* =========================
-   small visual polish
-========================= */
 
 .character-card,
 .party-member-card,
@@ -2290,10 +2240,6 @@ body.modal-open {
   background: radial-gradient(circle, rgba(67, 217, 255, 0.08), transparent 68%);
   pointer-events: none;
 }
-
-/* =========================
-   bottom bar safe area
-========================= */
 
 .bottom-action-bar {
   padding-bottom: calc(10px + env(safe-area-inset-bottom, 0px));
@@ -3006,6 +2952,39 @@ body.modal-open {
   background: rgba(67, 217, 255, 0.2) !important;
 }
 .sortable-drag {
+  cursor: grabbing !important;
+  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.5) !important;
+  transform: scale(1.05);
+}
+
+/* 이미 이번 주에 참여한 캐릭터 카드 스타일 */
+.applicant-card.already-placed {
+  opacity: 0.5; /* 반투명 */
+  filter: grayscale(1); /* 흑백 처리 */
+  cursor: not-allowed;
+  border: 1px dashed rgba(255, 255, 255, 0.2);
+}
+
+.applicant-card.already-placed::after {
+  content: '이번 주 완료';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: rgba(0, 0, 0, 0.8);
+  color: #ff4d4d;
+  font-size: 10px; /* 카드를 가리지 않도록 더 얇고 세련된 크기로 조절 */
+  font-weight: 800;
+  padding: 4px 8px;
+  border-radius: 6px;
+  white-space: nowrap;
+  z-index: 10;
+}
+
+.applicant-card.already-placed .drag-handle {
+  cursor: not-allowed;
+  opacity: 0.3;
+}sortable-drag {
   cursor: grabbing !important;
   box-shadow: 0 12px 28px rgba(0, 0, 0, 0.5) !important;
   transform: scale(1.05);
