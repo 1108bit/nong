@@ -71,8 +71,12 @@ function savePartyComposition(adminCode, targetDate, targetTime, partyListJson) 
     let foundRow = -1;
 
     for (let i = 1; i < values.length; i++) {
+      if (!values[i][1] || !values[i][3]) continue; // 빈 줄 건너뛰기
+      
       const rowDate = Utilities.formatDate(new Date(values[i][1]), "GMT+9", "yyyy-MM-dd");
-      const rowTime = values[i][3].toString(); // 시간 데이터 형식 (주의: 시트 포맷에 따라 보정이 필요할 수 있음)
+      // 구글 시트의 시간 데이터(Date 객체)를 "HH:mm" 포맷으로 정확히 변환
+      const rowTime = values[i][3] instanceof Date ? Utilities.formatDate(values[i][3], "GMT+9", "HH:mm") : values[i][3].toString().substring(0, 5);
+      
       if (rowDate === targetDate && rowTime === targetTime) {
         foundRow = i + 1;
         break;
