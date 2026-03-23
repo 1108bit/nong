@@ -1,6 +1,7 @@
 const API_URL = "https://script.google.com/macros/s/AKfycbxgoannrkzyrAaIF8FeJP-ZJyFUrhdtT1d_iJdrY0JiJwqebPYbToS5r-nUYp6Ow-2fYw/exec";
 
 // 서버 통신 함수
+
 async function callApi(params) {
   try {
     console.log(`➡️ [API 요청] ${params.action} :`, params);
@@ -26,27 +27,42 @@ async function callApi(params) {
   }
 }
 
+
 // URL 정보 추출 (accountId, mainName 등)
-function getParams() { return new URLSearchParams(location.search); }
+
+function getParameter(key) {
+  const urlParams = new URLSearchParams(location.search);
+  const urlValue = urlParams.get(key) || '';
+  return urlValue;
+}
+
 function getAccountId() {
-  const urlId = getParams().get("accountId");
+  const urlId = getParameter('accountId');
   if (urlId) {
-    sessionStorage.setItem("accountId", urlId);
+    sessionStorage.setItem('accountId', urlId);
     return urlId;
   }
-  return sessionStorage.getItem("accountId") || "";
+  return sessionStorage.getItem('accountId') || '';
 }
+
 function getMainName() {
-  const urlName = decodeURIComponent(getParams().get("mainName") || "");
+  const urlName = decodeURIComponent(getParameter('mainName') || '');
   if (urlName) {
-    sessionStorage.setItem("mainName", urlName);
+    sessionStorage.setItem('mainName', urlName);
     return urlName;
   }
-  return sessionStorage.getItem("mainName") || "";
+  return sessionStorage.getItem('mainName') || '';
 }
-function getAdminCode() { return sessionStorage.getItem("adminCode") || ""; }
+
+function getAdminCode() {
+  return sessionStorage.getItem('adminCode') || '';
+}
+
+// 새로운 함수
+function clearSessionStorage() {
+    sessionStorage.clear();
+}
 // 요소 선택 및 텍스트 설정
-function getEl(id) { return document.getElementById(id); }
 function setText(id, value) { 
   const el = getEl(id);
   if (el) el.textContent = value !== undefined ? value : "-";
@@ -83,3 +99,5 @@ function getPowerRange(power) {
   const end = start + 50;
   return `${start}${kUnit} ~ ${end}${kUnit}`;
 }
+
+function getEl(id) { return document.getElementById(id); }
