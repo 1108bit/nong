@@ -1,12 +1,12 @@
-!Code.gs
-!index.html
-!appsscript.json
-!*.gs
-!*.html
-
+# 구글 서버(GAS) 충돌 방지 완벽 차단 리스트
 .git/
+.github/
 node_modules/
-clasp.json
-.clasprc.json
+js/
+css/
+images/
 *.bat
 *.sh
+*.json
+!appsscript.json
+!.clasp.json
