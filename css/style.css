@@ -2521,11 +2521,11 @@ body.modal-open {
   padding: 15px 8px !important;    /* 위아래 여백을 15px 이상 확보하여 그림자 보호 */
   gap: 12px !important;
   -webkit-overflow-scrolling: touch;
+  touch-action: pan-x !important; /* 모바일에서 가로 스와이프를 최우선으로 인식하게 만들어 훨씬 부드러워짐 */
   scrollbar-width: none;
   white-space: nowrap !important;
   scroll-snap-type: x mandatory !important; /* 애플 스타일 가로 스크롤 스냅 */
   scroll-padding-left: 8px !important;
-  scroll-behavior: smooth !important; /* 스와이프 시 부드러운 자석 탄성 적용 */
 }
 
 .horizontal-scroll-chips::-webkit-scrollbar {
@@ -2546,6 +2546,8 @@ body.modal-open {
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
   color: var(--text-muted) !important;
   scroll-snap-align: center !important; /* 넘길 때 아이템이 자석처럼 가운데 정렬되게 함 */
+  user-select: none !important; /* 드래그할 때 텍스트가 파랗게 선택되며 버벅이는 현상 완벽 방지 */
+  -webkit-user-drag: none !important; /* 이미지/텍스트 고스트 드래그(잔상) 방지 */
 }
 
 .chip-btn:active, .main-button:active {
