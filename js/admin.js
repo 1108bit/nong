@@ -157,6 +157,12 @@ async function loadAdminSchedule() {
     if (secCard) secCard.style.display = "none";
   }
 
+  // API 통신을 시작하기 전에 화면에 직관적인 로딩 스피너 표시
+  const list = getEl("scheduleList");
+  if (list) {
+    list.innerHTML = `<div class="admin-empty-state" style="margin-top: 40px;"><span style="display:inline-block; font-size: 28px; margin-bottom: 12px; animation: spin 1s linear infinite;">⏳</span><br>일정 및 파티 데이터를 불러오는 중입니다...</div>`;
+  }
+
   const [scheduleData, summaryData] = await Promise.all([
     callApi({ action: "getRaidScheduleAdmin", adminCode }),
     callApi({ action: "getAvailabilitySummary" })
@@ -190,6 +196,12 @@ function renderCalendar() {
   
   let selectedIndex = 0; // 진행 바를 위한 인덱스 추적
   
+  // 1. 반복문 밖에서 날짜별 신청 인원수를 미리 계산하여 Map 형태로 저장 (수십 배 빠른 렌더링 성능)
+  const countsByDate = allSummaries.reduce((acc, s) => {
+    acc[s.date] = (acc[s.date] || 0) + 1;
+    return acc;
+  }, {});
+
   for(let i = 0; i < 14; i++) {
     const d = new Date(today);
     d.setDate(today.getDate() + i);
@@ -204,9 +216,8 @@ function renderCalendar() {
     if (isActive) selectedIndex = i; // 현재 선택된 날짜의 인덱스 저장
     const hasData = allSchedules.some(s => s.date === dateVal) ? 'has-data' : '';
     
-    // 해당 날짜의 총 신청 인원 계산
-    const dailySummaries = allSummaries.filter(s => s.date === dateVal);
-    const totalApplicants = dailySummaries.length;
+    // 2. 미리 계산해둔 객체에서 값만 쏙 뽑아오기 (데이터가 수천 개여도 렉 없음)
+    const totalApplicants = countsByDate[dateVal] || 0;
     
     let badgeHtml = "";
     let highlightClass = "";
@@ -880,17 +891,37 @@ function renderPartyEditor(date, time) {
     autoPlacedHealerId = slot8Data.accountId;
   }
 
+  // 3. 저장된 파티 데이터 및 이번 주차 중복 참여자 데이터 수집
+  const targetSchedule = allSchedules.find(s => s.date === date && s.time_slot === time);
+  const savedParty = targetSchedule && targetSchedule.partyList ? targetSchedule.partyList : [];
+  const currentWeekKey = targetSchedule ? targetSchedule.week_key : null;
+  let waitingList = [...participants]; // 슬롯에 배치될 인원은 여기서 뺄 예정
+
+  const alreadyPlacedNames = new Set();
+  if (currentWeekKey) {
+    allSchedules.forEach(s => {
+      if (s.week_key === currentWeekKey && !(s.date === date && s.time_slot === time)) {
+        if (Array.isArray(s.partyList)) {
+          s.partyList.forEach(name => {
+            if (name) alreadyPlacedNames.add(name);
+          });
+        }
+      }
+    });
+  }
+
   // 카드 생성 헬퍼 함수
-  const createCardHtml = (p) => {
+  const createCardHtml = (p, isPlaced = false) => {
     const classIconMap = {
       '검성': '⚔️', '수호성': '🛡️', '살성': '🗡️', '궁성': '🏹',
       '마도성': '🔥', '정령성': '💨', '치유성': '✨', '호법성': '📿'
     };
     const icon = classIconMap[p.className] || '👤';
     const typeBadge = p.type === '본캐' ? '<span class="chip chip-type main">본캐</span>' : '<span class="chip chip-type sub">부캐</span>';
+    const placedClass = isPlaced ? 'already-placed' : 'draggable-char';
 
     return `
-      <div class="applicant-card draggable-char" id="char_${p.accountId}_${p.name}" data-name="${escapeHtml(p.name)}" data-class="${escapeHtml(p.className)}" data-power="${p.power}">
+      <div class="applicant-card ${placedClass}" id="char_${p.accountId}_${p.name}" data-name="${escapeHtml(p.name)}" data-class="${escapeHtml(p.className)}" data-power="${p.power}">
         <div class="applicant-info">
           <span class="drag-handle">⠿</span>
           <span style="font-size: 16px;">${icon}</span>
@@ -904,23 +935,27 @@ function renderPartyEditor(date, time) {
     `;
   };
 
-  // 3. 대기열 HTML 생성 (자동 배치된 유저 제외)
-  const waitingList = participants.filter(p => p.accountId !== autoPlacedHealerId);
-  let waitingHtml = `<div class="waiting-list-title">신청자 대기열 (${waitingList.length}명)</div>`;
-  
-  if (waitingList.length === 0) {
-    waitingHtml += `<div class="admin-empty-state" style="margin-top:20px;">대기열이 비어있습니다.</div>`;
-  } else {
-    waitingList.forEach(p => { waitingHtml += createCardHtml(p); });
-  }
-
-  // 4. 우측 8개의 슬롯 생성
+  // 4. 우측 8개의 슬롯 생성 및 불러오기 배치
   let slotsHtml = "";
   for (let i = 1; i <= 8; i++) {
     let slotContent = `<div class="empty-slot-text">비어있음</div>`;
-    if (i === 8 && slot8Data) {
-      slotContent = createCardHtml(slot8Data);
+    const savedName = savedParty[i - 1]; // 시트에 저장된 해당 슬롯의 닉네임
+    let matchedParticipant = null;
+
+    if (savedName) {
+      // 저장된 이름이 있으면 대기열에서 빼서 슬롯에 배치
+      const idx = waitingList.findIndex(p => p.name === savedName);
+      if (idx !== -1) matchedParticipant = waitingList.splice(idx, 1)[0];
+    } else if (!savedParty.some(n => n) && i === 8 && slot8Data) {
+      // 저장된 파티가 아예 없고(최초 렌더링), 치유성이 딱 1명이면 8번 슬롯 자동 배치
+      const idx = waitingList.findIndex(p => p.accountId === autoPlacedHealerId);
+      if (idx !== -1) matchedParticipant = waitingList.splice(idx, 1)[0];
     }
+
+    if (matchedParticipant) {
+      slotContent = createCardHtml(matchedParticipant, alreadyPlacedNames.has(matchedParticipant.name));
+    }
+
     slotsHtml += `
       <div class="party-slot drop-zone" id="partySlot${i}">
         <span class="party-slot-num">${i}</span>
@@ -929,7 +964,15 @@ function renderPartyEditor(date, time) {
     `;
   }
 
-  // 5. 전체 에디터 UI 렌더링
+  // 5. 대기열 HTML 생성 (슬롯에 들어간 인원을 제외한 나머지)
+  let waitingHtml = `<div class="waiting-list-title">신청자 대기열 (${waitingList.length}명)</div>`;
+  if (waitingList.length === 0) {
+    waitingHtml += `<div class="admin-empty-state" style="margin-top:20px;">대기열이 비어있습니다.</div>`;
+  } else {
+    waitingList.forEach(p => { waitingHtml += createCardHtml(p, alreadyPlacedNames.has(p.name)); });
+  }
+
+  // 6. 전체 에디터 UI 렌더링
   content.innerHTML = `
     <div class="synergy-board" id="synergyBoard">
       <div class="synergy-stat">평균 전투력 <span id="avgPower">0K</span></div>
@@ -975,6 +1018,7 @@ function renderPartyEditor(date, time) {
     animation: 150,
     delay: 100, // 모바일에서 꾹 눌러야 드래그
     delayOnTouchOnly: true,
+    filter: '.already-placed', // 중복 참여자 드래그 방지
     ghostClass: 'sortable-ghost',
     dragClass: 'sortable-drag',
     onAdd: updateSynergy,
@@ -1002,15 +1046,30 @@ function renderPartyEditor(date, time) {
   // 8. 파티 저장 기능 연동
   document.getElementById('savePartyBtn').onclick = async () => {
     const btn = document.getElementById('savePartyBtn');
+
+    const partyData = [];
+    let hasDuplicated = false;
+
+    for (let i = 1; i <= 8; i++) {
+      const card = document.getElementById(`partySlot${i}`).querySelector('.applicant-card');
+      if (card) {
+        const charName = card.dataset.name;
+        partyData.push(charName);
+        if (alreadyPlacedNames.has(charName)) hasDuplicated = true;
+      } else {
+        partyData.push("");
+      }
+    }
+
+    if (hasDuplicated) {
+      if (!confirm("⚠️ 주의: 이번 주 다른 일정에 이미 참여한 캐릭터가 포함되어 있습니다.\n\n정말 이대로 저장하시겠습니까?")) {
+        return;
+      }
+    }
+
     const originalText = btn.textContent;
     btn.disabled = true;
     btn.textContent = "저장 중...";
-
-    const partyData = [];
-    for (let i = 1; i <= 8; i++) {
-      const card = document.getElementById(`partySlot${i}`).querySelector('.applicant-card');
-      partyData.push(card ? card.dataset.name : "");
-    }
 
     const res = await callApi({
       action: 'savePartyComposition',

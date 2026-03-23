@@ -53,21 +53,32 @@ function getColumnMap(headers) {
   }, {});
 }
 
+// [속도 최적화] GAS 1회 실행 시 동일한 시트를 여러 번 읽지 않도록 메모리 캐싱 적용
+const _SHEET_CACHE = {};
+
 function getRowsAsObjects(sheetName) {
+  if (_SHEET_CACHE[sheetName]) return _SHEET_CACHE[sheetName];
+
   const sheet = getSheet(sheetName);
   const values = sheet.getDataRange().getValues();
 
-  if (values.length < 2) return [];
+  if (values.length < 2) {
+    _SHEET_CACHE[sheetName] = [];
+    return [];
+  }
 
   const headers = values[0].map(v => String(v).trim());
 
-  return values.slice(1).map(row => {
+  const rows = values.slice(1).map(row => {
     const obj = {};
     headers.forEach((header, i) => {
       obj[header] = row[i];
     });
     return obj;
   });
+
+  _SHEET_CACHE[sheetName] = rows;
+  return rows;
 }
 
 function normalizeValue(value) {

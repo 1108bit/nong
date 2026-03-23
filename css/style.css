@@ -2980,3 +2980,32 @@ body.modal-open {
   box-shadow: 0 12px 28px rgba(0, 0, 0, 0.5) !important;
   transform: scale(1.05);
 }
+
+/* 이미 이번 주에 참여한 캐릭터 카드 스타일 */
+.applicant-card.already-placed {
+  opacity: 0.5; /* 반투명 */
+  filter: grayscale(1); /* 흑백 처리 */
+  cursor: not-allowed;
+  border: 1px dashed rgba(255, 255, 255, 0.2);
+}
+
+.applicant-card.already-placed::after {
+  content: '이번 주 완료';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: rgba(0, 0, 0, 0.8);
+  color: #ff4d4d;
+  font-size: 10px; /* 카드를 가리지 않도록 더 얇고 세련된 크기로 조절 */
+  font-weight: 800;
+  padding: 4px 8px;
+  border-radius: 6px;
+  white-space: nowrap;
+  z-index: 10;
+}
+
+.applicant-card.already-placed .drag-handle {
+  cursor: not-allowed;
+  opacity: 0.3;
+}

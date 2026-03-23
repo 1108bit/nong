@@ -15,16 +15,24 @@ function getCurrentWeekKey() {
 }
 
 function getRaidSchedule(weekKey) {
-  const actualWeekKey = normalizeValue(weekKey) || getCurrentWeekKey().weekKey;
+  // weekKey 파라미터가 없으면(대시보드 등) 이번 주와 다음 주 총 2주치를 반환
+  const currentWeek = getCurrentWeekKey().weekKey;
+  const nextWeekDate = new Date(currentWeek);
+  nextWeekDate.setDate(nextWeekDate.getDate() + 7);
+  const nextWeek = Utilities.formatDate(nextWeekDate, 'Asia/Seoul', 'yyyy-MM-dd');
+  const targetWeeks = weekKey ? [normalizeValue(weekKey)] : [currentWeek, nextWeek];
+
   const items = getRowsAsObjects(SHEET_NAMES.RAID_SCHEDULE)
-    .filter(row => formatDate(row.week_key) === actualWeekKey)
+    .filter(row => targetWeeks.includes(formatDate(row.week_key)))
     .filter(row => normalizeValue(row.open_yn).toUpperCase() === 'Y')
     .sort((a, b) => Number(a.sort || 0) - Number(b.sort || 0))
     .map(row => ({
       week_key: formatDate(row.week_key), date: formatDate(row.date), day: row.day || '',
-      time_slot: formatTime(row.time_slot), note: row.note || ''
+      time_slot: formatTime(row.time_slot), note: row.note || '',
+      // I열~P열(p1~p8)에 저장된 파티 구성 데이터를 배열로 묶어 프론트엔드로 전달
+      partyList: [row.p1, row.p2, row.p3, row.p4, row.p5, row.p6, row.p7, row.p8].map(v => normalizeValue(v))
     }));
-  return { ok: true, weekKey: actualWeekKey, items };
+  return { ok: true, weekKey: currentWeek, items };
 }
 
 function getRaidScheduleAdmin(weekKey, adminCode) {
@@ -119,23 +127,51 @@ function saveAvailability(accountId, mainName, characterName, type, weekKey, slo
 }
 
 function getAvailabilitySummary(weekKey) {
-  const actualWeekKey = normalizeValue(weekKey) || getCurrentWeekKey().weekKey;
-  const availabilityRows = getRowsAsObjects(SHEET_NAMES.AVAILABILITY).filter(row => formatDate(row.week_key) === actualWeekKey);
+  const currentWeek = getCurrentWeekKey().weekKey;
+  const nextWeekDate = new Date(currentWeek);
+  nextWeekDate.setDate(nextWeekDate.getDate() + 7);
+  const nextWeek = Utilities.formatDate(nextWeekDate, 'Asia/Seoul', 'yyyy-MM-dd');
+  const targetWeeks = weekKey ? [normalizeValue(weekKey)] : [currentWeek, nextWeek];
+
+  const availabilityRows = getRowsAsObjects(SHEET_NAMES.AVAILABILITY).filter(row => targetWeeks.includes(formatDate(row.week_key)));
   const characterRows = getRowsAsObjects(SHEET_NAMES.CHARACTERS);
 
+  // [속도 최적화] O(N^2) 렉 방지: 캐릭터 데이터를 Map으로 변환
+  const charMap = {};
+  characterRows.forEach(charRow => {
+    if (normalizeValue(charRow.use_yn).toUpperCase() !== 'N') {
+      const key = normalizeCompareValue(charRow.account_id) + '_' + normalizeCompareValue(charRow.name);
+      charMap[key] = charRow;
+    }
+  });
+
+  const daysArr = ["일", "월", "화", "수", "목", "금", "토"];
+
   const items = availabilityRows.map(row => {
-    const character = characterRows.find(charRow =>
-      normalizeCompareValue(charRow.account_id) === normalizeCompareValue(row.account_id) &&
-      normalizeCompareValue(charRow.name) === normalizeCompareValue(row.character_name) &&
-      normalizeValue(charRow.use_yn).toUpperCase() !== 'N'
-    );
+    const key = normalizeCompareValue(row.account_id) + '_' + normalizeCompareValue(row.character_name);
+    const character = charMap[key];
+
+    // [핵심 버그 수정] 프론트엔드 대시보드(date 필터) 연동을 위해 week_key와 day로 실제 날짜(date) 계산
+    let calcDate = '';
+    if (row.week_key && row.day) {
+      const baseDate = new Date(row.week_key);
+      const targetDayIdx = daysArr.indexOf(row.day);
+      if (targetDayIdx !== -1) {
+        let offset = targetDayIdx - baseDate.getDay();
+        if (offset < 0) offset += 7; // 수요일 시작 주차 보정
+        const tDate = new Date(baseDate);
+        tDate.setDate(baseDate.getDate() + offset);
+        calcDate = Utilities.formatDate(tDate, 'Asia/Seoul', 'yyyy-MM-dd');
+      }
+    }
+
     return {
       account_id: row.account_id, main_name: row.main_name, character_name: row.character_name,
-      day: row.day, time_slot: formatTime(row.time_slot),
+      day: row.day, date: calcDate, time_slot: formatTime(row.time_slot),
       className: character ? character.class_name : '', power: character ? character.power : '', power_value: character ? Number(character.power || 0) : 0
     };
   });
-  return { ok: true, weekKey: actualWeekKey, items };
+  return { ok: true, weekKey: currentWeek, items };
 }
 
 function validateDatabaseSchema() { return { ok: true, isValid: true, errors: [] }; }
