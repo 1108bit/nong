@@ -2454,6 +2454,7 @@ body.modal-open {
   background: rgba(255, 255, 255, 0.03);
   border-radius: 16px;
   border: 1px solid rgba(255, 255, 255, 0.05);
+  flex-shrink: 0; /* Flex 부모 안에서 높이가 찌그러지거나 겹치는 현상 완벽 차단 */
 }
 
 .cal-day-cell {
