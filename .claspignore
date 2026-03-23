@@ -1,5 +1,6 @@
 **/**
-!Code.js
+!*.js
+!*.gs
 !*.html
 !appsscript.json
 !.clasp.json
