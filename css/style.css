@@ -352,6 +352,12 @@ a {
     opacity 0.16s ease;
 }
 
+html, body {
+  /* 전체 페이지의 고무줄 효과 방지 */
+  overscroll-behavior-y: none; 
+  background-color: #000; /* 배경색을 앱 테마와 맞추면 흰색이 안 보입니다 */
+  overflow-x: hidden;
+}
 .btn:active,
 .main-button:active,
 .mini-btn:active {

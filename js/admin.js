@@ -643,6 +643,18 @@ function applyDragScroll() {
   });
 }
 
+// PC 환경에서 마우스 휠 스크롤을 가로 스크롤로 변환
+const scrollContainers = document.querySelectorAll('.horizontal-scroll-chips');
+scrollContainers.forEach(container => {
+  container.addEventListener('wheel', (e) => {
+    if (e.deltaY !== 0) {
+      e.preventDefault();
+      // 세로 휠 이동량을 가로 스크롤(scrollLeft)로 변환
+      container.scrollLeft += e.deltaY; 
+    }
+  });
+});
+
 // 칩 버튼 클릭 이벤트 위임 (관리자용)
 document.querySelectorAll('.chip-select-group').forEach(group => {
   group.addEventListener('click', e => {
