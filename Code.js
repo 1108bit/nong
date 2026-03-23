@@ -5,9 +5,7 @@ function doGet(e) {
   const action = (e && e.parameter && e.parameter.action) ? e.parameter.action : '';
 
   if (!action) {
-    return HtmlService.createHtmlOutputFromFile('index')
-      .setTitle('NoStepBack')
-      .setXFrameOptionsMode(HtmlService.XFrameOptionsMode.ALLOWALL);
+    return outputJson({ ok: true, message: 'NoStepBack API 서버가 정상 동작 중입니다.' });
   }
 
   try {

@@ -1,12 +1,9 @@
-# 구글 서버(GAS) 충돌 방지 완벽 차단 리스트
-.git/
-.github/
-node_modules/
-js/
-css/
-images/
-*.bat
-*.sh
-*.json
+# 1. 모든 파일을 무시 (전부 차단)
+**/*
+
+# 2. 서버 로직인 .gs 파일과 설정 파일만 허용
+!Code.gs
 !appsscript.json
-!.clasp.json
+
+# 3. 만약 서버 로직 파일이 더 있다면 추가 (예: server/*.gs)
+!server/*.gs

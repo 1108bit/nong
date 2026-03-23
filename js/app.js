@@ -38,6 +38,7 @@ async function login() {
   }
 
   resultEl.textContent = "확인 중입니다...";
+  resultEl.classList.remove("error"); // 이전 에러 텍스트 스타일(빨간색) 초기화
   const data = await callApi({ action: "login", mainName, password });
 
   if (data.ok) {
@@ -83,7 +84,7 @@ const pwdEl = getEl("password");
 if (pwdEl) pwdEl.onkeydown = (e) => { if(e.key === "Enter") login(); };
 
 // =========================
-// 관리자 이스터에그 (5번 연속 터치)
+// 관리자 이스터에그 (3번 연속 터치)
 // =========================
 let adminClickCount = 0;
 let adminClickTimer = null;
