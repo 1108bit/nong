@@ -385,6 +385,7 @@ initDateChips();
 initTimeChips();
 loadAdminSchedule();
 
+
 // 특정 유저의 캐릭터 정보를 불러와서 편집 모달 띄우기
 async function openUserCharacterManager(searchValue) {
   const data = await callApi({ 
@@ -636,8 +637,8 @@ function applyDragScroll() {
 
 // 칩 버튼 클릭 이벤트 위임 (관리자용)
 document.querySelectorAll('.chip-select-group').forEach(group => {
-    group.addEventListener('click', e => {
-        if (isDraggingScroll) return; // 드래그 중엔 클릭 무시
+  group.addEventListener('click', e => {
+    if (isDraggingScroll) return; // 드래그 중엔 클릭 무시
         const btn = e.target.closest('.chip-btn');
         if (!btn || btn.disabled) return;
         
