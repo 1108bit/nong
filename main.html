@@ -56,16 +56,11 @@
           </div>
         </article>
 
-        <article class="main-card" style="grid-column: 1 / -1;">
-          <div class="card-head"><h2 class="section-title">빠른 이동</h2></div>
-          <div class="quick-menu">
-            <button type="button" class="btn btn-primary" id="goAvailabilityButton">시간 선택</button>
-            <button type="button" class="btn btn-secondary" id="goPartyButton">조합 보기</button>
-            <button type="button" class="btn btn-secondary" id="goAllCharactersButton">전체 캐릭터 목록</button>
-            <button type="button" class="btn btn-secondary" id="changePwdButton">비밀번호 변경</button>
-            <button type="button" class="btn btn-secondary" id="goAdminButton" style="display: none; border-color: var(--gold-2); color: var(--gold-1); background: rgba(215, 170, 75, 0.1);">👑 관리자 페이지</button>
-          </div>
-        </article>
+        <div class="minimal-links">
+          <button type="button" class="minimal-link" id="goAllCharactersButton">전체 목록</button>
+          <button type="button" class="minimal-link" id="changePwdButton">비밀번호 변경</button>
+          <button type="button" class="minimal-link" id="goAdminButton" style="display: none; color: var(--gold-1);">👑 관리자</button>
+        </div>
       </section>
 
       <!-- 관리자 진입용 숨겨진 버튼 (이스터에그) -->
@@ -134,6 +129,22 @@
             <button class="btn btn-primary" id="submitCharacterButton">등록하기</button>
           </div>
         </div>
+      </div>
+    </div>
+
+    <!-- 애플 스타일 Action Sheet (더보기) -->
+    <div class="action-sheet-overlay" id="characterActionSheet" onclick="if(event.target===this) closeCharacterActionSheet()">
+      <div class="action-sheet">
+        <div class="action-sheet-group">
+          <div class="action-sheet-head">
+            <span id="actionSheetCharName" style="font-weight: 800; font-size: 13px; color: var(--text-sub);">캐릭터명</span>
+          </div>
+          <button class="action-sheet-btn" onclick="closeCharacterActionSheet(); openEditModal(selectedCharNameForAction)">✏️ 편집</button>
+          <button class="action-sheet-btn" id="actionSheetToggleBtn" onclick="closeCharacterActionSheet(); toggleCharacterType(selectedCharNameForAction)">⇄ 본캐/부캐 전환</button>
+          <button class="action-sheet-btn danger" id="actionSheetDeleteBtn" onclick="closeCharacterActionSheet(); confirmDelete(selectedCharNameForAction)">🗑️ 삭제</button>
+        </div>
+        <div class="action-sheet-gap"></div>
+        <button class="action-sheet-btn cancel" onclick="closeCharacterActionSheet()">취소</button>
       </div>
     </div>
   </main>

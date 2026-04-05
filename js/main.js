@@ -6,6 +6,7 @@ const CHARACTER_TYPES = {
 
 let hasMainCharacter = false; // 현재 본캐 등록 여부
 let characters = []; // 전역 변수 제거, 로컬로 관리
+let selectedCharNameForAction = ""; // Action Sheet용 현재 선택된 캐릭터명
 
 async function loadMain() {
   const accountId = getAccountId();
@@ -85,6 +86,31 @@ function renderCharacters(items) {
   // 애니메이션 효과 적용
   applyTouchPop();
 }
+
+// Action Sheet 열기/닫기
+window.openCharacterActionSheet = function(charName, isMainChar) {
+  selectedCharNameForAction = charName;
+  getEl("actionSheetCharName").textContent = charName;
+  
+  const deleteBtn = getEl("actionSheetDeleteBtn");
+  const toggleBtn = getEl("actionSheetToggleBtn");
+  
+  if(isMainChar) {
+    deleteBtn.style.display = "none";
+    toggleBtn.innerHTML = "⇄ 본캐 지정 해제";
+  } else {
+    deleteBtn.style.display = "block";
+    toggleBtn.innerHTML = "⇄ 본캐로 전환";
+  }
+  
+  getEl("characterActionSheet").classList.add("show");
+  document.body.classList.add("modal-open");
+};
+
+window.closeCharacterActionSheet = function() {
+  getEl("characterActionSheet").classList.remove("show");
+  document.body.classList.remove("modal-open");
+};
 
 // 모달 열기 로직 개선
 getEl("addCharacterButton").addEventListener("click", () => {
@@ -354,8 +380,8 @@ document.querySelectorAll('.chip-select-group').forEach(group => {
 });
 
 // 버튼 연결
-getEl("goAvailabilityButton").onclick = () => movePage("availability.html");
-getEl("goPartyButton").onclick = () => movePage("party.html");
+if(getEl("goAvailabilityButton")) getEl("goAvailabilityButton").onclick = () => movePage("availability.html");
+if(getEl("goPartyButton")) getEl("goPartyButton").onclick = () => movePage("party.html");
 getEl("goAllCharactersButton").onclick = () => movePage("all-characters.html");
 getEl("logoutButton").onclick = () => {
     // 로그아웃 시 sessionStorage 정리
