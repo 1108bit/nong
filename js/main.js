@@ -58,25 +58,21 @@ function renderCharacters(items) {
     // c.type, c.className 등이 정확히 입력되어야 색상이 나옵니다.
     const isMainChar = (c.type === '본캐');
     const pRange = getPowerRange(c.power);
+    const mainIcon = isMainChar ? '<span style="color:var(--gold-1); margin-right:4px; font-size:14px; text-shadow: 0 0 8px rgba(246,211,122,0.4);">⭐️</span>' : '';
     
     return `
-      <div class="character-card ${isMainChar ? 'main-char-card' : ''}">
+      <div class="character-card">
         
         <div class="character-left">
-          <div class="character-name">${escapeHtml(c.character_name)}</div>
+          <div class="character-name">${mainIcon}${escapeHtml(c.character_name)}</div>
           <div class="character-sub">
             <span class="chip chip-class ${escapeHtml(c.className)}">${escapeHtml(c.className)}</span>
-            <span class="chip chip-type ${isMainChar ? 'main' : 'sub'}">${escapeHtml(c.type)}</span>
             <div class="character-power" style="margin-left: 4px;">${pRange}</div>
           </div>
         </div>
         
         <div class="character-right">
-          <div class="row-action-group">
-            <button class="icon-btn edit-btn" title="편집" onclick="openEditModal('${escapeHtml(c.character_name)}')">✏️</button>
-            <button class="icon-btn" style="color: var(--cyan-1);" title="본캐/부캐 전환" onclick="toggleCharacterType('${escapeHtml(c.character_name)}')">⇄</button>
-            ${!isMainChar ? `<button class="icon-btn delete-btn" title="삭제" onclick="confirmDelete('${escapeHtml(c.character_name)}')">🗑️</button>` : ''}
-          </div>
+          <button class="icon-btn" style="border:none; background:transparent; font-size:18px; color:var(--text-sub);" title="더보기" onclick="openCharacterActionSheet('${escapeHtml(c.character_name)}', ${isMainChar})">⋯</button>
         </div>
 
       </div>
