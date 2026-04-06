@@ -478,11 +478,21 @@ document.querySelectorAll('.chip-select-group').forEach(group => {
     });
 });
 
-// 버튼 연결
-if(getEl("goAvailabilityButton")) getEl("goAvailabilityButton").onclick = () => movePage("availability.html");
-if(getEl("goPartyButton")) getEl("goPartyButton").onclick = () => movePage("party.html");
-getEl("goAllCharactersButton").onclick = () => movePage("all-characters.html");
-getEl("logoutButton").onclick = () => {
+// =========================
+// 설정 메뉴 (Action Sheet) 제어
+// =========================
+const settingsSheet = getEl("settingsActionSheet");
+getEl("openSettingsBtn").onclick = () => {
+  settingsSheet.classList.add("show");
+  document.body.classList.add("modal-open");
+};
+window.closeSettingsActionSheet = function() {
+  settingsSheet.classList.remove("show");
+  document.body.classList.remove("modal-open");
+};
+
+getEl("goAllCharactersBtn").onclick = () => movePage("all-characters.html");
+getEl("logoutBtn").onclick = () => {
     // 로그아웃 시 sessionStorage 정리
     sessionStorage.clear();
     // 자동 로그인 정보도 해제
@@ -494,9 +504,10 @@ getEl("logoutButton").onclick = () => {
 };
 
 // 일반 유저 비밀번호 변경
-const changePwdBtn = getEl("changePwdButton");
+const changePwdBtn = getEl("changePwdBtn");
 if (changePwdBtn) {
   changePwdBtn.onclick = async () => {
+    closeSettingsActionSheet(); // 모달 닫고 알림창 띄우기
     const oldPwd = prompt("현재 비밀번호 4자리를 입력해주세요."); if (!oldPwd) return;
     const newPwd = prompt("새롭게 설정할 비밀번호 4자리를 입력해주세요."); if (!newPwd) return;
     if (oldPwd === newPwd) return alert("기존 비밀번호와 동일합니다.");
@@ -516,9 +527,9 @@ if (bottomAddBtn) {
 // =========================
 const isAdmin = sessionStorage.getItem("isAdmin") === "true";
 if (isAdmin) {
-  const adminBtn = getEl("goAdminButton");
+  const adminBtn = getEl("goAdminBtn");
   if (adminBtn) {
-    adminBtn.style.display = "flex";
+    adminBtn.style.display = "block";
     adminBtn.onclick = () => movePage("admin.html"); // 비밀번호 입력 없이 다이렉트 이동
   }
 }

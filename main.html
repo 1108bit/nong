@@ -26,13 +26,9 @@
             <h1 class="main-page-title">그림자 · SHADOW</h1>
             <p class="main-page-desc">레기온 일정과 캐릭터를 관리합니다</p>
           </div>
-          <div style="display: flex; flex-direction: column; align-items: flex-end; gap: 8px;">
-            <button type="button" class="btn btn-secondary" id="logoutButton" style="padding: 0 16px; min-height: 40px; border-radius: 12px; font-size: 13px;">로그아웃</button>
-            <div style="display: flex; flex-direction: column; align-items: flex-end; gap: 8px; margin-top: 4px;">
-              <button type="button" class="minimal-link" id="goAllCharactersButton" style="font-size: 12px;">전체 목록</button>
-              <button type="button" class="minimal-link" id="changePwdButton" style="font-size: 12px;">비밀번호 변경</button>
-              <button type="button" class="minimal-link" id="goAdminButton" style="display: none; color: var(--gold-1); font-size: 12px;">👑 관리자</button>
-            </div>
+          <!-- 💡 단일 설정 버튼으로 깔끔하게 통합 -->
+          <div class="header-btn">
+            <button type="button" class="icon-btn" id="openSettingsBtn" style="width: 42px; height: 42px; border-radius: 14px; font-size: 18px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1);">⚙️</button>
           </div>
         </div>
         
@@ -167,6 +163,23 @@
         </div>
         <div class="action-sheet-gap"></div>
         <button class="action-sheet-btn cancel" onclick="closeCharacterActionSheet()">취소</button>
+      </div>
+    </div>
+
+    <!-- 애플 스타일 설정 메뉴 Action Sheet -->
+    <div class="action-sheet-overlay" id="settingsActionSheet" onclick="if(event.target===this) closeSettingsActionSheet()">
+      <div class="action-sheet">
+        <div class="action-sheet-group">
+          <div class="action-sheet-head">
+            <span style="font-weight: 800; font-size: 13px; color: var(--text-sub);">시스템 및 계정 설정</span>
+          </div>
+          <button class="action-sheet-btn" id="goAllCharactersBtn">👥 레기온 전체 목록</button>
+          <button class="action-sheet-btn" id="changePwdBtn">🔒 비밀번호 변경</button>
+          <button class="action-sheet-btn" id="goAdminBtn" style="display: none; color: var(--gold-1);">👑 관리자 페이지</button>
+          <button class="action-sheet-btn danger" id="logoutBtn">🚪 로그아웃</button>
+        </div>
+        <div class="action-sheet-gap"></div>
+        <button class="action-sheet-btn cancel" onclick="closeSettingsActionSheet()">닫기</button>
       </div>
     </div>
   </main>
