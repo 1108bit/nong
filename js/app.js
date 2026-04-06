@@ -2,8 +2,11 @@
 window.addEventListener("DOMContentLoaded", () => {
   // 💡 스플래시 스크린 처리 (해당 세션에서 최초 1회만 표시)
   const splash = document.getElementById('splashScreen');
+  let splashDelay = 0; // 자동 로그인 대기 시간 설정용
+
   if (splash) {
     if (!sessionStorage.getItem('splashShown')) {
+      splashDelay = 3600; // 스플래시가 보일 때는 3.6초 대기
       setTimeout(() => {
         splash.classList.add('hidden');
         sessionStorage.setItem('splashShown', 'true');
@@ -17,17 +20,20 @@ window.addEventListener("DOMContentLoaded", () => {
   const autoMainName = localStorage.getItem("autoMainName");
   
   if (autoAccountId && autoMainName) {
-    const isAdmin = localStorage.getItem("autoIsAdmin") === "true";
-    if (isAdmin) {
-      sessionStorage.setItem("isAdmin", "true");
-      const adminCode = localStorage.getItem("autoAdminCode");
-      if (adminCode) sessionStorage.setItem("adminCode", adminCode);
-    }
-    if (autoAccountId === "MASTER_ADMIN") {
-      location.href = `./admin.html?mainName=${encodeURIComponent(autoMainName)}&accountId=${autoAccountId}`;
-    } else {
-      location.href = `./main.html?mainName=${encodeURIComponent(autoMainName)}&accountId=${autoAccountId}`;
-    }
+    // 💡 자동 로그인 시, 스플래시가 재생 중이면 끝날 때까지 기다렸다가 우아하게 메인으로 이동
+    setTimeout(() => {
+      const isAdmin = localStorage.getItem("autoIsAdmin") === "true";
+      if (isAdmin) {
+        sessionStorage.setItem("isAdmin", "true");
+        const adminCode = localStorage.getItem("autoAdminCode");
+        if (adminCode) sessionStorage.setItem("adminCode", adminCode);
+      }
+      if (autoAccountId === "MASTER_ADMIN") {
+        location.href = `./admin.html?mainName=${encodeURIComponent(autoMainName)}&accountId=${autoAccountId}`;
+      } else {
+        location.href = `./main.html?mainName=${encodeURIComponent(autoMainName)}&accountId=${autoAccountId}`;
+      }
+    }, splashDelay);
   }
 });
 
