@@ -7,7 +7,7 @@ window.addEventListener("DOMContentLoaded", () => {
       setTimeout(() => {
         splash.classList.add('hidden');
         sessionStorage.setItem('splashShown', 'true');
-      }, 2600); // 애니메이션(2.5초)이 끝난 직후 컨테이너 숨김
+      }, 3600); // 애니메이션(3.5초)이 끝난 직후 컨테이너 숨김
     } else {
       splash.style.display = 'none'; // 이미 본 유저는 즉시 로그인 창으로
     }

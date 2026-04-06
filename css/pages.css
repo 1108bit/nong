@@ -141,19 +141,27 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  animation: splashFadeInOut 2.5s ease-in-out forwards;
+  animation: splashFadeInOut 3.5s ease-in-out forwards;
 }
 
 .splash-logo {
-  width: 240px;
-  max-width: 50vw;
+  width: 320px;
+  max-width: 65vw;
   filter: drop-shadow(0 0 30px rgba(67, 217, 255, 0.2));
+}
+
+.splash-greeting {
+  margin-top: 24px;
+  font-size: 16px;
+  font-weight: 500;
+  color: var(--text-sub);
+  letter-spacing: -0.03em;
 }
 
 @keyframes splashFadeInOut {
   0% { opacity: 0; transform: scale(0.95); }
-  20% { opacity: 1; transform: scale(1); }
-  80% { opacity: 1; transform: scale(1); }
+  15% { opacity: 1; transform: scale(1); }
+  85% { opacity: 1; transform: scale(1); }
   100% { opacity: 0; transform: scale(1.05); }
 }
 
