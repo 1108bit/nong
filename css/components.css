@@ -353,6 +353,11 @@ body.modal-open { overflow: hidden; }
 }
 .spinner-icon.large { width: 2.4em; height: 2.4em; border-width: 3.5px; margin-right: 0; box-shadow: 0 0 12px rgba(67, 217, 255, 0.3); }
 
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
 /* 터치 피드백 팝 효과 */
 .touch-pop { animation: touchPop 0.18s ease; }
 @keyframes touchPop { 0% { transform: scale(0.985); } 100% { transform: scale(1); } }
