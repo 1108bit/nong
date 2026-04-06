@@ -5,10 +5,10 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>그림자 레기온 - 일정 관리</title>
   <script src="https://cdn.jsdelivr.net/npm/sortablejs@latest/Sortable.min.js"></script>
-  <link rel="stylesheet" href="./css/variables.css?v=20260406203425" />
-  <link rel="stylesheet" href="./css/layout.css?v=20260406203425" />
-  <link rel="stylesheet" href="./css/components.css?v=20260406203425" />
-  <link rel="stylesheet" href="./css/pages.css?v=20260406203425" />
+  <link rel="stylesheet" href="./css/variables.css?v=20260406204149" />
+  <link rel="stylesheet" href="./css/layout.css?v=20260406204149" />
+  <link rel="stylesheet" href="./css/components.css?v=20260406204149" />
+  <link rel="stylesheet" href="./css/pages.css?v=20260406204149" />
 </head>
 <body>
   <div class="bg-logo"></div>
@@ -252,10 +252,25 @@
         </div>
       </div>
 
+      <!-- 캐릭터 변경(스왑) 모달 -->
+      <div class="modal-overlay" id="swapCharacterModal">
+        <div class="modal-sheet" style="max-width: 420px;">
+          <div class="modal-head">
+            <h3 class="modal-title">캐릭터 변경</h3>
+            <button class="modal-close-btn" onclick="closeSwapCharacterModal()">닫기</button>
+          </div>
+          <div class="modal-form">
+            <div id="swapCharacterList" style="display: flex; flex-direction: column; gap: 8px; max-height: 50vh; overflow-y: auto;">
+              <!-- 캐릭터 리스트 출력 -->
+            </div>
+          </div>
+        </div>
+      </div>
+
     </div>
   </main>
-  <script src="./js/api.js?v=20260406203425"></script>
-  <script src="./js/common.js?v=20260406203425"></script>
-  <script src="./js/admin.js?v=20260406203425"></script>
+  <script src="./js/api.js?v=20260406204149"></script>
+  <script src="./js/common.js?v=20260406204149"></script>
+  <script src="./js/admin.js?v=20260406204149"></script>
 </body>
 </html>

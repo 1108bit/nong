@@ -12,7 +12,8 @@ if (sessionStorage.getItem("isAdmin") !== "true" || !getAdminCode()) {
 const State = {
   schedules: [],
   summaries: [],
-  selectedDashboardDate: null
+  selectedDashboardDate: null,
+  currentPartyInfo: {}
 };
 
 /**
@@ -809,6 +810,13 @@ function renderPartyEditor(date, time) {
     });
   }
 
+  State.currentPartyInfo = {
+    date: date,
+    time: time,
+    weekKey: currentWeekKey,
+    alreadyPlacedNames: alreadyPlacedNames
+  };
+
   // 카드 생성 헬퍼 함수
   const createCardHtml = (p, isPlaced = false) => {
     const typeBadge = p.type === '본캐' ? '<span class="chip chip-type main">본캐</span>' : '<span class="chip chip-type sub">부캐</span>';
@@ -816,10 +824,11 @@ function renderPartyEditor(date, time) {
     const placedClass = isPlaced ? 'already-placed' : 'draggable-char';
 
     return `
-      <div class="applicant-card ${placedClass}" id="char_${p.account_id}_${p.character_name}" data-name="${escapeHtml(p.character_name)}" data-class="${escapeHtml(p.className)}" data-power="${p.power}">
+      <div class="applicant-card ${placedClass}" id="char_${p.account_id}_${p.character_name}" data-acc="${p.account_id}" data-name="${escapeHtml(p.character_name)}" data-class="${escapeHtml(p.className)}" data-type="${escapeHtml(p.type)}" data-power="${p.power}" ondblclick="openSwapCharacterModal(this)">
         <div class="applicant-info">
           <span class="drag-handle">⠿</span>
           <span class="applicant-name">${escapeHtml(p.character_name)}</span>
+          ${!isPlaced ? `<span class="swap-icon touch-pop" style="cursor:pointer; font-size:12px; margin-left:4px; padding:4px; opacity:0.6;" onclick="openSwapCharacterModal(this.closest('.applicant-card')); event.stopPropagation();" title="캐릭터 변경">🔄</span>` : ''}
         </div>
         <div class="applicant-meta">
           <div style="display: flex; gap: 4px; margin-bottom: 4px; align-items: center; justify-content: flex-end;">
@@ -909,6 +918,8 @@ function renderPartyEditor(date, time) {
     document.getElementById('avgPower').textContent = `${avg}K`;
     document.getElementById('classDist').textContent = `탱커 ${roles.tank} | 힐러(서폿) ${roles.heal} | 딜러 ${roles.dps}`;
   };
+
+  document.getElementById('partyEditor').addEventListener('partyUpdated', updateSynergy);
 
   // 7. SortableJS 활성화 (모바일 터치 딜레이 적용)
   const sortableOptions = {
@@ -1081,3 +1092,113 @@ function bindEvents() {
   if(getEl("cancelAdminModalButton")) getEl("cancelAdminModalButton").onclick = closeAdminModal;
   if(getEl("closePartyDetailBtn")) getEl("closePartyDetailBtn").onclick = closePartyDetailModal;
 }
+
+// =========================
+// 캐릭터 변경 (스왑) 기능
+// =========================
+let currentSwapTargetCard = null;
+
+window.openSwapCharacterModal = async function(cardEl) {
+  if(cardEl.classList.contains('already-placed')) {
+      uiAlert("이번 주에 이미 배치가 완료된 캐릭터는 변경할 수 없습니다.");
+      return;
+  }
+
+  currentSwapTargetCard = cardEl;
+  const accountId = cardEl.dataset.acc;
+  const currentName = cardEl.dataset.name;
+
+  const modal = getEl("swapCharacterModal");
+  const listEl = getEl("swapCharacterList");
+  
+  listEl.innerHTML = `<div style="text-align:center; padding: 30px; color: var(--cyan-2);"><span class="spinner-icon"></span> 캐릭터 정보를 불러오는 중...</div>`;
+  modal.classList.add("show");
+  
+  const res = await callApi({ action: "getCharacters", accountId, background: true });
+  
+  if (!res.success) {
+      listEl.innerHTML = `<div class="admin-empty-state">캐릭터를 불러오지 못했습니다.</div>`;
+      return;
+  }
+
+  const chars = res.data.items || [];
+  
+  // 에디터에 이미 올라와 있는 캐릭터인지 확인하여 중복 배치 방지
+  const activeNamesInEditor = new Set();
+  document.getElementById("partyEditor").querySelectorAll('.applicant-card').forEach(c => {
+      activeNamesInEditor.add(c.dataset.name);
+  });
+
+  let html = "";
+  chars.forEach(c => {
+      const isCurrent = c.name === currentName;
+      const isAlreadyPlaced = State.currentPartyInfo.alreadyPlacedNames && State.currentPartyInfo.alreadyPlacedNames.has(c.name);
+      const isActiveInEditor = activeNamesInEditor.has(c.name);
+
+      let statusBadge = "";
+      let opacity = 1;
+
+      if (isCurrent) {
+          statusBadge = `<span class="chip-class" style="background:var(--blue-1); color:#fff; border:none;">현재 선택됨</span>`;
+      } else if (isAlreadyPlaced) {
+          statusBadge = `<span class="chip-class" style="background:rgba(244,63,94,0.15); color:#fda4af; border:1px solid rgba(244,63,94,0.3);">이번 주 완료</span>`;
+          opacity = 0.5;
+      } else if (isActiveInEditor) {
+          statusBadge = `<span class="chip-class" style="background:rgba(244,63,94,0.15); color:#fda4af; border:1px solid rgba(244,63,94,0.3);">에디터에 있음</span>`;
+          opacity = 0.5;
+      } else {
+          statusBadge = `<button class="mini-btn" style="min-width:60px;" onclick="executeSwapCharacter('${escapeHtml(c.name)}', '${escapeHtml(c.className)}', '${escapeHtml(c.type)}', '${escapeHtml(c.power)}')">선택</button>`;
+      }
+
+      html += `
+          <div class="character-card" style="opacity: ${opacity}; padding: 12px; margin-bottom: 0;">
+              <div class="character-left">
+                  <div class="character-name">${escapeHtml(c.name)}</div>
+                  <div class="character-sub">
+                      <span class="chip chip-class ${escapeHtml(c.className)}">${escapeHtml(c.className)}</span>
+                      <span class="chip chip-type ${c.type === '본캐' ? 'main' : 'sub'}">${escapeHtml(c.type)}</span>
+                  </div>
+              </div>
+              <div class="character-right">
+                  ${statusBadge}
+              </div>
+          </div>
+      `;
+  });
+
+  listEl.innerHTML = html || `<div class="admin-empty-state">선택할 수 있는 다른 캐릭터가 없습니다.</div>`;
+};
+
+window.closeSwapCharacterModal = function() {
+    getEl("swapCharacterModal").classList.remove("show");
+};
+
+window.executeSwapCharacter = function(name, className, type, power) {
+    if(!currentSwapTargetCard) return;
+
+    // DOM 요소 업데이트
+    currentSwapTargetCard.dataset.name = name;
+    currentSwapTargetCard.dataset.class = className;
+    currentSwapTargetCard.dataset.type = type;
+    currentSwapTargetCard.dataset.power = power;
+    currentSwapTargetCard.id = `char_${currentSwapTargetCard.dataset.acc}_${name}`;
+
+    const nameEl = currentSwapTargetCard.querySelector('.applicant-name');
+    if(nameEl) nameEl.textContent = name;
+
+    const metaEl = currentSwapTargetCard.querySelector('.applicant-meta');
+    if(metaEl) {
+        metaEl.innerHTML = `
+            <div style="display: flex; gap: 4px; margin-bottom: 4px; align-items: center; justify-content: flex-end;">
+                <span class="chip chip-class ${className}">${className}</span>
+                <span class="chip chip-type ${type === '본캐' ? 'main' : 'sub'}">${type}</span>
+            </div>
+            <span class="applicant-power">${getPowerRange(power)}</span>
+        `;
+    }
+
+    // 시너지 재계산 트리거
+    document.getElementById('partyEditor').dispatchEvent(new CustomEvent('partyUpdated'));
+
+    closeSwapCharacterModal();
+};
