@@ -3,7 +3,7 @@ const API_URL = "https://script.google.com/macros/s/AKfycbxgoannrkzyrAaIF8FeJP-Z
 // 💡 [UX 최적화] 로딩이 길어질 수 있는 쓰기 작업 목록
 const WRITE_ACTIONS_FOR_LOADING = [
   'login', 'adminLogin', 'addCharacter', 'updateCharacter', 'deleteCharacter', 'toggleCharacterType',
-  'saveRaidSchedule', 'deleteRaidSchedule', 'savePartyComposition',
+  'saveRaidSchedule', 'deleteRaidSchedule', 'savePartyComposition', 'saveAvailability',
   'updateCharacterByAdmin', 'updateAdminCodeSetting', 'changePassword',
   'toggleAdminRole', 'resetUserPasswordByAdmin', 'saveNotice'
 ];
