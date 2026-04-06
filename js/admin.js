@@ -716,98 +716,10 @@ if (changeAdminCodeBtn) {
 }
 
 // =========================
-// 애플 스타일 가로 스크롤 & 프로그레스 바 완결판
-// =========================
-let isDraggingScroll = false; // 드래그 클릭 방지용
-
-function setupAppleScroll(scrollBoxId, indicatorId) {
-  const slider = document.getElementById(scrollBoxId);
-  const indicatorWrap = document.getElementById(indicatorId);
-  if (!slider) return;
-  
-  const indicator = indicatorWrap ? indicatorWrap.querySelector('.scroll-indicator-dot') : null;
-
-  let isDown = false;
-  let startX;
-  let scrollLeft;
-  let velX = 0;
-  let momentumID;
-
-  // 1. 스크롤 위치에 따라 파란 바(프로그레스 게이지) 채우기
-  const updateIndicator = () => {
-    if (!indicator) return;
-    const maxScroll = slider.scrollWidth - slider.clientWidth;
-    if (maxScroll <= 0) {
-      indicator.style.width = '0%';
-      return;
-    }
-    const scrollPercent = (slider.scrollLeft / maxScroll) * 100;
-    indicator.style.width = `${scrollPercent}%`; 
-  };
-
-  slider.addEventListener('scroll', updateIndicator);
-  setTimeout(updateIndicator, 100);
-
-  // 2. 마우스 휠 지원 (PC)
-  slider.addEventListener('wheel', (e) => {
-    if (e.deltaY !== 0) {
-      e.preventDefault();
-      slider.scrollLeft += e.deltaY;
-      cancelAnimationFrame(momentumID);
-    }
-  });
-
-  // 3. 드래그 시작 (마우스)
-  slider.addEventListener('mousedown', (e) => {
-    isDown = true;
-    isDraggingScroll = false;
-    slider.classList.add('grabbing'); // 커서 모양 변경
-    slider.style.scrollSnapType = 'none'; // 드래그 중 스냅 해제
-    slider.style.scrollBehavior = 'auto'; // 즉각적인 반응
-    startX = e.pageX - slider.offsetLeft;
-    scrollLeft = slider.scrollLeft;
-    cancelAnimationFrame(momentumID);
-  });
-
-  // 4. 드래그 중
-  slider.addEventListener('mousemove', (e) => {
-    if (!isDown) return;
-    e.preventDefault();
-    const x = e.pageX - slider.offsetLeft;
-    const walk = (x - startX) * 2; // 스크롤 속도 배율
-    if (Math.abs(walk) > 5) isDraggingScroll = true; // 5px 이상 드래그 시 클릭 무시용 트리거 작동
-    const prevScroll = slider.scrollLeft;
-    slider.scrollLeft = scrollLeft - walk;
-    velX = slider.scrollLeft - prevScroll; // 속도 계산
-  });
-
-  // 5. 드래그 종료 -> 관성 시작
-  const handleMouseUp = () => {
-    if (!isDown) return;
-    isDown = false;
-    slider.classList.remove('grabbing'); // 커서 모양 복구
-    slider.style.scrollSnapType = 'x mandatory'; // 스냅 복구
-    slider.style.scrollBehavior = 'smooth';
-    beginMomentum();
-  };
-
-  slider.addEventListener('mouseup', handleMouseUp);
-  slider.addEventListener('mouseleave', handleMouseUp);
-
-  // 관성 스크롤 로직 (애플 스타일)
-  function beginMomentum() {
-    velX *= 0.95; // 부드럽게 멈추는 마찰력
-    slider.scrollLeft += velX;
-    if (Math.abs(velX) > 0.5) {
-      momentumID = requestAnimationFrame(beginMomentum);
-    }
-  }
-}
-
 // 6. 칩 버튼 클릭 이벤트 위임 (단 한 번만 선언하여 중복 충돌 방지)
 document.querySelectorAll('.chip-select-group').forEach(group => {
   group.addEventListener('click', e => {
-    if (isDraggingScroll) { 
+    if (window.isDraggingScroll) { 
       e.preventDefault();
       e.stopPropagation();
       return; // 드래그 중엔 클릭 무시

@@ -101,3 +101,72 @@ function getPowerRange(power) {
 }
 
 function getEl(id) { return document.getElementById(id); }
+
+// =========================
+// 애플 스타일 가로 스크롤 & 프로그레스 바 (공통)
+// =========================
+window.isDraggingScroll = false; // 드래그 클릭 방지용 전역 상태
+
+function setupAppleScroll(scrollBoxId, indicatorId) {
+  const slider = document.getElementById(scrollBoxId);
+  const indicatorWrap = document.getElementById(indicatorId);
+  if (!slider) return;
+  
+  const indicator = indicatorWrap ? indicatorWrap.querySelector('.scroll-indicator-dot') : null;
+  let isDown = false;
+  let startX, scrollLeft, momentumID;
+  let velX = 0;
+
+  const updateIndicator = () => {
+    if (!indicator) return;
+    const maxScroll = slider.scrollWidth - slider.clientWidth;
+    if (maxScroll <= 0) { indicator.style.width = '0%'; return; }
+    indicator.style.width = `${(slider.scrollLeft / maxScroll) * 100}%`; 
+  };
+
+  slider.addEventListener('scroll', updateIndicator);
+  setTimeout(updateIndicator, 100);
+
+  slider.addEventListener('wheel', (e) => {
+    if (e.deltaY !== 0) { e.preventDefault(); slider.scrollLeft += e.deltaY; cancelAnimationFrame(momentumID); }
+  });
+
+  slider.addEventListener('mousedown', (e) => {
+    isDown = true; window.isDraggingScroll = false;
+    slider.classList.add('grabbing');
+    slider.style.scrollSnapType = 'none';
+    slider.style.scrollBehavior = 'auto';
+    startX = e.pageX - slider.offsetLeft;
+    scrollLeft = slider.scrollLeft;
+    cancelAnimationFrame(momentumID);
+  });
+
+  slider.addEventListener('mousemove', (e) => {
+    if (!isDown) return;
+    e.preventDefault();
+    const x = e.pageX - slider.offsetLeft;
+    const walk = (x - startX) * 2;
+    if (Math.abs(walk) > 5) window.isDraggingScroll = true;
+    const prevScroll = slider.scrollLeft;
+    slider.scrollLeft = scrollLeft - walk;
+    velX = slider.scrollLeft - prevScroll;
+  });
+
+  const handleMouseUp = () => {
+    if (!isDown) return;
+    isDown = false;
+    slider.classList.remove('grabbing');
+    slider.style.scrollSnapType = 'x mandatory';
+    slider.style.scrollBehavior = 'smooth';
+    beginMomentum();
+  };
+
+  slider.addEventListener('mouseup', handleMouseUp);
+  slider.addEventListener('mouseleave', handleMouseUp);
+
+  function beginMomentum() {
+    velX *= 0.95;
+    slider.scrollLeft += velX;
+    if (Math.abs(velX) > 0.5) momentumID = requestAnimationFrame(beginMomentum);
+  }
+}

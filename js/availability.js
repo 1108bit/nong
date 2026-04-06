@@ -1,4 +1,16 @@
 let selectedMap = new Set();
+let allSchedules = [];
+let allSummaries = [];
+let selectedDate = null;
+
+// 날짜 표준화 헬퍼 (2026. 3. 8 -> 2026-03-08)
+function normalizeDateStr(val) {
+  if (!val) return '';
+  let text = String(val).replace(/[\.\/]/g, '-').replace(/\s/g, '').trim();
+  if (text.includes('-')) text = text.split('-').map(p => p.padStart(2, '0')).join('-');
+  return text;
+}
+const isSameDate = (d1, d2) => normalizeDateStr(d1) === normalizeDateStr(d2);
 
 async function initAvailability() {
   const accountId = getAccountId();
@@ -14,6 +26,15 @@ async function initAvailability() {
     `;
   }
 
+  initDateChips();
+
+  // 칩 스크롤 및 인디케이터 활성화
+  setTimeout(() => {
+    if (typeof setupAppleScroll === 'function') {
+      setupAppleScroll('dateChipGroup', 'dateScrollInd');
+    }
+  }, 100);
+
   const [schedule, mySelection, summaryData] = await Promise.all([
     callApi({ action: "getRaidSchedule" }),
     callApi({ action: "getAvailability", accountId, characterName }),
@@ -23,18 +44,110 @@ async function initAvailability() {
   selectedMap.clear();
   mySelection.items?.forEach(i => selectedMap.add(`${i.day}__${i.time_slot}`));
   
-  const summaryItems = summaryData.items || [];
-  renderList(schedule.items || [], summaryItems);
+  allSchedules = schedule.items || [];
+  allSummaries = summaryData.items || [];
+  
+  updateDateChipsWithData();
+  renderList();
 }
 
-function renderList(items, summaryItems) {
+function initDateChips() {
+  const days = ["일", "월", "화", "수", "목", "금", "토"];
+  const today = new Date();
+  let html = "";
+  
+  if (!selectedDate) {
+    const yyyy = today.getFullYear();
+    const mm = String(today.getMonth() + 1).padStart(2, '0');
+    const dd = String(today.getDate()).padStart(2, '0');
+    selectedDate = `${yyyy}-${mm}-${dd}`;
+  }
+  
+  for(let i = 0; i < 14; i++) {
+    const d = new Date(today);
+    d.setDate(today.getDate() + i);
+    const yyyy = d.getFullYear();
+    const mm = String(d.getMonth() + 1).padStart(2, '0');
+    const dd = String(d.getDate()).padStart(2, '0');
+    const dayStr = days[d.getDay()];
+    
+    const dateVal = `${yyyy}-${mm}-${dd}`;
+    
+    const isWeekend = (dayStr === '토' || dayStr === '일') ? 'color: var(--blue-1);' : '';
+    const isSelected = isSameDate(dateVal, selectedDate) ? "selected" : "";
+    
+    const appleDisplay = `<span style="font-size:11px; opacity:0.6; font-weight:700; ${isWeekend}">${dayStr}</span><span style="font-size:16px; font-weight:900; margin-top:4px;">${dd}</span>`;
+    html += `<button type="button" class="chip-btn date-chip ${isSelected}" data-date="${dateVal}" data-day="${dayStr}">${appleDisplay}</button>`;
+  }
+  
+  const group = getEl("dateChipGroup");
+  if (group) group.innerHTML = html;
+}
+
+// 칩 이벤트 위임
+const dateChipGroup = getEl("dateChipGroup");
+if (dateChipGroup) {
+  dateChipGroup.addEventListener("click", e => {
+     if (window.isDraggingScroll) return; // 드래그 중 클릭 방지
+     const btn = e.target.closest(".chip-btn");
+     if(!btn) return;
+     
+     btn.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
+
+     dateChipGroup.querySelectorAll(".chip-btn").forEach(b => b.classList.remove("selected"));
+     btn.classList.add("selected");
+     selectedDate = btn.dataset.date;
+     renderList();
+  });
+}
+
+function updateDateChipsWithData() {
+  const group = getEl("dateChipGroup");
+  if (!group) return;
+  
+  let firstDataDate = null;
+
+  group.querySelectorAll(".chip-btn").forEach(btn => {
+    const dateVal = btn.dataset.date;
+    const hasData = allSchedules.some(s => isSameDate(s.date, dateVal));
+    if (hasData) {
+      btn.style.border = "1px solid rgba(67, 217, 255, 0.4)";
+      btn.style.background = "rgba(67, 217, 255, 0.05)";
+      if (!firstDataDate) firstDataDate = dateVal;
+    }
+  });
+  
+  // 현재 선택된 날짜에 일정이 없고, 일정이 있는 첫 날짜가 존재하면 자동 스크롤/선택 이동
+  const currentHasData = allSchedules.some(s => isSameDate(s.date, selectedDate));
+  if (!currentHasData && firstDataDate) {
+    const targetBtn = group.querySelector(`.chip-btn[data-date="${firstDataDate}"]`);
+    if (targetBtn) {
+      group.querySelectorAll(".chip-btn").forEach(b => b.classList.remove("selected"));
+      targetBtn.classList.add("selected");
+      selectedDate = firstDataDate;
+      targetBtn.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
+    }
+  }
+}
+
+function renderList() {
   const target = getEl("availabilityList");
-  target.innerHTML = items.map(i => {
+  const filteredItems = allSchedules.filter(s => isSameDate(s.date, selectedDate));
+  
+  if (filteredItems.length === 0) {
+    target.innerHTML = `<div class="availability-empty">선택한 날짜에 등록된 일정이 없습니다.</div>`;
+    return;
+  }
+
+  // 시간순 정렬
+  filteredItems.sort((a, b) => a.time_slot.localeCompare(b.time_slot));
+
+  target.innerHTML = filteredItems.map(i => {
     const key = `${i.day}__${i.time_slot}`;
     const isSelected = selectedMap.has(key);
     const shortDate = i.date && i.date.length >= 10 ? i.date.substring(5).replace('-', '.') : i.date;
     
-    const participantsCount = summaryItems.filter(s => s.day === i.day && s.time_slot === i.time_slot).length;
+    const participantsCount = allSummaries.filter(s => isSameDate(s.date, i.date) && s.time_slot === i.time_slot).length;
 
     return `
       <button class="availability-item ${isSelected ? 'active' : ''}" data-day="${escapeHtml(i.day)}" data-time="${escapeHtml(i.time_slot)}">
