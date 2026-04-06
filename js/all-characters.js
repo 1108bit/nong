@@ -9,11 +9,29 @@ async function loadAllCharacters() {
   
   // 💡 [UX 향상] 데이터를 불러오는 동안 테이블 형태의 스켈레톤(고스팅) UI 표시
   target.innerHTML = `
-    <div class="skeleton-list" style="margin-top: 12px;">
-      <div class="skeleton-block" style="height: 52px; border-radius: 12px;"></div>
-      <div class="skeleton-block" style="height: 52px; border-radius: 12px;"></div>
-      <div class="skeleton-block" style="height: 52px; border-radius: 12px;"></div>
-      <div class="skeleton-block" style="height: 52px; border-radius: 12px;"></div>
+    <div class="table-wrapper" style="pointer-events: none;">
+      <table class="char-table">
+        <thead style="opacity: 0.5;">
+          <tr>
+            <th>본캐명 <span class="sort-icon">↕</span></th>
+            <th>캐릭터명 <span class="sort-icon">↕</span></th>
+            <th>클래스 <span class="sort-icon">↕</span></th>
+            <th>타입 <span class="sort-icon">↕</span></th>
+            <th>전투력 <span class="sort-icon">↕</span></th>
+          </tr>
+        </thead>
+        <tbody>
+          ${Array(6).fill(`
+            <tr>
+              <td><div class="skeleton-block" style="width: 50px; height: 18px; border-radius: 4px; display: inline-block; vertical-align: middle;"></div></td>
+              <td><div class="skeleton-block" style="width: 70px; height: 18px; border-radius: 4px; display: inline-block; vertical-align: middle;"></div></td>
+              <td><div class="skeleton-block" style="width: 50px; height: 26px; border-radius: 12px; display: inline-block; vertical-align: middle;"></div></td>
+              <td><div class="skeleton-block" style="width: 40px; height: 26px; border-radius: 12px; display: inline-block; vertical-align: middle;"></div></td>
+              <td><div class="skeleton-block" style="width: 60px; height: 18px; border-radius: 4px; display: inline-block; vertical-align: middle;"></div></td>
+            </tr>
+          `).join('')}
+        </tbody>
+      </table>
     </div>
   `;
 
