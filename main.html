@@ -7,11 +7,11 @@
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
   <title>그림자 레기온 - 메인</title>
-  <link rel="stylesheet" href="./css/variables.css?v=20260406193626" />
-  <link rel="stylesheet" href="./css/layout.css?v=20260406193626" />
-  <link rel="stylesheet" href="./css/components.css?v=20260406193626" />
-  <link rel="stylesheet" href="./css/pages.css?v=20260406193626" />
-  <!-- character-delete.css ?댁슜? components.css濡?蹂묓빀???덉젙?낅땲??-->
+  <link rel="stylesheet" href="./css/variables.css?v=20260406191807" />
+  <link rel="stylesheet" href="./css/layout.css?v=20260406191807" />
+  <link rel="stylesheet" href="./css/components.css?v=20260406191807" />
+  <link rel="stylesheet" href="./css/pages.css?v=20260406191807" />
+  <!-- character-delete.css 내용은 components.css로 병합될 예정입니다. -->
 </head>
 <body>
   <div class="bg-logo"></div>
@@ -22,21 +22,21 @@
         <div class="main-hero-bg"></div>
         <div class="main-hero-top">
           <div>
-            <div class="main-eyebrow">AION2 쨌 LEGION MANAGER</div>
-            <h1 class="main-page-title">洹몃┝??쨌 SHADOW</h1>
-            <p class="main-page-desc">?덇린???쇱젙怨?罹먮┃?곕? 愿由ы빀?덈떎</p>
+            <div class="main-eyebrow">AION2 · LEGION MANAGER</div>
+            <h1 class="main-page-title">그림자 · SHADOW</h1>
+            <p class="main-page-desc">레기온 일정과 캐릭터를 관리합니다.</p>
           </div>
-          <!-- ?뮕 ?⑥씪 ?ㅼ젙 踰꾪듉?쇰줈 源붾걫?섍쾶 ?듯빀 -->
+          <!-- 우측 단일 설정 버튼으로 깔끔하게 통합 -->
           <div class="header-btn">
-            <button type="button" class="icon-btn" id="openSettingsBtn" style="width: 42px; height: 42px; border-radius: 14px; font-size: 18px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1);">?숋툘</button>
+            <button type="button" class="icon-btn" id="openSettingsBtn" style="width: 42px; height: 42px; border-radius: 14px; font-size: 18px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1);">⚙️</button>
           </div>
         </div>
         
-        <!-- 怨듭??ы빆 ?곸뿭 -->
+        <!-- 공지사항 영역 -->
         <div id="noticeContainer" class="notice-container" style="display: none;">
           <div class="notice-head">
-            <span class="notice-badge">?뱼 ?덇린??怨듭?</span>
-            <button id="editNoticeBtn" class="icon-btn edit-btn" style="display: none; width: 24px; height: 24px; min-height: 24px; font-size: 12px;" title="怨듭? ?섏젙">?륅툘</button>
+            <span class="notice-badge">📢 레기온 공지</span>
+            <button id="editNoticeBtn" class="icon-btn edit-btn" style="display: none; width: 24px; height: 24px; min-height: 24px; font-size: 12px;" title="공지 수정">✏️</button>
           </div>
           <div id="noticeText" class="notice-text"></div>
         </div>
@@ -63,76 +63,76 @@
       <section class="main-grid">
         <article class="main-card" style="grid-column: 1 / -1;">
           <div class="card-head">
-            <h2 class="section-title">??罹먮┃??/h2>
-            <button type="button" class="mini-btn" id="addCharacterButton">異붽?</button>
+            <h2 class="section-title">내 캐릭터</h2>
+            <button type="button" class="mini-btn" id="addCharacterButton">추가</button>
           </div>
           <div class="character-list" id="characterList">
-            <div class="character-empty">遺덈윭?ㅻ뒗 以?..</div>
+            <div class="character-empty">불러오는 중...</div>
           </div>
         </article>
       </section>
 
-      <!-- 愿由ъ옄 吏꾩엯???④꺼吏?踰꾪듉 (?댁뒪?곗뿉洹? -->
-      <div class="copyright-text" id="adminSecretBtn" style="text-align: center; margin-top: 32px; margin-bottom: 20px; cursor: pointer; user-select: none; -webkit-user-select: none;">짤 ???좎뭅]. All Rights Reserved.</div>
+      <!-- 관리자 진입용 숨겨진 버튼 (이스터에그) -->
+      <div class="copyright-text" id="adminSecretBtn" style="text-align: center; margin-top: 32px; margin-bottom: 20px; cursor: pointer; user-select: none; -webkit-user-select: none;">© 그림자 레기온. All Rights Reserved.</div>
     </div>
 
     <div class="bottom-action-bar">
       <button class="bottom-action-btn primary" onclick="movePage('availability.html')">
-        <span class="action-icon">?뿎截?/span>
-        <span class="action-text">?덉씠???좎껌</span>
+        <span class="action-icon">📅</span>
+        <span class="action-text">레이드 신청</span>
       </button>
       <button class="bottom-action-btn gold" onclick="movePage('party.html')">
-        <span class="action-icon">?뷂툘</span>
-        <span class="action-text">?뚰떚 ?곹솴</span>
+        <span class="action-icon">⚔️</span>
+        <span class="action-text">파티 상황</span>
       </button>
       <button class="bottom-action-btn purple" onclick="movePage('all-characters.html')">
-        <span class="action-icon">?뫁</span>
-        <span class="action-text">?덇린??紐낅?</span>
+        <span class="action-icon">👥</span>
+        <span class="action-text">레기온 명부</span>
       </button>
       <button class="bottom-action-btn accent" id="bottomAddBtn">
-        <span class="action-icon">?뫀</span>
-        <span class="action-text">罹먮┃??異붽?</span>
+        <span class="action-icon">➕</span>
+        <span class="action-text">캐릭터 추가</span>
       </button>
     </div>
 
     <div class="modal-overlay" id="characterModal">
       <div class="modal-sheet">
         <div class="modal-head">
-          <h3 class="modal-title" id="modalTitle">罹먮┃??異붽?</h3>
-          <button class="modal-close-btn" id="closeCharacterModalButton">?リ린</button>
+          <h3 class="modal-title" id="modalTitle">캐릭터 추가</h3>
+          <button class="modal-close-btn" id="closeCharacterModalButton">닫기</button>
         </div>
         <div class="modal-form">
           <div class="form-group">
-            <label class="input-label">罹먮┃?곕챸</label>
-            <input type="text" id="modalCharacterName" class="main-input" placeholder="罹먮┃?곕챸 ?낅젰" />
+            <label class="input-label">캐릭터명</label>
+            <input type="text" id="modalCharacterName" class="main-input" placeholder="캐릭터명 입력" />
           </div>
           <div class="form-group">
-            <label class="input-label">?대옒??/label>
+            <label class="input-label">클래스</label>
             <div class="chip-select-group" data-target="modalCharacterClass">
-              <button type="button" class="chip-btn chip-class 寃??selected" data-value="寃??>寃??/button>
-              <button type="button" class="chip-btn chip-class ?섑샇?? data-value="?섑샇??>?섑샇??/button>
-              <button type="button" class="chip-btn chip-class ?댁꽦" data-value="?댁꽦">?댁꽦</button>
-              <button type="button" class="chip-btn chip-class 沅곸꽦" data-value="沅곸꽦">沅곸꽦</button>
-              <button type="button" class="chip-btn chip-class 留덈룄?? data-value="留덈룄??>留덈룄??/button>
-              <button type="button" class="chip-btn chip-class ?뺣졊?? data-value="?뺣졊??>?뺣졊??/button>
-              <button type="button" class="chip-btn chip-class 移섏쑀?? data-value="移섏쑀??>移섏쑀??/button>
-              <button type="button" class="chip-btn chip-class ?몃쾿?? data-value="?몃쾿??>?몃쾿??/button>
+              <button type="button" class="chip-btn chip-class 검성 selected" data-value="검성">검성</button>
+              <button type="button" class="chip-btn chip-class 수호성" data-value="수호성">수호성</button>
+              <button type="button" class="chip-btn chip-class 살성" data-value="살성">살성</button>
+              <button type="button" class="chip-btn chip-class 궁성" data-value="궁성">궁성</button>
+              <button type="button" class="chip-btn chip-class 마도성" data-value="마도성">마도성</button>
+              <button type="button" class="chip-btn chip-class 정령성" data-value="정령성">정령성</button>
+              <button type="button" class="chip-btn chip-class 치유성" data-value="치유성">치유성</button>
+              <button type="button" class="chip-btn chip-class 호법성" data-value="호법성">호법성</button>
             </div>
-            <input type="hidden" id="modalCharacterClass" value="寃?? />
+            <input type="hidden" id="modalCharacterClass" value="검성" />
           </div>
           
           <div class="form-group">
-            <label class="input-label">???/label>
+            <label class="input-label">타입</label>
             <div class="chip-select-group" data-target="modalCharacterType">
-              <button type="button" class="chip-btn chip-type main" data-value="蹂몄틦" id="chipTypeMain">蹂몄틦</button>
-              <button type="button" class="chip-btn chip-type sub selected" data-value="遺罹? id="chipTypeSub">遺罹?/button>
+              <button type="button" class="chip-btn chip-type main" data-value="본캐" id="chipTypeMain">본캐</button>
+              <button type="button" class="chip-btn chip-type sub selected" data-value="부캐" id="chipTypeSub">부캐</button>
             </div>
-            <input type="hidden" id="modalCharacterType" value="遺罹? />
+            <input type="hidden" id="modalCharacterType" value="부캐" />
           </div>
           <div class="form-group">
-            <label class="input-label">?꾪닾??/label>
+            <label class="input-label">전투력</label>
             <div class="chip-select-group" data-target="modalCharacterPower">
-              <button type="button" class="chip-btn" data-value="0">100<span class="unit-k">K</span> 誘몃쭔</button>
+              <button type="button" class="chip-btn" data-value="0">100<span class="unit-k">K</span> 미만</button>
               <button type="button" class="chip-btn" data-value="100">100<span class="unit-k">K</span> ~ 150<span class="unit-k">K</span></button>
               <button type="button" class="chip-btn" data-value="150">150<span class="unit-k">K</span> ~ 200<span class="unit-k">K</span></button>
               <button type="button" class="chip-btn" data-value="200">200<span class="unit-k">K</span> ~ 250<span class="unit-k">K</span></button>
@@ -141,7 +141,7 @@
               <button type="button" class="chip-btn" data-value="350">350<span class="unit-k">K</span> ~ 400<span class="unit-k">K</span></button>
               <button type="button" class="chip-btn selected" data-value="400">400<span class="unit-k">K</span> ~ 450<span class="unit-k">K</span></button>
               <button type="button" class="chip-btn" data-value="450">450<span class="unit-k">K</span> ~ 500<span class="unit-k">K</span></button>
-              <button type="button" class="chip-btn" data-value="500">500<span class="unit-k">K</span> ?댁긽</button>
+              <button type="button" class="chip-btn" data-value="500">500<span class="unit-k">K</span> 이상</button>
             </div>
             <input type="hidden" id="modalCharacterPower" value="400" />
           </div>
@@ -186,8 +186,8 @@
       </div>
     </div>
   </main>
-  <script src="./js/api.js?v=20260406193626"></script>
-  <script src="./js/common.js?v=20260406193626"></script>
-  <script src="./js/main.js?v=20260406193626"></script>
+  <script src="./js/api.js?v=20260406191807"></script>
+  <script src="./js/common.js?v=20260406191807"></script>
+  <script src="./js/main.js?v=20260406191807"></script>
 </body>
 </html>
