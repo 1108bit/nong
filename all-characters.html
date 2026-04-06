@@ -7,10 +7,10 @@
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
   <title>전체 캐릭터</title>
-  <link rel="stylesheet" href="./css/variables.css?v=20260406200706" />
-  <link rel="stylesheet" href="./css/layout.css?v=20260406200706" />
-  <link rel="stylesheet" href="./css/components.css?v=20260406200706" />
-  <link rel="stylesheet" href="./css/pages.css?v=20260406200706" />
+  <link rel="stylesheet" href="./css/variables.css?v=20260406201047" />
+  <link rel="stylesheet" href="./css/layout.css?v=20260406201047" />
+  <link rel="stylesheet" href="./css/components.css?v=20260406201047" />
+  <link rel="stylesheet" href="./css/pages.css?v=20260406201047" />
 </head>
 <body>
   <div class="bg-logo"></div>
@@ -25,14 +25,20 @@
       </section>
       <section class="main-grid">
         <article class="main-card" style="grid-column: 1 / -1;">
-          <div class="card-head"><h2 class="section-title">멤버 현황</h2></div>
+          <div class="card-head" style="align-items: center;">
+            <h2 class="section-title">멤버 현황</h2>
+            <label class="checkbox-label" style="margin: 0; cursor: pointer;">
+              <input type="checkbox" id="filterMainCharCheck" />
+              <span class="checkbox-text" style="font-weight: 700; color: var(--cyan-2);">본캐만 보기</span>
+            </label>
+          </div>
           <div id="allCharactersTableContainer"></div>
         </article>
       </section>
     </div>
   </main>
-  <script src="./js/api.js?v=20260406200706"></script>
-  <script src="./js/common.js?v=20260406200706"></script>
-  <script src="./js/all-characters.js?v=20260406200706"></script>
+  <script src="./js/api.js?v=20260406201047"></script>
+  <script src="./js/common.js?v=20260406201047"></script>
+  <script src="./js/all-characters.js?v=20260406201047"></script>
 </body>
 </html>
