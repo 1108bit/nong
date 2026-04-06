@@ -793,7 +793,11 @@ function renderPartyEditor(date, time) {
 
   // 3. 저장된 파티 데이터 및 이번 주차 중복 참여자 데이터 수집
   const targetSchedule = State.schedules.find(s => isSameDate(s.date, date) && String(s.time_slot).trim() === String(time).trim());
-  const savedParty = targetSchedule && targetSchedule.partyList ? targetSchedule.partyList : [];
+  let savedParty = [];
+  if (targetSchedule) {
+    if (Array.isArray(targetSchedule.partyList)) savedParty = targetSchedule.partyList;
+    else savedParty = [targetSchedule.p1, targetSchedule.p2, targetSchedule.p3, targetSchedule.p4, targetSchedule.p5, targetSchedule.p6, targetSchedule.p7, targetSchedule.p8];
+  }
   const currentWeekKey = targetSchedule ? targetSchedule.week_key : null;
   let waitingList = [...participants]; // 슬롯에 배치될 인원은 여기서 뺄 예정
 
@@ -801,11 +805,10 @@ function renderPartyEditor(date, time) {
   if (currentWeekKey) {
     State.schedules.forEach(s => {
       if (isSameDate(s.week_key, currentWeekKey) && !(isSameDate(s.date, date) && String(s.time_slot).trim() === String(time).trim())) {
-        if (Array.isArray(s.partyList)) {
-          s.partyList.forEach(name => {
-            if (name) alreadyPlacedNames.add(name.trim());
-          });
-        }
+        let pList = Array.isArray(s.partyList) ? s.partyList : [s.p1, s.p2, s.p3, s.p4, s.p5, s.p6, s.p7, s.p8];
+        pList.forEach(name => {
+          if (name && typeof name === 'string') alreadyPlacedNames.add(name.trim());
+        });
       }
     });
   }
