@@ -16,15 +16,15 @@ function showGlobalLoading() {
     globalLoadingEl = document.createElement("div");
     globalLoadingEl.id = "globalLoadingOverlay";
     globalLoadingEl.innerHTML = `
-      <div style="background: rgba(14, 26, 40, 0.95); padding: 28px 36px; border-radius: 20px; border: 1px solid rgba(67, 217, 255, 0.25); display: flex; flex-direction: column; align-items: center; box-shadow: 0 10px 40px rgba(0,0,0,0.6); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);">
-        <div class="spinner-icon large" style="margin-bottom: 16px;"></div>
-        <div id="globalLoadingText" style="font-size: 16px; font-weight: 800; color: var(--text-main); text-align: center; line-height: 1.5;">요청을 처리하고 있습니다</div>
-        <div id="globalLoadingSubText" style="font-size: 13px; font-weight: 600; color: var(--cyan-1); margin-top: 10px; opacity: 0; transition: opacity 0.4s ease; text-align: center;">서버 접속량이 많아 대기 중입니다<br><span style="color:var(--text-sub); font-size:11px; font-weight:400;">(최대 5초 소요)</span></div>
+      <div style="background: rgba(28, 28, 30, 0.85); padding: 36px 40px 32px; border-radius: 24px; border: 1px solid rgba(255, 255, 255, 0.08); display: flex; flex-direction: column; align-items: center; box-shadow: 0 24px 48px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.15); backdrop-filter: blur(24px) saturate(180%); -webkit-backdrop-filter: blur(24px) saturate(180%); transform: scale(0.95); animation: dialogPop 0.4s cubic-bezier(0.32, 0.72, 0, 1) forwards;">
+        <div class="spinner-icon large" style="margin-bottom: 20px; width: 40px; height: 40px; border-width: 3.5px;"></div>
+        <div id="globalLoadingText" style="font-size: 16px; font-weight: 700; color: var(--text-main); text-align: center; letter-spacing: -0.01em;">처리 중...</div>
+        <div id="globalLoadingSubText" style="font-size: 13px; font-weight: 500; color: rgba(233, 242, 255, 0.6); margin-top: 12px; opacity: 0; transition: opacity 0.5s ease; text-align: center; line-height: 1.5;">서버 동기화 진행 중<br><span style="font-size: 11px; opacity: 0.7;">잠시만 기다려주세요</span></div>
       </div>
     `;
     globalLoadingEl.style.position = "fixed"; globalLoadingEl.style.inset = "0"; globalLoadingEl.style.zIndex = "9999";
     globalLoadingEl.style.display = "none"; globalLoadingEl.style.alignItems = "center"; globalLoadingEl.style.justifyContent = "center";
-    globalLoadingEl.style.background = "rgba(0, 0, 0, 0.5)"; globalLoadingEl.style.transition = "opacity 0.2s ease";
+    globalLoadingEl.style.background = "rgba(0, 0, 0, 0.4)"; globalLoadingEl.style.backdropFilter = "blur(4px)"; globalLoadingEl.style.WebkitBackdropFilter = "blur(4px)"; globalLoadingEl.style.transition = "opacity 0.3s ease";
     document.body.appendChild(globalLoadingEl);
   }
   
