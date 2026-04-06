@@ -322,7 +322,8 @@ async function toggleTime(date, time) {
     characterName: getMainName(),
     type: "본캐",
     weekKey: targetWeekKey,
-    slotList: JSON.stringify(slotsForThisWeek)
+    slotList: JSON.stringify(slotsForThisWeek),
+    background: true // 💡 [UX] 낙관적 UI이므로 글로벌 로딩을 띄우지 않음
   }).then(res => {
     State.isSaving = false; // 저장 상태 OFF (백그라운드 동기화 허용)
     

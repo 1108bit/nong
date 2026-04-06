@@ -2,8 +2,10 @@
  * 99. 라우팅 허브 (Routes)
  ************************************************/
 
-// 💡 데이터를 수정(Write)하는 액션 목록 정의 (동시성 락 대상)
+// 💡 [동시성 보수적 잠금] 구글 시트의 치명적인 단점(행 밀림 삭제 버그, 중복 가입 등)을 원천 차단하기 위해
+// 데이터를 조금이라도 수정하는 "모든 쓰기(Write) 작업"에 스크립트 락을 엄격하게 적용합니다.
 const WRITE_ACTIONS = [
+  'login', // 신규 유저 첫 로그인 시 시트에 추가(createAccount)되므로 락 필수
   'addCharacter', 'updateCharacter', 'deleteCharacter', 'toggleCharacterType',
   'saveRaidSchedule', 'deleteRaidSchedule', 'saveAvailability', 'savePartyComposition',
   'updateCharacterByAdmin', 'updateAdminCodeSetting', 'changePassword',
@@ -23,7 +25,7 @@ function doGet(e) {
   let lock = null;
 
   try {
-    // 💡 [동시성 방어] 쓰기 작업인 경우 스크립트 락(Lock)을 걸어 병목 현상 및 덮어쓰기 방지
+    // 💡 [동시성 방어벽] 쓰기 작업 시 락을 걸어 구글 시트 데이터 덮어쓰기 및 행 밀림 대참사 완벽 방어
     if (WRITE_ACTIONS.includes(action)) {
       lock = LockService.getScriptLock();
       // 최대 5초 대기 (5초 이상 다른 유저의 쓰기가 안 끝나면 에러 반환)

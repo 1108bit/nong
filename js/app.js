@@ -1,5 +1,18 @@
 // 페이지 로드 시 자동 로그인 체크
 window.addEventListener("DOMContentLoaded", () => {
+  // 💡 스플래시 스크린 처리 (해당 세션에서 최초 1회만 표시)
+  const splash = document.getElementById('splashScreen');
+  if (splash) {
+    if (!sessionStorage.getItem('splashShown')) {
+      setTimeout(() => {
+        splash.classList.add('hidden');
+        sessionStorage.setItem('splashShown', 'true');
+      }, 2600); // 애니메이션(2.5초)이 끝난 직후 컨테이너 숨김
+    } else {
+      splash.style.display = 'none'; // 이미 본 유저는 즉시 로그인 창으로
+    }
+  }
+
   const autoAccountId = localStorage.getItem("autoAccountId");
   const autoMainName = localStorage.getItem("autoMainName");
   

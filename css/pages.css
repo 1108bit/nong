@@ -118,6 +118,46 @@
 .party-power-label { font-size: 11px; color: var(--text-muted); }
 
 /* -------------------------
+   SPLASH SCREEN (인트로 애니메이션)
+------------------------- */
+.splash-screen {
+  position: fixed;
+  inset: 0;
+  z-index: 99999;
+  background: var(--bg-0);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: opacity 0.6s ease, visibility 0.6s ease;
+}
+
+.splash-screen.hidden {
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+}
+
+.splash-logo-wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  animation: splashFadeInOut 2.5s ease-in-out forwards;
+}
+
+.splash-logo {
+  width: 240px;
+  max-width: 50vw;
+  filter: drop-shadow(0 0 30px rgba(67, 217, 255, 0.2));
+}
+
+@keyframes splashFadeInOut {
+  0% { opacity: 0; transform: scale(0.95); }
+  20% { opacity: 1; transform: scale(1); }
+  80% { opacity: 1; transform: scale(1); }
+  100% { opacity: 0; transform: scale(1.05); }
+}
+
+/* -------------------------
    PAGE: ADMIN (관리자 대시보드 및 에디터)
 ------------------------- */
 .admin-form-grid { display: grid; grid-template-columns: minmax(0, 1fr); gap: 12px; }
