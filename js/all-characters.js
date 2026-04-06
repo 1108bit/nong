@@ -1,34 +1,45 @@
 let allCharacters = [];
 let sortState = {
-  column: 'mainName',
-  asc: true
+  column: 'power',
+  asc: false // 💡 기본 정렬: 전투력 내림차순(가장 높은 사람이 위로)
 };
 
 async function loadAllCharacters() {
+  const target = getEl("allCharactersTableContainer");
+  
+  // 💡 [UX 향상] 데이터를 불러오는 동안 테이블 형태의 스켈레톤(고스팅) UI 표시
+  target.innerHTML = `
+    <div class="skeleton-list" style="margin-top: 12px;">
+      <div class="skeleton-block" style="height: 52px; border-radius: 12px;"></div>
+      <div class="skeleton-block" style="height: 52px; border-radius: 12px;"></div>
+      <div class="skeleton-block" style="height: 52px; border-radius: 12px;"></div>
+      <div class="skeleton-block" style="height: 52px; border-radius: 12px;"></div>
+    </div>
+  `;
+
   const res = await callApi({ action: "getAllCharacters" });
-  getEl("pageMessage").style.display = "none";
   
   if (!res.success) {
-    getEl("allCharactersTableContainer").innerHTML = `<div class="character-empty">데이터를 불러올 수 없습니다.</div>`;
+    target.innerHTML = `<div class="character-empty">데이터를 불러올 수 없습니다.</div>`;
     return;
   }
   
   allCharacters = res.data.items || [];
-  renderTable();
+  applySort(); // 💡 데이터 로드 직후 바로 정렬 적용
 }
 
-function sortData(column) {
-  if (sortState.column === column) {
-    sortState.asc = !sortState.asc; // 누를 때마다 오름차순/내림차순 토글
-  } else {
-    sortState.column = column;
-    sortState.asc = true;
-  }
-  
+function applySort() {
   allCharacters.sort((a, b) => {
-    let valA = a[column];
-    let valB = b[column];
+    let valA = a[sortState.column];
+    let valB = b[sortState.column];
     
+    // 💡 전투력(power)은 문자가 아닌 '숫자'로 변환해서 완벽하게 대소 비교
+    if (sortState.column === 'power') {
+      valA = Number(valA) || 0;
+      valB = Number(valB) || 0;
+      return sortState.asc ? valA - valB : valB - valA;
+    }
+
     if (typeof valA === 'string') valA = valA.toLowerCase();
     if (typeof valB === 'string') valB = valB.toLowerCase();
     
@@ -38,6 +49,17 @@ function sortData(column) {
   });
   
   renderTable();
+}
+
+function sortData(column) {
+  if (sortState.column === column) {
+    sortState.asc = !sortState.asc; // 누를 때마다 오름차순/내림차순 토글
+  } else {
+    sortState.column = column;
+    sortState.asc = column !== 'power'; // 💡 전투력 탭을 처음 누르면 무조건 내림차순, 나머지는 오름차순 시작
+  }
+  
+  applySort();
 }
 
 function renderTable() {

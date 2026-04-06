@@ -209,7 +209,7 @@ window.closeCharacterActionSheet = function() {
 };
 
 // 모달 열기 로직 개선
-getEl("addCharacterButton").addEventListener("click", () => {
+getEl("addCharacterButton").addEventListener("click", async () => {
     const nameInput = getEl("modalCharacterName");
     const typeInput = getEl("modalCharacterType");
     const powerInput = getEl("modalCharacterPower");
@@ -225,7 +225,7 @@ getEl("addCharacterButton").addEventListener("click", () => {
         if (chipMain) { chipMain.classList.add("selected"); chipMain.disabled = false; }
         if (chipSub) { chipSub.classList.remove("selected"); chipSub.disabled = true; }
         powerInput.disabled = false;
-        alert("최초 1회 본캐 정보를 먼저 등록해야 합니다.");
+        await uiAlert("최초 1회 본캐 정보를 먼저 등록해야 합니다.");
     } else {
         // 본캐가 있는 경우: 부캐 입력 모드
         nameInput.value = "";
@@ -263,7 +263,8 @@ async function submitCharacter() {
     btn.disabled = false;
     btn.textContent = originalText;
     btn.style.opacity = "1";
-    return alert("이름과 클래스를 입력해주세요.");
+    await uiAlert("이름과 클래스를 입력해주세요.");
+    return;
   }
   
   const modal = getEl("characterModal");
@@ -278,7 +279,7 @@ async function submitCharacter() {
       btn.disabled = false;
       btn.textContent = originalText;
       btn.style.opacity = "1";
-      alert(`본캐 이름은 '${getMainName()}'과(와) 같아야 합니다.`);
+      await uiAlert(`본캐 이름은 '${getMainName()}'과(와) 같아야 합니다.`);
       return;
     }
   }
@@ -306,13 +307,13 @@ async function submitCharacter() {
     closeModal(); // 모달 닫기 및 입력창 완전 초기화
     setTimeout(loadMain, 400); // 구글 시트 저장 대기 후 리스트 새로고침
   } else {
-    alert(res.message || "처리에 실패했습니다.");
+    await uiAlert(res.message || "처리에 실패했습니다.");
   }
 }
 
 // 캐릭터 삭제 확인 함수
 async function confirmDelete(characterName) {
-  if (!confirm(`'${characterName}' 캐릭터를 삭제하시겠습니까?`)) return;
+  if (!(await uiConfirm(`'${characterName}' 캐릭터를 삭제하시겠습니까?`))) return;
 
   // 1. 해당 캐릭터 카드 요소 찾기
   const cards = document.querySelectorAll(".character-card");
@@ -340,7 +341,7 @@ async function confirmDelete(characterName) {
       sessionStorage.removeItem(`cache_main_${getAccountId()}`); // 💡 캐시 날리기
       setTimeout(loadMain, 300); // 삭제 처리 후 대기 및 새로고침
     } else {
-      alert(res.message || "캐릭터 삭제에 실패했습니다.");
+      await uiAlert(res.message || "캐릭터 삭제에 실패했습니다.");
       if (targetCard) targetCard.classList.remove("removing"); // 실패 시 복구
     }
   }, 400);
@@ -406,7 +407,7 @@ async function toggleCharacterType(characterName) {
         confirmMsg = `[ ${characterName} ] 캐릭터의 '본캐' 지정을 해제하시겠습니까?\n\n⚠️ 경고: 정상적인 레기온 관리를 위해 1개의 본캐가 필수로 요구됩니다. 해제 후 다른 캐릭터를 본캐로 지정해 주세요.`;
     }
 
-    if (!confirm(confirmMsg)) return;
+    if (!(await uiConfirm(confirmMsg))) return;
 
     const res = await callApi({
         action: "toggleCharacterType",
@@ -420,11 +421,11 @@ async function toggleCharacterType(characterName) {
             sessionStorage.setItem("mainName", characterName);
             if (localStorage.getItem("autoMainName")) localStorage.setItem("autoMainName", characterName);
         }
-        alert(`'${characterName}' 캐릭터 설정이 변경되었습니다.`);
+        await uiAlert(`'${characterName}' 캐릭터 설정이 변경되었습니다.`);
         sessionStorage.removeItem(`cache_main_${getAccountId()}`); // 💡 캐시 날리기
         setTimeout(loadMain, 300); // 타입 변경 후 대기 및 새로고침
     } else {
-        alert(res.message || "타입 변경에 실패했습니다.");
+        await uiAlert(res.message || "타입 변경에 실패했습니다.");
     }
 }
 
@@ -507,11 +508,11 @@ const changePwdBtn = getEl("changePwdBtn");
 if (changePwdBtn) {
   changePwdBtn.onclick = async () => {
     closeSettingsActionSheet(); // 모달 닫고 알림창 띄우기
-    const oldPwd = prompt("현재 비밀번호 4자리를 입력해주세요."); if (!oldPwd) return;
-    const newPwd = prompt("새롭게 설정할 비밀번호 4자리를 입력해주세요."); if (!newPwd) return;
-    if (oldPwd === newPwd) return alert("기존 비밀번호와 동일합니다.");
+    const oldPwd = await uiPrompt("현재 비밀번호 4자리를 입력해주세요."); if (!oldPwd) return;
+    const newPwd = await uiPrompt("새롭게 설정할 비밀번호 4자리를 입력해주세요."); if (!newPwd) return;
+    if (oldPwd === newPwd) { await uiAlert("기존 비밀번호와 동일합니다."); return; }
     const res = await callApi({ action: "changePassword", accountId: getAccountId(), oldPassword: oldPwd, newPassword: newPwd });
-    if (res.success) alert(res.message); // 에러는 api.js가 띄우므로 성공 시에만 띄움
+    if (res.success) await uiAlert(res.message); // 에러는 api.js가 띄우므로 성공 시에만 띄움
   };
 }
 
@@ -549,7 +550,7 @@ if (adminSecretBtn) {
     
     if (adminClickCount >= 3) {
       adminClickCount = 0;
-      const code = prompt("마스터 계정으로 전환합니다. 관리자 코드를 입력하세요.");
+      const code = await uiPrompt("마스터 계정으로 전환합니다. 관리자 코드를 입력하세요.");
       if (!code) return;
 
       const res = await callApi({ action: "adminLogin", adminCode: code });

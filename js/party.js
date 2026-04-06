@@ -55,7 +55,7 @@ async function showComposition(day, time) {
     if(!res.success) return; // 에러처리는 api.js에서 일괄 담당
 
     if (res.data.warning) {
-        alert(res.data.warning);
+        await uiAlert(res.data.warning);
     }
 
     // 1파티, 2파티 렌더링

@@ -159,3 +159,54 @@ if ('serviceWorker' in navigator) {
     }
   });
 }
+
+// =========================
+// 커스텀 UI 다이얼로그 (Apple Style)
+// =========================
+const CustomUI = {
+  createOverlay() {
+    const overlay = document.createElement('div');
+    overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.5);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);z-index:999999;display:flex;align-items:center;justify-content:center;opacity:0;transition:opacity 0.2s ease;';
+    document.body.appendChild(overlay);
+    void overlay.offsetWidth; // Reflow
+    overlay.style.opacity = '1';
+    return overlay;
+  },
+  closeOverlay(overlay) {
+    overlay.style.opacity = '0';
+    setTimeout(() => overlay.remove(), 200);
+  },
+  alert(message) {
+    return new Promise(resolve => {
+      const overlay = this.createOverlay();
+      overlay.innerHTML = `<div class="custom-dialog"><div class="custom-dialog-msg">${escapeHtml(message).replace(/\n/g, '<br>')}</div><div class="custom-dialog-actions row"><button class="custom-dialog-btn primary">확인</button></div></div>`;
+      overlay.querySelector('.primary').onclick = () => { this.closeOverlay(overlay); resolve(); };
+    });
+  },
+  confirm(message) {
+    return new Promise(resolve => {
+      const overlay = this.createOverlay();
+      overlay.innerHTML = `<div class="custom-dialog"><div class="custom-dialog-msg">${escapeHtml(message).replace(/\n/g, '<br>')}</div><div class="custom-dialog-actions row"><button class="custom-dialog-btn cancel">취소</button><button class="custom-dialog-btn primary">확인</button></div></div>`;
+      overlay.querySelector('.cancel').onclick = () => { this.closeOverlay(overlay); resolve(false); };
+      overlay.querySelector('.primary').onclick = () => { this.closeOverlay(overlay); resolve(true); };
+    });
+  },
+  prompt(message, defaultValue = "") {
+    return new Promise(resolve => {
+      const overlay = this.createOverlay();
+      const isPassword = message.includes('비밀번호') || message.includes('코드'); // 스마트 마스킹
+      const inputType = isPassword ? 'password' : 'text';
+      overlay.innerHTML = `<div class="custom-dialog"><div class="custom-dialog-msg" style="padding-bottom: 12px;">${escapeHtml(message).replace(/\n/g, '<br>')}</div><input type="${inputType}" class="custom-dialog-input" value="${escapeHtml(defaultValue)}" autocomplete="off" /><div class="custom-dialog-actions row"><button class="custom-dialog-btn cancel">취소</button><button class="custom-dialog-btn primary">확인</button></div></div>`;
+      const input = overlay.querySelector('.custom-dialog-input');
+      setTimeout(() => input.focus(), 100);
+      input.onkeydown = (e) => { if(e.key === 'Enter') overlay.querySelector('.primary').click(); };
+      overlay.querySelector('.cancel').onclick = () => { this.closeOverlay(overlay); resolve(null); };
+      overlay.querySelector('.primary').onclick = () => { this.closeOverlay(overlay); resolve(input.value); };
+    });
+  }
+};
+
+// 글로벌 함수 등록 (비동기 처리 필수)
+window.uiAlert = (msg) => CustomUI.alert(msg);
+window.uiConfirm = (msg) => CustomUI.confirm(msg);
+window.uiPrompt = (msg, def) => CustomUI.prompt(msg, def);

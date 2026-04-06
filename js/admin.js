@@ -1,7 +1,9 @@
 // 페이지 진입 시 즉각적인 권한 검사 (비정상 접근 원천 차단)
 if (sessionStorage.getItem("isAdmin") !== "true" || !getAdminCode()) {
-  alert("세션이 만료되었거나 관리자 권한이 없습니다.\n다시 로그인해 주세요.");
-  location.replace("index.html");
+  uiAlert("세션이 만료되었거나 관리자 권한이 없습니다.\n다시 로그인해 주세요.").then(() => {
+    location.replace("index.html");
+  });
+  throw new Error("Unauthorized Access");
 }
 
 /**
@@ -388,11 +390,11 @@ async function saveSchedule() {
   btn.disabled = false;
   btn.textContent = originalText;
 
-  if(res.success) { alert("저장되었습니다."); loadAdminSchedule(); }
+  if(res.success) { await uiAlert("저장되었습니다."); loadAdminSchedule(); }
 }
 
 async function deleteSchedule(date, day, time) {
-  if(!confirm("정말 삭제하시겠습니까?")) return;
+  if(!(await uiConfirm("정말 삭제하시겠습니까?"))) return;
   const res = await callApi({ action: "deleteRaidSchedule", adminCode: getAdminCode(), date, day, timeSlot: time });
   if(res.success) loadAdminSchedule();
 }
@@ -495,7 +497,7 @@ if(getEl("submitScheduleModalBtn")) {
     btn.textContent = "완료";
 
     if (res.success) {
-       alert("일정이 성공적으로 수정되었습니다.");
+       await uiAlert("일정이 성공적으로 수정되었습니다.");
        closeScheduleModal();
        loadAdminSchedule();
     }
@@ -612,7 +614,8 @@ getEl("submitAdminCharacterButton").onclick = async () => {
   if (!newName) {
     btn.disabled = false;
     btn.textContent = originalText;
-    return alert("캐릭터 이름을 입력하세요.");
+    await uiAlert("캐릭터 이름을 입력하세요.");
+    return;
   }
 
   const res = await callApi({
@@ -630,7 +633,7 @@ getEl("submitAdminCharacterButton").onclick = async () => {
   btn.textContent = originalText;
  
   if (res.success) {
-    alert("수정되었습니다.");
+    await uiAlert("수정되었습니다.");
     closeAdminModal();
     openUserCharacterManager(accountId); // 목록 새로고침
   }
@@ -638,17 +641,17 @@ getEl("submitAdminCharacterButton").onclick = async () => {
 
 // 유저 운영진 권한 토글
 async function toggleUserAdmin(targetAccountId, searchValue) {
-  if(!confirm(`해당 유저의 운영진 권한을 변경하시겠습니까?`)) return;
+  if(!(await uiConfirm(`해당 유저의 운영진 권한을 변경하시겠습니까?`))) return;
   const res = await callApi({ action: "toggleAdminRole", adminCode: getAdminCode(), targetAccountId, callerAccountId: getAccountId() });
-  if (res.success) alert(res.message);
+  if (res.success) await uiAlert(res.message);
   if (res.success) openUserCharacterManager(searchValue || targetAccountId); // UI 갱신
 }
 
 // 유저 비밀번호 강제 초기화
 async function resetUserPassword(targetAccountId) {
-  if(!confirm(`[${targetAccountId}] 유저의 비밀번호를 '0000'으로 초기화하시겠습니까?`)) return;
+  if(!(await uiConfirm(`[${targetAccountId}] 유저의 비밀번호를 '0000'으로 초기화하시겠습니까?`))) return;
   const res = await callApi({ action: "resetUserPasswordByAdmin", adminCode: getAdminCode(), targetAccountId });
-  if (res.success) alert(res.message);
+  if (res.success) await uiAlert(res.message);
 }
 
 // =========================
@@ -660,9 +663,9 @@ if (changeAdminCodeBtn) {
     const oldCode = getEl("oldAdminCodeInput").value.trim();
     const newCode = getEl("newAdminCodeInput").value.trim();
     
-    if (!oldCode) return alert("현재 관리자 코드를 입력해주세요.");
-    if (!newCode) return alert("새 관리자 코드를 입력해주세요.");
-    if (!confirm("관리자 코드를 변경하시겠습니까?")) return;
+    if (!oldCode) { await uiAlert("현재 관리자 코드를 입력해주세요."); return; }
+    if (!newCode) { await uiAlert("새 관리자 코드를 입력해주세요."); return; }
+    if (!(await uiConfirm("관리자 코드를 변경하시겠습니까?"))) return;
 
     changeAdminCodeBtn.disabled = true;
     changeAdminCodeBtn.textContent = "변경 중...";
@@ -677,7 +680,7 @@ if (changeAdminCodeBtn) {
     changeAdminCodeBtn.disabled = false;
     changeAdminCodeBtn.textContent = "코드 변경";
 
-    if (res.success) alert(res.message); 
+    if (res.success) await uiAlert(res.message); 
     
     if (res.success) {
       sessionStorage.setItem("adminCode", newCode); 
@@ -942,7 +945,7 @@ function renderPartyEditor(date, time) {
   // 7.5 치유 자동 분배 지능형 로직
   const autoHealerBtn = document.getElementById('autoHealerBtn');
   if (autoHealerBtn) {
-    autoHealerBtn.onclick = () => {
+    autoHealerBtn.onclick = async () => {
       const waitingListEl = document.getElementById('waitingList');
       const p1Slots = [1, 2, 3, 4].map(i => document.getElementById(`partySlot${i}`));
       const p2Slots = [5, 6, 7, 8].map(i => document.getElementById(`partySlot${i}`));
@@ -968,7 +971,7 @@ function renderPartyEditor(date, time) {
       });
 
       if (availableHealers.length === 0 && p1Healers.length <= 1 && p2Healers.length <= 1) {
-          alert("배치할 치유성이 없거나 이미 균등하게 분배되어 있습니다.");
+          await uiAlert("배치할 치유성이 없거나 이미 균등하게 분배되어 있습니다.");
           return;
       }
 
@@ -1010,7 +1013,7 @@ function renderPartyEditor(date, time) {
     }
 
     if (hasDuplicated) {
-      if (!confirm("⚠️ 주의: 이번 주 다른 일정에 이미 참여한 캐릭터가 포함되어 있습니다.\n\n정말 이대로 저장하시겠습니까?")) {
+      if (!(await uiConfirm("⚠️ 주의: 이번 주 다른 일정에 이미 참여한 캐릭터가 포함되어 있습니다.\n\n정말 이대로 저장하시겠습니까?"))) {
         return;
       }
     }
@@ -1031,7 +1034,7 @@ function renderPartyEditor(date, time) {
     btn.textContent = originalText;
 
     if (res.success) {
-      alert("파티 구성이 성공적으로 저장되었습니다!");
+      await uiAlert("파티 구성이 성공적으로 저장되었습니다!");
       closePartyDetailModal();
     }
   };
@@ -1046,8 +1049,8 @@ function bindEvents() {
   if(getEl("checkSchemaButton")) getEl("checkSchemaButton").onclick = async () => {
     const res = await callApi({ action: "validateDatabaseSchema" });
     if (!res.success) return; // 에러 알림은 api.js가 담당
-    if (res.data.isValid) { alert("DB 스키마가 정상입니다."); }
-    else { alert("DB 스키마 오류:\n" + (res.data.errors || []).join("\n")); }
+    if (res.data.isValid) { await uiAlert("DB 스키마가 정상입니다."); }
+    else { await uiAlert("DB 스키마 오류:\n" + (res.data.errors || []).join("\n")); }
   };
 
   const backBtn = getEl("backButton");
@@ -1065,7 +1068,7 @@ function bindEvents() {
 
   if(getEl("searchUserButton")) getEl("searchUserButton").onclick = async () => {
     const searchValue = getEl("userAccountIdInput").value.trim();
-    if (!searchValue) return alert("유저 본캐명을 입력하세요.");
+    if (!searchValue) { await uiAlert("유저 본캐명을 입력하세요."); return; }
     const searchArea = getEl("userSearchResultArea");
     if (searchArea) searchArea.style.display = "block";
     getEl("userMessage").innerHTML = "검색 중입니다...";

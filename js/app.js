@@ -114,7 +114,7 @@ if (adminSecretBtn) {
     
     if (adminClickCount >= 3) {
       adminClickCount = 0;
-      const code = prompt("마스터 계정으로 접속합니다. 관리자 코드를 입력하세요.");
+      const code = await uiPrompt("마스터 계정으로 접속합니다. 관리자 코드를 입력하세요.");
       if (!code) return;
       
       const res = await callApi({ action: "adminLogin", adminCode: code });

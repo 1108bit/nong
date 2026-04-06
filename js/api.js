@@ -75,7 +75,7 @@ async function callApi(params) {
 
     // 💡 [1순위] 통합 에러 핸들링: 실패 시 공통 알림창을 띄워 개별 화면의 중복 코드를 제거
     if (!json.success && !hideAlert) {
-      alert(json.message || "서버 통신 중 오류가 발생했습니다.");
+      await uiAlert(json.message || "서버 통신 중 오류가 발생했습니다.");
     }
     
     if (isWriteAction && !isBackground) hideGlobalLoading();
@@ -83,7 +83,7 @@ async function callApi(params) {
   } catch (e) {
     if (isWriteAction && !isBackground) hideGlobalLoading();
     console.error("❌ [API 연결 실패]:", e);
-    alert(`통신 오류가 발생했습니다: ${e.message}`);
+    await uiAlert(`통신 오류가 발생했습니다: ${e.message}`);
     return { success: false, data: {}, message: `통신 차단됨: ${e.message}`, code: 500 };
   }
 }
