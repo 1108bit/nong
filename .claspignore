@@ -1,8 +1,11 @@
-**/**
-!appsscript.json
-
-# 1. 루트 폴더에 있는 백엔드 파일(.js)만 정확하게 업로드 허용 (하위 폴더 접근 원천 차단)
-!*.js
-
-# 2. 루트 폴더에 있지만 프론트엔드용인 파일은 업로드 차단
+# 프론트엔드 폴더 및 파일 업로드 원천 차단
+css/
+js/
+images/
+.github/
+*.html
+*.md
+*.bat
+*.sh
 sw.js
+manifest.json

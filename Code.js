@@ -44,10 +44,13 @@ function doGet(e) {
     }
     
     // 기존 { ok: true, items: [], ... } 객체를 신규 표준 포맷으로 자동 변환
-    const success = result.ok;
-    const message = result.message || (success ? "성공" : "요청 처리 실패");
-    delete result.ok;
-    delete result.message;
+    const success = result ? result.ok !== false : false; // ok 속성이 없어도 데이터가 있으면 성공으로 간주
+    const message = (result && result.message) ? result.message : (success ? "성공" : "요청 처리 실패");
+    
+    if (result && typeof result === 'object') {
+      delete result.ok;
+      delete result.message;
+    }
     
     return outputStandard(success, result, message, success ? 200 : 400);
   } catch (err) {
