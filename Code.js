@@ -1,6 +1,15 @@
 /************************************************
  * 99. 라우팅 허브 (Routes)
  ************************************************/
+
+// 💡 데이터를 수정(Write)하는 액션 목록 정의 (동시성 락 대상)
+const WRITE_ACTIONS = [
+  'addCharacter', 'updateCharacter', 'deleteCharacter', 'toggleCharacterType',
+  'saveRaidSchedule', 'deleteRaidSchedule', 'saveAvailability', 'savePartyComposition',
+  'updateCharacterByAdmin', 'updateAdminCodeSetting', 'changePassword',
+  'toggleAdminRole', 'resetUserPasswordByAdmin'
+];
+
 function doGet(e) {
   // 디버깅용 로그: 실제로 어떤 데이터가 들어오고 있는지 GAS 실행 로그에 남깁니다.
   console.log("들어온 파라미터 전체:", JSON.stringify(e));
@@ -11,7 +20,18 @@ function doGet(e) {
     return outputStandard(true, null, "LEGION MANAGER API 서버가 정상 동작 중입니다.", 200);
   }
 
+  let lock = null;
+
   try {
+    // 💡 [동시성 방어] 쓰기 작업인 경우 스크립트 락(Lock)을 걸어 병목 현상 및 덮어쓰기 방지
+    if (WRITE_ACTIONS.includes(action)) {
+      lock = LockService.getScriptLock();
+      // 최대 5초 대기 (5초 이상 다른 유저의 쓰기가 안 끝나면 에러 반환)
+      if (!lock.tryLock(5000)) {
+        return outputStandard(false, null, "현재 접속자가 많아 저장이 지연되고 있습니다. 잠시 후 다시 시도해주세요.", 429);
+      }
+    }
+
     let result;
     switch (action) {
       case 'init': result = handleInit(); break;
@@ -55,6 +75,9 @@ function doGet(e) {
     return outputStandard(success, result, message, success ? 200 : 400);
   } catch (err) {
     return outputStandard(false, null, err.message || '서버 오류가 발생했습니다.', 500);
+  } finally {
+    // 💡 락(Lock) 해제: 통신이 성공하든 실패하든 무조건 마지막에 락을 풀어주어 다음 유저가 쓸 수 있게 함
+    if (lock) lock.releaseLock();
   }
 }
 

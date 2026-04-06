@@ -899,6 +899,7 @@ function renderPartyEditor(date, time) {
     animation: 150,
     delay: 100, // 모바일에서 꾹 눌러야 드래그
     delayOnTouchOnly: true,
+    fallbackTolerance: 3, // 💡 터치 중 살짝 손가락이 미끄러져도 드래그가 취소되지 않도록 여유 공간 3px 부여
     filter: '.already-placed', // 중복 참여자 드래그 방지
     ghostClass: 'sortable-ghost',
     dragClass: 'sortable-drag',

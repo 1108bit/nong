@@ -6,7 +6,8 @@ const State = {
   summaries: [],
   selectedDate: 'ALL', // 기본값을 '전체'로 변경
   selectedMap: new Set(),
-  filterMode: 'all' // 필터 상태 (all / my)
+  filterMode: 'all', // 필터 상태 (all / my)
+  isSaving: false // 💡 [레이스 컨디션 방어용] 저장 중 상태 플래그
 };
 
 
@@ -61,6 +62,9 @@ async function loadAvailabilityData() {
 
   // 💡 [1순위] 통신 규격 변경 대응 (res.success, res.data 사용)
   if (!schedule.success || !summaryData.success) return; 
+
+  // 💡 [레이스 컨디션 방어] 사용자가 버튼을 눌러 저장 중일 때는, 백그라운드 통신이 완료되어도 옛날 데이터로 덮어씌우지 않음!
+  if (State.isSaving) return;
 
   State.schedules = schedule.data.items || [];
   State.summaries = summaryData.data.items || [];
@@ -269,6 +273,10 @@ async function toggleTime(date, time) {
         currentCount = Math.max(0, currentCount - 1);
         countEl.innerHTML = `<span class="ui-dot ${currentCount >= 8 ? 'green' : 'gold'}"></span>${currentCount}명 참여`;
       }
+
+      // 💡 [캐시 정합성 맞춤] 취소(delete) 시: 캐시 배열에서 내 정보를 찾아서 '삭제'
+      const idx = State.summaries.findIndex(s => s.account_id === getAccountId() && s.date === date && s.time_slot === time);
+      if (idx !== -1) State.summaries.splice(idx, 1);
     }
   } else {
     State.selectedMap.add(key);
@@ -283,6 +291,9 @@ async function toggleTime(date, time) {
         currentCount += 1;
         countEl.innerHTML = `<span class="ui-dot ${currentCount >= 8 ? 'green' : 'gold'}"></span>${currentCount}명 참여`;
       }
+      
+      // 💡 [캐시 정합성 맞춤] 참여(add) 시: 캐시 배열에 내 정보를 '추가'
+      State.summaries.push({ account_id: getAccountId(), date: date, time_slot: time, className: "검성", power_value: 0 }); // 최소한의 기본 포맷 유지
     }
   }
 
@@ -296,6 +307,13 @@ async function toggleTime(date, time) {
     }
   }
 
+  // 💡 [SWR 캐시 동기화] 변경된 상태를 즉시 캐시에 저장하여 나갔다 들어와도 깜빡임 없음
+  sessionStorage.setItem(`cache_avail_${getAccountId()}`, JSON.stringify({
+    schedules: State.schedules,
+    summaries: State.summaries,
+    selectedMap: Array.from(State.selectedMap)
+  }));
+
   // 2. 백그라운드에서 서버 동기화 (await 없이 백그라운드 실행)
   callApi({
     action: "saveAvailability",
@@ -306,6 +324,8 @@ async function toggleTime(date, time) {
     weekKey: targetWeekKey,
     slotList: JSON.stringify(slotsForThisWeek)
   }).then(res => {
+    State.isSaving = false; // 저장 상태 OFF (백그라운드 동기화 허용)
+    
     // 💡 1순위: 에러 알림은 api.js에서 띄워주므로, 여기서는 데이터 롤백만 수행하면 끝!
     if (!res.success) {
       loadAvailabilityData(); 

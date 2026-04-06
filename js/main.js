@@ -213,6 +213,7 @@ async function submitCharacter() {
   btn.style.opacity = "1";
 
   if(res.success) {
+    sessionStorage.removeItem(`cache_main_${getAccountId()}`); // 💡 캐시 날리기
     closeModal(); // 모달 닫기 및 입력창 완전 초기화
     setTimeout(loadMain, 400); // 구글 시트 저장 대기 후 리스트 새로고침
   } else {
@@ -247,6 +248,7 @@ async function confirmDelete(characterName) {
     });
 
     if (res.success) {
+      sessionStorage.removeItem(`cache_main_${getAccountId()}`); // 💡 캐시 날리기
       setTimeout(loadMain, 300); // 삭제 처리 후 대기 및 새로고침
     } else {
       alert(res.message || "캐릭터 삭제에 실패했습니다.");
@@ -330,6 +332,7 @@ async function toggleCharacterType(characterName) {
             if (localStorage.getItem("autoMainName")) localStorage.setItem("autoMainName", characterName);
         }
         alert(`'${characterName}' 캐릭터 설정이 변경되었습니다.`);
+        sessionStorage.removeItem(`cache_main_${getAccountId()}`); // 💡 캐시 날리기
         setTimeout(loadMain, 300); // 타입 변경 후 대기 및 새로고침
     } else {
         alert(res.message || "타입 변경에 실패했습니다.");
