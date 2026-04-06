@@ -179,8 +179,8 @@ function sendDiscordNotification(date, time, partyArray) {
   const safeArray = Array.isArray(partyArray) ? partyArray : [];
   const paddedArray = Array.from({ length: 8 }, (_, i) => safeArray[i] || "");
 
-  const p1 = paddedArray.slice(0, 4).map((n, i) => n ? `${i+1}. ${n}` : `${i+1}. (빈자리)`).join("\n");
-  const p2 = paddedArray.slice(4, 8).map((n, i) => n ? `${i+1}. ${n}` : `${i+1}. (빈자리)`).join("\n");
+  const p1 = paddedArray.slice(0, 4).map((n, i) => n ? `${i+1}. @${n}` : `${i+1}. (빈자리)`).join("\n");
+  const p2 = paddedArray.slice(4, 8).map((n, i) => n ? `${i+1}. @${n}` : `${i+1}. (빈자리)`).join("\n");
 
   const message = {
     embeds: [{
