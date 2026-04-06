@@ -124,14 +124,23 @@ function savePartyComposition(adminCode, targetDate, targetTime, partyListJson) 
     if (!sheet) return { ok: false, message: "'RAID_SCHEDULE' 시트를 찾을 수 없습니다." };
 
     const values = sheet.getDataRange().getValues();
+    const headers = values[0].map(v => String(v).trim());
+    const dateCol = headers.indexOf('date');
+    const timeCol = headers.indexOf('time_slot');
+    const p1Col = headers.indexOf('p1');
+
+    if (dateCol === -1 || timeCol === -1) {
+      return { ok: false, message: "시트에서 'date' 또는 'time_slot' 컬럼을 찾을 수 없습니다." };
+    }
+
     let foundRow = -1;
 
     for (let i = 1; i < values.length; i++) {
-      if (!values[i][1] || !values[i][3]) continue; // 빈 줄 건너뛰기
+      if (!values[i][dateCol] || !values[i][timeCol]) continue; // 빈 줄 건너뛰기
       
-      const rowDate = Utilities.formatDate(new Date(values[i][1]), "GMT+9", "yyyy-MM-dd");
-      // 구글 시트의 시간 데이터(Date 객체)를 "HH:mm" 포맷으로 정확히 변환
-      const rowTime = values[i][3] instanceof Date ? Utilities.formatDate(values[i][3], "GMT+9", "HH:mm") : values[i][3].toString().substring(0, 5);
+      // 💡 [버그 수정] 하드코딩된 변환 대신 완벽한 공통 헬퍼 함수를 사용하여 비교
+      const rowDate = formatDate(values[i][dateCol]);
+      const rowTime = formatTime(values[i][timeCol]);
       
       if (rowDate === targetDate && rowTime === targetTime) {
         foundRow = i + 1;
@@ -140,8 +149,9 @@ function savePartyComposition(adminCode, targetDate, targetTime, partyListJson) 
     }
 
     if (foundRow !== -1) {
-      // I열(9)부터 8칸(1행 8열)에 배열의 값을 그대로 덮어씁니다.
-      sheet.getRange(foundRow, 9, 1, 8).setValues([partyArray]);
+      // p1 열이 없으면 기본값으로 I열(9)부터 8칸에 배열의 값을 그대로 덮어씁니다.
+      const targetCol = p1Col !== -1 ? p1Col + 1 : 9;
+      sheet.getRange(foundRow, targetCol, 1, 8).setValues([partyArray]);
       
       // 💡 [디스코드 알림 발송] 파티 저장이 성공하면 웹훅 전송
       sendDiscordNotification(targetDate, targetTime, partyArray);
