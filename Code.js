@@ -179,10 +179,11 @@ function sendDiscordNotification(date, time, partyArray) {
   const safeArray = Array.isArray(partyArray) ? partyArray : [];
   const paddedArray = Array.from({ length: 8 }, (_, i) => safeArray[i] || "");
 
-  const p1 = paddedArray.slice(0, 4).map((n, i) => n ? `${i+1}. @${n}` : `${i+1}. (빈자리)`).join("\n");
-  const p2 = paddedArray.slice(4, 8).map((n, i) => n ? `${i+1}. @${n}` : `${i+1}. (빈자리)`).join("\n");
+  const p1 = paddedArray.slice(0, 4).map((n, i) => n ? `${i+1}. ${n}` : `${i+1}. (빈자리)`).join("\n");
+  const p2 = paddedArray.slice(4, 8).map((n, i) => n ? `${i+1}. ${n}` : `${i+1}. (빈자리)`).join("\n");
 
   const message = {
+    content: "@everyone 파티 조율이 완료되었습니다!",
     embeds: [{
       title: "⚔️ 파티 조율 완료 안내",
       description: `**${date} ${time}** 레이드 파티 구성이 업데이트되었습니다.\n인게임 접속 전 파티를 확인해 주세요!`,
