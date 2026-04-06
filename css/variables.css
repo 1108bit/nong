@@ -20,28 +20,30 @@
   --line-2: rgba(130, 189, 255, 0.22);
   --line-strong: rgba(103, 232, 249, 0.4);
 
-  --text-main: #f8fbff;
-  --text-sub: rgba(233, 242, 255, 0.82);
-  --text-muted: rgba(211, 226, 243, 0.6);
+  /* Apple iOS Dark Mode Standard Text Colors */
+  --text-main: #f5f5f7; 
+  --text-sub: rgba(235, 235, 245, 0.6);
+  --text-muted: rgba(235, 235, 245, 0.3);
 
-  --blue-1: #6cb9ff;
-  --blue-2: #2e8fff;
-  --cyan-1: #43d9ff;
-  --cyan-2: #8ef3ff;
-  --teal-1: #3dd6c6;
-  --teal-2: #14b8a6;
-  --green-1: #34d399;
-  --green-2: #10b981;
-  --gold-1: #f6d37a;
-  --gold-2: #d7aa4b;
-  --red-1: #fb7185;
-  --red-2: #f43f5e;
-  --purple-1: #c084fc;
-  --purple-2: #a855f7;
+  /* Apple iOS Dark Mode System Colors */
+  --blue-1: #0A84FF;
+  --blue-2: #0066CC;
+  --cyan-1: #32ADE6;
+  --cyan-2: #64D2FF;
+  --teal-1: #5E5CE6; /* Indigo */
+  --teal-2: #403EA0;
+  --green-1: #32D74B;
+  --green-2: #24A135;
+  --gold-1: #FF9F0A; /* Orange/Gold */
+  --gold-2: #D17F00;
+  --red-1: #FF453A;
+  --red-2: #D73126;
+  --purple-1: #BF5AF2;
+  --purple-2: #9A43C6;
 
-  --shadow-1: 0 10px 30px rgba(0, 0, 0, 0.28);
-  --shadow-2: 0 18px 44px rgba(0, 0, 0, 0.34);
-  --shadow-glow: 0 0 0 1px rgba(67, 217, 255, 0.18), 0 14px 28px rgba(32, 169, 255, 0.14);
+  --shadow-1: 0 10px 30px rgba(0, 0, 0, 0.4);
+  --shadow-2: 0 18px 44px rgba(0, 0, 0, 0.5);
+  --shadow-glow: 0 0 0 1px rgba(10, 132, 255, 0.2), 0 14px 28px rgba(10, 132, 255, 0.15);
 
   --radius-xs: 10px;
   --radius-sm: 14px;
@@ -61,11 +63,13 @@ body {
   margin: 0;
   min-height: 100vh;
   font-family: -apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo", "Pretendard", "Noto Sans KR", sans-serif;
+  text-rendering: optimizeLegibility; /* 💡 폰트를 가장 예쁘고 또렷하게 렌더링 */
+  letter-spacing: -0.015em; /* 전체적으로 글자 간격을 살짝 좁혀 네이티브 앱 특유의 밀도감 생성 */
   color: var(--text-main);
   background-color: #000;
   background-image:
-    radial-gradient(circle at top center, rgba(67, 217, 255, 0.16), transparent 26%),
-    radial-gradient(circle at bottom left, rgba(20, 184, 166, 0.12), transparent 24%),
+    radial-gradient(circle at top center, rgba(50, 173, 230, 0.12), transparent 26%),
+    radial-gradient(circle at bottom left, rgba(10, 132, 255, 0.1), transparent 24%),
     linear-gradient(180deg, var(--bg-0) 0%, var(--bg-1) 36%, var(--bg-2) 100%);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
