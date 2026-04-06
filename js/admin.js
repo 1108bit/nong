@@ -190,7 +190,7 @@ async function loadAdminSchedule() {
   // API 통신을 시작하기 전에 화면에 직관적인 로딩 스피너 표시
   const list = getEl("scheduleList");
   if (list) {
-    list.innerHTML = `<div class="admin-empty-state" style="margin-top: 40px;"><span style="display:inline-block; font-size: 28px; margin-bottom: 12px; animation: spin 1s linear infinite;">⏳</span><br>일정 및 파티 데이터를 불러오는 중입니다...</div>`;
+    list.innerHTML = `<div class="admin-empty-state" style="margin-top: 40px;"><div class="spinner-icon large" style="font-size: 28px; margin-bottom: 12px; color: var(--cyan-1);"></div><br>일정 및 파티 데이터를 불러오는 중입니다...</div>`;
   }
 
   const [scheduleData, summaryData] = await Promise.all([
@@ -359,7 +359,7 @@ async function saveSchedule() {
   const btn = getEl("saveButton");
   const originalText = btn.textContent;
   btn.disabled = true;
-  btn.innerHTML = `<span style="display:inline-block; animation: spin 1s linear infinite;">⏳</span> 저장 중...`;
+  btn.innerHTML = `<span class="spinner-icon"></span> 저장 중...`;
 
   // 지능형 넘버링 (N차 파티 생성 로직)
   let targetNote = getEl("noteInput").value;
@@ -472,7 +472,7 @@ if(getEl("submitScheduleModalBtn")) {
   getEl("submitScheduleModalBtn").onclick = async () => {
     const btn = getEl("submitScheduleModalBtn");
     btn.disabled = true;
-    btn.innerHTML = `<span style="display:inline-block; animation: spin 1s linear infinite;">⏳</span> 처리 중...`;
+    btn.innerHTML = `<span class="spinner-icon"></span> 처리 중...`;
 
     const oDate = getEl("editOriginalDate").value;
     const oDay = getEl("editOriginalDay").value;
@@ -736,7 +736,7 @@ async function openPartyDetail(date, day, time) {
   const content = getEl("partyDetailContent");
   
   if (title) title.textContent = `${date} (${day}) ${time} 파티 구성`;
-  if (content) content.innerHTML = `<div style="text-align:center; padding: 30px; color: var(--cyan-2);"><span style="display:inline-block; animation: spin 1s linear infinite;">⏳</span> 데이터를 불러오는 중...</div>`;
+  if (content) content.innerHTML = `<div style="text-align:center; padding: 30px; color: var(--cyan-2);"><span class="spinner-icon"></span> 데이터를 불러오는 중...</div>`;
   
   if (modal) modal.classList.add("show");
   document.body.classList.add("modal-open");
