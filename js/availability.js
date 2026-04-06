@@ -189,9 +189,15 @@ function renderList() {
   const target = getEl("availabilityList");
   let filteredItems = State.schedules;
   
+  const today = new Date();
+  const todayStr = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
+
   // 1. 날짜 필터링
   if (State.selectedDate !== 'ALL') {
     filteredItems = filteredItems.filter(s => isSameDate(s.date, State.selectedDate));
+  } else {
+    // 💡 '전체 일정' 선택 시 오늘보다 과거인 일정은 자동으로 제외
+    filteredItems = filteredItems.filter(s => s.date >= todayStr);
   }
 
   // 2. '참여 중' 탭 필터링
