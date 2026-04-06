@@ -111,7 +111,7 @@
 .party-member-card::after { content: ""; position: absolute; inset: auto -20% -50% auto; width: 90px; height: 90px; border-radius: 999px; background: radial-gradient(circle, rgba(67, 217, 255, 0.08), transparent 68%); pointer-events: none; }
 .party-member-left { display: flex; flex-direction: column; gap: 6px; min-width: 0; }
 .party-member-right { display: flex; flex-direction: column; align-items: flex-end; gap: 3px; flex-shrink: 0; }
-.party-name { font-size: 16px; font-weight: 700; letter-spacing: -0.02em; word-break: break-all; }
+.party-name { font-size: 16px; font-weight: 700; letter-spacing: -0.02em; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .party-member-chips { display: flex; flex-wrap: wrap; gap: 6px; }
 .party-badges { display: flex; flex-wrap: wrap; gap: 6px; }
 .party-power { font-size: 18px; font-weight: 800; color: var(--blue-1); text-shadow: 0 0 12px rgba(108, 185, 255, 0.4); letter-spacing: -0.02em; }
@@ -175,9 +175,9 @@
 .admin-item { position: relative; overflow: hidden; display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 14px; border-radius: 18px; background: linear-gradient(180deg, rgba(19, 36, 54, 0.88) 0%, rgba(24, 42, 62, 0.94) 100%); border: 1px solid rgba(138, 188, 233, 0.1); box-shadow: 0 10px 24px rgba(0, 0, 0, 0.18); margin-bottom: 10px; transition: transform 0.16s ease; }
 .admin-item::before { content: ""; position: absolute; inset: 0 0 auto 0; height: 2px; background: linear-gradient(90deg, transparent, rgba(67, 217, 255, 0.28), transparent); }
 .admin-item:hover { transform: translateY(-1px); }
-.admin-item-title { font-size: 16px; font-weight: 700; color: var(--text-main); letter-spacing: -0.02em; }
+.admin-item-title { font-size: 16px; font-weight: 700; color: var(--text-main); letter-spacing: -0.02em; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .admin-item-meta { margin-top: 4px; font-size: 12px; line-height: 1.55; color: var(--text-sub); }
-.admin-item-actions { display: flex; gap: 8px; flex-shrink: 0; }
+.admin-item-actions { display: flex; gap: 8px; flex-shrink: 0; min-width: 0; }
 .admin-item-actions .mini-btn { min-width: 64px; }
 
 #scheduleList { flex: 1; max-height: 560px; overflow-y: auto; padding-right: 6px; scrollbar-width: thin; }
