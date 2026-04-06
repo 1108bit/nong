@@ -13,26 +13,38 @@ async function loadMain() {
   if (!accountId) return location.href = "index.html";
   if (accountId === "MASTER_ADMIN") return location.href = "admin.html";
 
-  const list = getEl("characterList");
-  // 데이터를 가져오기 전 가짜 카드를 보여줌
-  list.innerHTML = `
-    <div class="skeleton-block skeleton-card" style="margin-bottom:10px;"></div>
-  `;
+  // 💡 [SWR 캐시 패턴] 이전에 저장된 데이터가 있으면 즉시(0.01초) 화면에 렌더링
+  const cacheKey = `cache_main_${accountId}`;
+  const cachedData = sessionStorage.getItem(cacheKey);
+  
+  if (cachedData) {
+    try { updateMainUI(JSON.parse(cachedData)); } catch(e){}
+  } else {
+    getEl("characterList").innerHTML = `<div class="skeleton-block skeleton-card" style="margin-bottom:10px;"></div>`;
+  }
 
+  // 백그라운드에서 서버의 최신 데이터를 가져옴
   const data = await callApi({ action: "getMainData", accountId, hideAlert: true });
   if (!data.success) {
-    list.innerHTML = `<div class="character-empty" style="color: #fda4af;">에러: ${data.message || "데이터를 불러올 수 없습니다."}</div>`;
+    if (!cachedData) getEl("characterList").innerHTML = `<div class="character-empty" style="color: #fda4af;">에러: ${data.message || "데이터를 불러올 수 없습니다."}</div>`;
     return;
   }
 
-  setText("accountMainName", data.data.mainName || "계정 없음");
-  setText("characterCount", data.data.characters?.length || 0);
-  setText("selectedCount", (data.data.selectedCount || 0) + "개");
+  // 최신 데이터로 캐시 갱신 및 UI 업데이트
+  sessionStorage.setItem(cacheKey, JSON.stringify(data.data));
+  updateMainUI(data.data);
+}
+
+// UI 업데이트 로직 분리
+function updateMainUI(data) {
+  setText("accountMainName", data.mainName || "계정 없음");
+  setText("characterCount", data.characters?.length || 0);
+  setText("selectedCount", (data.selectedCount || 0) + "개");
   
   // 등록된 캐릭터 중 '본캐'가 있는지 확인
-  hasMainCharacter = data.data.characters?.some(c => c.type === CHARACTER_TYPES.MAIN);
+  hasMainCharacter = data.characters?.some(c => c.type === CHARACTER_TYPES.MAIN);
 
-  characters = data.data.characters || [];
+  characters = data.characters || [];
   renderCharacters(characters);
   applyTouchPop();
 }

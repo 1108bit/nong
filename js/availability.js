@@ -22,18 +22,30 @@ document.addEventListener('DOMContentLoaded', () => {
 async function loadAvailabilityData() {
   const accountId = getAccountId();
   const characterName = getMainName();
-
-  // 로딩 중 스켈레톤 UI 표시
-  const target = getEl("availabilityList");
-  if (target) {
-    target.innerHTML = `
-      <div class="skeleton-block skeleton-card tall" style="margin-bottom:10px;"></div>
-      <div class="skeleton-block skeleton-card tall" style="margin-bottom:10px;"></div>
-      <div class="skeleton-block skeleton-card tall" style="margin-bottom:10px;"></div>
-    `;
-  }
+  const cacheKey = `cache_avail_${accountId}`;
+  const cachedData = sessionStorage.getItem(cacheKey);
 
   initDateChips();
+
+  if (cachedData) {
+    // 💡 캐시된 데이터가 있으면 스켈레톤 없이 즉각 렌더링
+    try {
+      const parsed = JSON.parse(cachedData);
+      State.schedules = parsed.schedules || [];
+      State.summaries = parsed.summaries || [];
+      State.selectedMap = new Set(parsed.selectedMap || []);
+      updateDateChipsWithData();
+      renderList();
+    } catch(e) {}
+  } else {
+    const target = getEl("availabilityList");
+    if (target) {
+      target.innerHTML = `
+        <div class="skeleton-block skeleton-card tall" style="margin-bottom:10px;"></div>
+        <div class="skeleton-block skeleton-card tall" style="margin-bottom:10px;"></div>
+      `;
+    }
+  }
 
   // 칩 스크롤 및 인디케이터 활성화
   setTimeout(() => {
@@ -56,6 +68,13 @@ async function loadAvailabilityData() {
   State.selectedMap.clear();
   const mySelections = State.summaries.filter(s => String(s.account_id).trim() === String(accountId).trim());
   mySelections.forEach(s => State.selectedMap.add(`${s.date}__${s.time_slot}`));
+
+  // 최신 데이터를 캐시에 저장
+  sessionStorage.setItem(cacheKey, JSON.stringify({
+    schedules: State.schedules,
+    summaries: State.summaries,
+    selectedMap: Array.from(State.selectedMap) // Set은 JSON 변환이 안되므로 Array로 변환
+  }));
 
   updateDateChipsWithData();
   renderList();
