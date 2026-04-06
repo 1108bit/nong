@@ -147,7 +147,8 @@
 .splash-logo {
   width: 640px;
   max-width: 90vw;
-  filter: drop-shadow(0 0 30px rgba(67, 217, 255, 0.2));
+  filter: drop-shadow(0 0 20px rgba(67, 217, 255, 0.1)) brightness(0.85);
+  opacity: 0.9;
 }
 
 .splash-greeting {
