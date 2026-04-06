@@ -223,6 +223,8 @@
 .bottom-action-btn.primary .action-icon { filter: drop-shadow(0 0 8px rgba(67, 217, 255, 0.6)); }
 .bottom-action-btn.accent { background: rgba(52, 211, 153, 0.12); color: var(--green-1); border: 1px solid rgba(52, 211, 153, 0.15); }
 .bottom-action-btn.accent .action-icon { filter: drop-shadow(0 0 8px rgba(52, 211, 153, 0.6)); }
+.bottom-action-btn.gold { background: rgba(246, 211, 122, 0.12); color: var(--gold-1); border: 1px solid rgba(246, 211, 122, 0.15); }
+.bottom-action-btn.gold .action-icon { filter: drop-shadow(0 0 8px rgba(246, 211, 122, 0.6)); }
 
 /* -------------------------
    모달 & 팝업 (Modals & Action Sheets)
