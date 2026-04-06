@@ -1,8 +1,8 @@
 # 프론트엔드 폴더 및 파일 업로드 원천 차단
-css/
-js/
-images/
-.github/
+css/**
+js/**
+images/**
+.github/**
 *.html
 *.md
 *.bat
