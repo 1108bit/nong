@@ -2,8 +2,8 @@
  * 99. 라우팅 허브 (Routes)
  ************************************************/
 
-// 💡 [디스코드 연동] 발급받은 웹훅 URL을 아래 따옴표 사이에 붙여넣으세요!
-const DISCORD_WEBHOOK_URL = "https://discord.com/api/webhooks/1490631778942062673/73rxOWE1w3Uwe1o3qgi5g_LMV3PD6-BysxqduBxZyUWWSUjEgcNWBvMikrPwmvV4Z8fD";
+// 💡 [보안] 디스코드 웹훅 URL은 코드에 노출하지 않고 GAS 스크립트 속성(비밀 금고)에서 안전하게 불러옵니다.
+const DISCORD_WEBHOOK_URL = PropertiesService.getScriptProperties().getProperty('DISCORD_WEBHOOK_URL');
 
 // 💡 [동시성 보수적 잠금] 구글 시트의 치명적인 단점(행 밀림 삭제 버그, 중복 가입 등)을 원천 차단하기 위해
 // 데이터를 조금이라도 수정하는 "모든 쓰기(Write) 작업"에 스크립트 락을 엄격하게 적용합니다.
