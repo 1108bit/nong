@@ -65,7 +65,14 @@ function sortData(column) {
 function renderTable() {
   const target = getEl("allCharactersTableContainer");
   
-  if (allCharacters.length === 0) {
+  // 💡 체크박스 상태를 확인하고 '본캐'만 필터링하는 로직 추가
+  const isMainOnly = getEl("filterMainCharCheck")?.checked;
+  let displayList = allCharacters;
+  if (isMainOnly) {
+    displayList = displayList.filter(c => c.type === '본캐');
+  }
+
+  if (displayList.length === 0) {
     target.innerHTML = `<div class="character-empty">등록된 캐릭터가 없습니다.</div>`;
     return;
   }
@@ -90,13 +97,14 @@ function renderTable() {
         <tbody>
   `;
   
-  html += allCharacters.map(c => {
+  html += displayList.map(c => {
     const classNameEscaped = escapeHtml(c.className);
     const isMainChar = c.type === '본캐';
+    const mainIcon = isMainChar ? '<span style="color:var(--gold-1); margin-right:4px; font-size:14px; text-shadow: 0 0 8px rgba(246,211,122,0.4);">⭐️</span>' : '';
     return `
       <tr>
         <td style="font-weight: 600;">${escapeHtml(c.mainName)}</td>
-        <td style="font-weight: 500; color: var(--text-main);">${escapeHtml(c.name)}</td>
+        <td style="font-weight: 500; color: var(--text-main);">${mainIcon}${escapeHtml(c.name)}</td>
         <td><span class="chip chip-class ${classNameEscaped}">${classNameEscaped}</span></td>
         <td><span class="chip chip-type ${isMainChar ? 'main' : 'sub'}">${escapeHtml(c.type)}</span></td>
         <td style="font-weight: 700; color: var(--cyan-2); font-variant-numeric: tabular-nums;">${getPowerRange(c.power)}</td>
@@ -111,6 +119,12 @@ function renderTable() {
   `;
   
   target.innerHTML = html;
+}
+
+// 💡 체크박스를 클릭할 때마다 테이블을 다시 그리도록 이벤트 연결
+const filterCheck = getEl("filterMainCharCheck");
+if (filterCheck) {
+  filterCheck.addEventListener("change", renderTable);
 }
 
 getEl("backButton").onclick = () => movePage("main.html");
