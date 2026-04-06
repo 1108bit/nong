@@ -8,7 +8,7 @@ function doGet(e) {
   const action = (e && e.parameter && e.parameter.action) ? e.parameter.action : '';
 
   if (!action) {
-    return outputJson({ ok: true, message: 'NoStepBack API 서버가 정상 동작 중입니다.' });
+    return outputJson({ ok: true, message: "LEGION MANAGER API 서버가 정상 동작 중입니다." });
   }
 
   try {
