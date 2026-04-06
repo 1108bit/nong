@@ -244,7 +244,7 @@ body.modal-open { overflow: hidden; }
   position: relative; width: 100%; max-width: 560px; border-radius: 28px 28px 20px 20px; padding: 28px 16px max(16px, env(safe-area-inset-bottom));
   background: rgba(28, 28, 30, 0.85); border: 1px solid rgba(255, 255, 255, 0.08); box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.15), 0 24px 48px rgba(0, 0, 0, 0.6);
   backdrop-filter: blur(24px) saturate(180%); -webkit-backdrop-filter: blur(24px) saturate(180%);
-  transform: translateY(18px); transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  transform: translateY(18px); transition: transform 0.4s cubic-bezier(0.32, 0.72, 0, 1);
 }
 .modal-sheet::before {
   content: ""; position: absolute; top: 10px; left: 50%; transform: translateX(-50%);
@@ -265,7 +265,7 @@ body.modal-open { overflow: hidden; }
   padding: 16px; background: rgba(0, 0, 0, 0.5); backdrop-filter: blur(4px); opacity: 0; pointer-events: none; transition: opacity 0.2s ease;
 }
 .action-sheet-overlay.show { opacity: 1; pointer-events: auto; }
-.action-sheet { width: 100%; max-width: 400px; transform: translateY(100%); transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.1); padding-bottom: env(safe-area-inset-bottom); }
+.action-sheet { width: 100%; max-width: 400px; transform: translateY(100%); transition: transform 0.4s cubic-bezier(0.32, 0.72, 0, 1); padding-bottom: env(safe-area-inset-bottom); }
 .action-sheet-overlay.show .action-sheet { transform: translateY(0); }
 .action-sheet-group { background: rgba(30, 41, 59, 0.85); border-radius: 16px; overflow: hidden; backdrop-filter: blur(20px); }
 .action-sheet-head { padding: 12px; text-align: center; border-bottom: 1px solid rgba(255, 255, 255, 0.05); }
@@ -342,14 +342,16 @@ body.modal-open { overflow: hidden; }
   display: inline-block;
   width: 1.2em;
   height: 1.2em;
-  border: 2.5px solid rgba(255, 255, 255, 0.2);
-  border-top-color: currentColor;
+  border: 2.5px solid rgba(255, 255, 255, 0.1);
+  border-top-color: var(--cyan-1);
+  border-right-color: rgba(67, 217, 255, 0.3);
   border-radius: 50%;
-  animation: spin 0.8s linear infinite;
+  animation: spin 0.85s linear infinite;
   vertical-align: middle;
   margin-right: 6px;
+  box-shadow: 0 0 8px rgba(67, 217, 255, 0.2);
 }
-.spinner-icon.large { width: 2em; height: 2em; border-width: 3px; margin-right: 0; }
+.spinner-icon.large { width: 2.4em; height: 2.4em; border-width: 3.5px; margin-right: 0; box-shadow: 0 0 12px rgba(67, 217, 255, 0.3); }
 
 /* 터치 피드백 팝 효과 */
 .touch-pop { animation: touchPop 0.18s ease; }
@@ -372,13 +374,17 @@ body.modal-open { overflow: hidden; }
 /* -------------------------
    스켈레톤 (Skeleton)
 ------------------------- */
-.skeleton { position: relative; overflow: hidden; background: rgba(255, 255, 255, 0.05) !important; border-color: rgba(255, 255, 255, 0.05) !important; pointer-events: none; }
-.skeleton::after { content: ""; position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.08), transparent); animation: skeleton-shimmer 1.5s infinite; }
-@keyframes skeleton-shimmer { 0% { transform: translateX(-100%); } 100% { transform: translateX(100%); } }
-
-.skeleton-block { position: relative; overflow: hidden; border-radius: 16px; background: rgba(26, 43, 62, 0.9); border: 1px solid rgba(138, 188, 233, 0.08); }
-.skeleton-block::after { content: ""; position: absolute; inset: 0; transform: translateX(-100%); background: linear-gradient(90deg, transparent 0%, rgba(255, 255, 255, 0.06) 40%, rgba(255, 255, 255, 0.12) 50%, rgba(255, 255, 255, 0.06) 60%, transparent 100%); animation: skeletonFlow 1.5s ease-in-out infinite; }
-@keyframes skeletonFlow { 100% { transform: translateX(100%); } }
+.skeleton, .skeleton-block {
+  position: relative; overflow: hidden; border-radius: 16px; pointer-events: none;
+  background: rgba(138, 188, 233, 0.06) !important;
+  border: 1px solid rgba(255, 255, 255, 0.02) !important;
+  animation: appleSkeletonPulse 1.2s ease-in-out infinite alternate !important;
+}
+.skeleton::after, .skeleton-block::after { display: none; }
+@keyframes appleSkeletonPulse {
+  0% { opacity: 0.5; background: rgba(138, 188, 233, 0.04) !important; }
+  100% { opacity: 1; background: rgba(138, 188, 233, 0.12) !important; }
+}
 .skeleton-list { display: flex; flex-direction: column; gap: 10px; }
 .skeleton-card { height: 84px; }
 .skeleton-card.tall { height: 102px; }
