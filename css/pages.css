@@ -239,7 +239,7 @@
 
 /* 파티 조율 에디터 (Party Editor Modal) */
 #partyDetailModal .modal-sheet { max-width: 880px; max-height: 85dvh; display: flex; flex-direction: column; }
-#partyDetailModal .modal-form { display: flex; flex-direction: column; flex: 1; overflow: hidden !important; }
+#partyDetailModal .modal-form { display: flex; flex-direction: column; flex: 1; overflow-y: auto !important; overflow-x: hidden; padding-right: 4px; }
 #partyDetailContent { display: flex; flex-direction: column; flex: 1; min-height: 0; }
 #partyEditor { display: flex; gap: 16px; margin-top: 10px; align-items: stretch; flex: 1; min-height: 0; }
 
@@ -249,7 +249,7 @@
 #waitingList::-webkit-scrollbar-track { background: transparent; }
 .waiting-list-title { font-size: 14px; font-weight: 800; color: var(--text-main); margin-bottom: 12px; padding-bottom: 8px; border-bottom: 1px solid rgba(255, 255, 255, 0.05); }
 
-#partyContainer { flex: 0 0 calc(60% - 16px); display: grid; grid-template-columns: repeat(4, 1fr); grid-template-rows: repeat(2, 1fr); gap: 10px; }
+#partyContainer { flex: 1; width: 100%; min-width: 0; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); grid-template-rows: repeat(2, 1fr); gap: 10px; }
 .party-slot { background: #1e293b; border: 2px dashed rgba(255, 255, 255, 0.15); border-radius: 12px; display: flex; flex-direction: column; align-items: center; justify-content: center; position: relative; transition: all 0.2s ease; min-height: 120px; padding: 6px; }
 .party-slot-num { position: absolute; top: 8px; left: 10px; font-size: 12px; font-weight: 800; color: rgba(255, 255, 255, 0.25); z-index: 1; }
 .empty-slot-text { color: #64748b; font-size: 13px; font-weight: 600; }

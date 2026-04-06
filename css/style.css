@@ -2818,7 +2818,8 @@ body.modal-open {
   display: flex;
   flex-direction: column;
   flex: 1;
-  overflow: hidden !important; /* 이중 스크롤 원천 차단 */
+  overflow-y: auto !important; /* 모바일에서 내용이 길어질 경우 스크롤 허용 */
+  overflow-x: hidden;
 }
 
 #partyDetailContent {
