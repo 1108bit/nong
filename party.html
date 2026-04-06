@@ -4,10 +4,10 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>그림자 레기온 - 조합 보기</title>
-  <link rel="stylesheet" href="./css/variables.css?v=20260406222243" />
-  <link rel="stylesheet" href="./css/layout.css?v=20260406222243" />
-  <link rel="stylesheet" href="./css/components.css?v=20260406222243" />
-  <link rel="stylesheet" href="./css/pages.css?v=20260406222243" />
+  <link rel="stylesheet" href="./css/variables.css?v=20260406222915" />
+  <link rel="stylesheet" href="./css/layout.css?v=20260406222915" />
+  <link rel="stylesheet" href="./css/components.css?v=20260406222915" />
+  <link rel="stylesheet" href="./css/pages.css?v=20260406222915" />
 </head>
 <body>
   <div class="bg-logo"></div>
@@ -15,31 +15,68 @@
   <main class="app-page">
     <div class="main-shell">
       <section class="main-header-hero">
+        <div class="main-hero-bg"></div>
         <div class="main-hero-top">
-          <h1 class="main-page-title">조합 보기</h1>
-          <button class="btn btn-secondary" id="backButton">메인으로</button>
+          <div>
+            <div class="main-eyebrow">AION2</div>
+            <h1 class="main-page-title">파티 상황</h1>
+            <p class="main-page-desc">현재 확정되거나 예상되는 파티 구성을 확인합니다.</p>
+          </div>
+          <button class="btn btn-secondary" id="backButton" style="padding: 0 16px; min-height: 40px; border-radius: 12px; font-size: 13px;">메인으로</button>
         </div>
       </section>
       <section class="main-grid party-grid">
         <article class="main-card party-card-full">
           <div class="card-head"><h2 class="section-title">시간대 선택</h2></div>
-          <div class="party-summary-list" id="summaryGrid">
-            <div class="availability-empty">집계 데이터를 불러오는 중...</div>
+          <div class="party-summary-list horizontal-scroll-chips" id="summaryGrid" style="margin-top: 0; padding-bottom: 8px !important;">
+            <div class="skeleton-block" style="min-width: 140px; height: 86px; border-radius: 16px; flex-shrink: 0;"></div>
+            <div class="skeleton-block" style="min-width: 140px; height: 86px; border-radius: 16px; flex-shrink: 0;"></div>
+            <div class="skeleton-block" style="min-width: 140px; height: 86px; border-radius: 16px; flex-shrink: 0;"></div>
+          </div>
+          <div class="scroll-indicator" id="summaryScrollInd" style="margin-top: 8px; margin-bottom: 4px; width: 60px;">
+            <div class="scroll-indicator-dot"></div>
           </div>
         </article>
         <article class="main-card">
           <div class="card-head"><h2 class="section-title">1파티</h2><div id="party1Badges"></div></div>
-          <div class="party-member-list" id="party1List"></div>
+          <div class="party-member-list" id="party1List">
+            <div class="skeleton-list">
+              <div class="skeleton-block" style="height: 76px;"></div>
+              <div class="skeleton-block" style="height: 76px;"></div>
+              <div class="skeleton-block" style="height: 76px;"></div>
+              <div class="skeleton-block" style="height: 76px;"></div>
+            </div>
+          </div>
         </article>
         <article class="main-card">
           <div class="card-head"><h2 class="section-title">2파티</h2><div id="party2Badges"></div></div>
-          <div class="party-member-list" id="party2List"></div>
+          <div class="party-member-list" id="party2List">
+            <div class="skeleton-list">
+              <div class="skeleton-block" style="height: 76px;"></div>
+              <div class="skeleton-block" style="height: 76px;"></div>
+              <div class="skeleton-block" style="height: 76px;"></div>
+              <div class="skeleton-block" style="height: 76px;"></div>
+            </div>
+          </div>
         </article>
       </section>
     </div>
   </main>
-  <script src="./js/api.js?v=20260406222243"></script>
-  <script src="./js/common.js?v=20260406222243"></script>
-  <script src="./js/party.js?v=20260406222243"></script>
+  <script src="./js/api.js?v=20260406222915"></script>
+  <script src="./js/common.js?v=20260406222915"></script>
+  <script src="./js/party.js?v=20260406222915"></script>
+  <script>
+    // 💡 party.js가 데이터를 모두 렌더링한 직후 하단 애플 스타일 스크롤 바를 활성화
+    const targetNode = document.getElementById('summaryGrid');
+    if (targetNode) {
+      const observer = new MutationObserver(() => {
+        if (typeof setupAppleScroll === 'function' && targetNode.children.length > 0 && !targetNode.querySelector('.skeleton-block')) {
+          setupAppleScroll('summaryGrid', 'summaryScrollInd');
+          observer.disconnect(); // 연결 완료 후 감시 종료
+        }
+      });
+      observer.observe(targetNode, { childList: true });
+    }
+  </script>
 </body>
 </html>
