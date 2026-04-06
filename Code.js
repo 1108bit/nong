@@ -58,7 +58,7 @@ function doGet(e) {
       case 'getMainData': result = getMainData(e.parameter.accountId); break;
       case 'validateDatabaseSchema': result = validateDatabaseSchema(); break;
       case 'getPartyComposition': result = getPartyComposition(e.parameter.weekKey, e.parameter.day, e.parameter.time_slot); break;
-      case 'savePartyComposition': result = savePartyComposition(e.parameter.adminCode, e.parameter.date, e.parameter.timeSlot, e.parameter.partyList); break;
+      case 'savePartyComposition': result = savePartyComposition(e.parameter.adminCode, e.parameter.date, e.parameter.timeSlot, e.parameter.partyList, e.parameter.sendDiscord); break;
       case 'adminLogin': result = adminLogin(e.parameter.adminCode); break;
       case 'updateCharacterByAdmin': result = updateCharacterByAdmin(e); break;
       case 'updateAdminCodeSetting': result = updateAdminCodeSetting(e.parameter.adminCode, e.parameter.newAdminCode, e.parameter.callerAccountId); break;
@@ -115,7 +115,7 @@ function outputStandard(success, data, message, code) {
 /**
  * 파티 구성을 RAID_SCHEDULE 시트의 I~P열(9~16번째 열)에 저장합니다.
  */
-function savePartyComposition(adminCode, targetDate, targetTime, partyListJson) {
+function savePartyComposition(adminCode, targetDate, targetTime, partyListJson, sendDiscord) {
   try {
     const partyArray = JSON.parse(partyListJson); // 8명의 닉네임 배열 파싱
 
@@ -153,8 +153,10 @@ function savePartyComposition(adminCode, targetDate, targetTime, partyListJson) 
       sheet.getRange(foundRow, targetCol, 1, 8).setValues([partyArray]);
       SpreadsheetApp.flush(); // 💡 구글 시트에 즉시 쓰기 강제 확정
       
-      // 💡 [디스코드 알림 발송] 파티 저장이 성공하면 웹훅 전송
-      sendDiscordNotification(targetDate, targetTime, partyArray);
+      // 💡 프론트엔드에서 '디코 전송' 버튼을 눌렀을 때만 웹훅 전송
+      if (sendDiscord === 'true') {
+        sendDiscordNotification(targetDate, targetTime, partyArray);
+      }
       
       return { ok: true, message: "성공적으로 저장되었습니다." };
     }
