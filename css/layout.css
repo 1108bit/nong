@@ -88,8 +88,14 @@
 @media (min-width: 768px) {
   .page,
   .app-page {
-    padding: max(24px, env(safe-area-inset-top)) 20px 36px;
+    padding: max(24px, env(safe-area-inset-top)) 20px 80px;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+    min-height: 100dvh;
   }
+  .login-shell,
+  .main-shell { margin-top: auto; margin-bottom: auto; width: 100%; }
   .main-shell { max-width: 920px; }
   .main-grid,
   .party-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }

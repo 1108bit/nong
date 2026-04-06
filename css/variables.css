@@ -57,6 +57,7 @@
 html {
   -webkit-text-size-adjust: 100%;
   overscroll-behavior-y: none; /* 전체 페이지 고무줄 효과 방지 */
+  background-color: var(--bg-0); /* 💡 오버스크롤 바운스 시 노출되는 배경색을 기본 테마색으로 맞춰 번쩍임 방지 */
 }
 
 body {
@@ -67,7 +68,7 @@ body {
   text-rendering: optimizeLegibility; /* 💡 폰트를 가장 예쁘고 또렷하게 렌더링 */
   letter-spacing: -0.015em; /* 전체적으로 글자 간격을 살짝 좁혀 네이티브 앱 특유의 밀도감 생성 */
   color: var(--text-main);
-  background-color: #000;
+  background-color: var(--bg-0); /* 💡 배경색을 완전한 검은색(#000)에서 네이티브 앱 테마색으로 변경하여 이질감 제거 */
   background-image:
     radial-gradient(circle at top center, rgba(50, 173, 230, 0.12), transparent 26%),
     radial-gradient(circle at bottom left, rgba(10, 132, 255, 0.1), transparent 24%),

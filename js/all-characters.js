@@ -101,7 +101,7 @@ function renderTable() {
   };
   
   let html = `
-    <div class="table-wrapper">
+    <div class="table-wrapper" id="charTableScrollBox">
       <table class="char-table">
         <thead>
           <tr>
@@ -134,9 +134,19 @@ function renderTable() {
         </tbody>
       </table>
     </div>
+    <div class="scroll-indicator" id="charTableScrollInd" style="margin-top: 16px; margin-bottom: 8px; width: 80px;">
+      <div class="scroll-indicator-dot"></div>
+    </div>
   `;
   
   target.innerHTML = html;
+
+  // 💡 테이블 렌더링 후 커스텀 스크롤 인디케이터 연결
+  setTimeout(() => {
+    if (typeof setupAppleScroll === 'function') {
+      setupAppleScroll('charTableScrollBox', 'charTableScrollInd');
+    }
+  }, 50);
 }
 
 // 💡 체크박스를 클릭할 때마다 테이블을 다시 그리도록 이벤트 연결
