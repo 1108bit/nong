@@ -831,7 +831,7 @@ function renderPartyEditor(date, time) {
         <div class="applicant-info">
           <span class="drag-handle">⠿</span>
           <span class="applicant-name">${escapeHtml(p.character_name)}</span>
-          ${!isPlaced ? `<span class="swap-icon touch-pop" style="cursor:pointer; font-size:12px; margin-left:4px; padding:4px; opacity:0.6;" onclick="openSwapCharacterModal(this.closest('.applicant-card')); event.stopPropagation();" title="캐릭터 변경">🔄</span>` : ''}
+          <span class="swap-icon touch-pop" style="position:relative; z-index:20; cursor:pointer; font-size:12px; margin-left:4px; padding:4px; opacity:0.8;" onclick="openSwapCharacterModal(this.closest('.applicant-card')); event.stopPropagation();" title="캐릭터 변경">🔄</span>
         </div>
         <div class="applicant-meta">
           <div style="display: flex; gap: 4px; margin-bottom: 4px; align-items: center; justify-content: flex-end;">
@@ -1102,10 +1102,6 @@ function bindEvents() {
 let currentSwapTargetCard = null;
 
 window.openSwapCharacterModal = async function(cardEl) {
-  if(cardEl.classList.contains('already-placed')) {
-      uiAlert("이번 주에 이미 배치가 완료된 캐릭터는 변경할 수 없습니다.");
-      return;
-  }
 
   currentSwapTargetCard = cardEl;
   const accountId = cardEl.dataset.acc;
@@ -1185,6 +1181,9 @@ window.executeSwapCharacter = function(name, className, type, power) {
     currentSwapTargetCard.dataset.type = type;
     currentSwapTargetCard.dataset.power = power;
     currentSwapTargetCard.id = `char_${currentSwapTargetCard.dataset.acc}_${name}`;
+
+    // 💡 [핵심] 다른 부캐로 교체했으므로 '이번 주 완료' 제약 상태를 즉시 해제하여 드래그 가능하게 만듦
+    currentSwapTargetCard.classList.remove('already-placed');
 
     const nameEl = currentSwapTargetCard.querySelector('.applicant-name');
     if(nameEl) nameEl.textContent = name;
