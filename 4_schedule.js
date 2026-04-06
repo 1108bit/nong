@@ -175,7 +175,42 @@ function getAvailabilitySummary(weekKey) {
   return { ok: true, weekKey: currentWeek, items };
 }
 
-function validateDatabaseSchema() { return { ok: true, isValid: true, errors: [] }; }
+function validateDatabaseSchema() {
+  const errors = [];
+  try {
+    const ss = getSpreadsheet();
+    // 💡 각 시트별로 반드시 존재해야 하는 핵심 컬럼(헤더) 목록
+    const requiredSheets = {
+      'ACCOUNTS': ['account_id', 'main_name', 'password', 'admin_yn'],
+      'CHARACTERS': ['account_id', 'name', 'class_name', 'type', 'power'],
+      'RAID_SCHEDULE': ['week_key', 'date', 'time_slot', 'open_yn', 'p1', 'p2', 'p3', 'p4', 'p5', 'p6', 'p7', 'p8'],
+      'AVAILABILITY': ['week_key', 'account_id', 'character_name', 'time_slot']
+    };
+
+    for (const [sheetName, requiredHeaders] of Object.entries(requiredSheets)) {
+      const sheet = ss.getSheetByName(sheetName);
+      if (!sheet) {
+        errors.push(`[${sheetName}] 시트 자체가 존재하지 않거나 이름이 다릅니다.`);
+        continue;
+      }
+      const values = sheet.getDataRange().getValues();
+      if (values.length === 0) {
+        errors.push(`[${sheetName}] 시트에 첫 번째 줄(헤더)이 없습니다.`);
+        continue;
+      }
+      // 대소문자 무시 및 공백 제거 후 비교
+      const headers = values[0].map(v => String(v).trim().toLowerCase());
+      const missing = requiredHeaders.filter(h => !headers.includes(h.toLowerCase()));
+      if (missing.length > 0) {
+        errors.push(`[${sheetName}] 누락된 컬럼: ${missing.join(', ')}`);
+      }
+    }
+  } catch (e) {
+    errors.push(`시트 검사 중 오류 발생: ${e.message}`);
+  }
+  
+  return { ok: true, isValid: errors.length === 0, errors };
+}
 
 function getMainData(accountId) {
   if (accountId === 'MASTER_ADMIN') {

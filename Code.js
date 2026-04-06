@@ -119,9 +119,8 @@ function savePartyComposition(adminCode, targetDate, targetTime, partyListJson) 
   try {
     const partyArray = JSON.parse(partyListJson); // 8명의 닉네임 배열 파싱
 
-    const ss = SpreadsheetApp.getActiveSpreadsheet(); // 환경에 따라 openById로 변경이 필요할 수 있습니다.
-    const sheet = ss.getSheetByName("RAID_SCHEDULE");
-    if (!sheet) return { ok: false, message: "'RAID_SCHEDULE' 시트를 찾을 수 없습니다." };
+    // 💡 [버그 수정] getActiveSpreadsheet() 대신 안정적인 공통 헬퍼 getSheet() 사용
+    const sheet = getSheet(SHEET_NAMES.RAID_SCHEDULE);
 
     const values = sheet.getDataRange().getValues();
     const headers = values[0].map(v => String(v).trim());
