@@ -26,7 +26,14 @@
             <h1 class="main-page-title">그림자 · SHADOW</h1>
             <p class="main-page-desc">레기온 일정과 캐릭터를 관리합니다</p>
           </div>
-          <button type="button" class="btn btn-secondary" id="logoutButton">로그아웃</button>
+          <div style="display: flex; flex-direction: column; align-items: flex-end; gap: 8px;">
+            <button type="button" class="btn btn-secondary" id="logoutButton" style="padding: 0 16px; min-height: 40px; border-radius: 12px; font-size: 13px;">로그아웃</button>
+            <div style="display: flex; flex-direction: column; align-items: flex-end; gap: 8px; margin-top: 4px;">
+              <button type="button" class="minimal-link" id="goAllCharactersButton" style="font-size: 12px;">전체 목록</button>
+              <button type="button" class="minimal-link" id="changePwdButton" style="font-size: 12px;">비밀번호 변경</button>
+              <button type="button" class="minimal-link" id="goAdminButton" style="display: none; color: var(--gold-1); font-size: 12px;">👑 관리자</button>
+            </div>
+          </div>
         </div>
         
         <!-- 공지사항 영역 -->
@@ -67,12 +74,6 @@
             <div class="character-empty">불러오는 중...</div>
           </div>
         </article>
-
-        <div class="minimal-links">
-          <button type="button" class="minimal-link" id="goAllCharactersButton">전체 목록</button>
-          <button type="button" class="minimal-link" id="changePwdButton">비밀번호 변경</button>
-          <button type="button" class="minimal-link" id="goAdminButton" style="display: none; color: var(--gold-1);">👑 관리자</button>
-        </div>
       </section>
 
       <!-- 관리자 진입용 숨겨진 버튼 (이스터에그) -->
