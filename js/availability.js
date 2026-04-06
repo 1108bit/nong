@@ -35,18 +35,18 @@ async function initAvailability() {
     }
   }, 100);
 
-  const [schedule, mySelection, summaryData] = await Promise.all([
+  const [schedule, summaryData] = await Promise.all([
     callApi({ action: "getRaidSchedule" }),
-    callApi({ action: "getAvailability", accountId, characterName }),
     callApi({ action: "getAvailabilitySummary" })
   ]);
 
-  selectedMap.clear();
-  mySelection.items?.forEach(i => selectedMap.add(`${i.day}__${i.time_slot}`));
-  
   allSchedules = schedule.items || [];
   allSummaries = summaryData.items || [];
   
+  selectedMap.clear();
+  const mySelections = allSummaries.filter(s => String(s.account_id).trim() === String(accountId).trim());
+  mySelections.forEach(s => selectedMap.add(`${s.date}__${s.time_slot}`));
+
   updateDateChipsWithData();
   renderList();
 }
@@ -143,14 +143,14 @@ function renderList() {
   filteredItems.sort((a, b) => a.time_slot.localeCompare(b.time_slot));
 
   target.innerHTML = filteredItems.map(i => {
-    const key = `${i.day}__${i.time_slot}`;
+    const key = `${i.date}__${i.time_slot}`;
     const isSelected = selectedMap.has(key);
     const shortDate = i.date && i.date.length >= 10 ? i.date.substring(5).replace('-', '.') : i.date;
     
     const participantsCount = allSummaries.filter(s => isSameDate(s.date, i.date) && s.time_slot === i.time_slot).length;
 
     return `
-      <button class="availability-item ${isSelected ? 'active' : ''}" data-day="${escapeHtml(i.day)}" data-time="${escapeHtml(i.time_slot)}">
+      <button class="availability-item ${isSelected ? 'active' : ''}" data-date="${i.date}" data-time="${escapeHtml(i.time_slot)}">
         <div style="display:flex; justify-content:space-between; align-items:center;">
           <div class="row-time" style="flex-direction:row; align-items:center; width:auto; gap:6px;">
             <span class="row-date">${shortDate} (${escapeHtml(i.day)})</span>
@@ -175,14 +175,17 @@ function renderList() {
 getEl("availabilityList").addEventListener("click", (e) => {
   const btn = e.target.closest(".availability-item");
   if (!btn) return;
-  toggleTime(btn.dataset.day, btn.dataset.time);
+  toggleTime(btn.dataset.date, btn.dataset.time);
 });
 
-async function toggleTime(day, time) {
-  const key = `${day}__${time}`;
+async function toggleTime(date, time) {
+  const key = `${date}__${time}`;
+  const scheduleItem = allSchedules.find(s => s.date === date && s.time_slot === time);
+  if (!scheduleItem) return;
+  const targetWeekKey = scheduleItem.week_key;
   
   // 1. 낙관적 UI 업데이트 (API 응답을 기다리지 않고 화면부터 즉각 변경)
-  const btn = document.querySelector(`.availability-item[data-day="${day}"][data-time="${time}"]`);
+  const btn = document.querySelector(`.availability-item[data-date="${date}"][data-time="${time}"]`);
   if (selectedMap.has(key)) {
     selectedMap.delete(key);
     if (btn) {
@@ -213,10 +216,15 @@ async function toggleTime(day, time) {
     }
   }
 
-  const slotList = Array.from(selectedMap).map(s => {
-    const [d, t] = s.split("__");
-    return { day: d, time_slot: t };
-  });
+  // 현재 클릭한 일정과 '같은 주차(week_key)'에 속한 항목들만 안전하게 분리해서 모아줌
+  const slotsForThisWeek = [];
+  for (const selKey of selectedMap) {
+    const [d, t] = selKey.split("__");
+    const sItem = allSchedules.find(s => s.date === d && s.time_slot === t);
+    if (sItem && sItem.week_key === targetWeekKey) {
+      slotsForThisWeek.push({ day: sItem.day, time_slot: t });
+    }
+  }
 
   // 2. 백그라운드에서 서버 동기화 (await 없이 백그라운드 실행)
   callApi({
@@ -225,7 +233,8 @@ async function toggleTime(day, time) {
     mainName: getMainName(),
     characterName: getMainName(),
     type: "본캐",
-    slotList: JSON.stringify(slotList)
+    weekKey: targetWeekKey,
+    slotList: JSON.stringify(slotsForThisWeek)
   }).then(res => {
     // 3. 실패했을 경우에만 경고 후 원래 상태로 복구
     if (!res.ok) {
