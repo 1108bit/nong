@@ -1,19 +1,15 @@
 // 페이지 로드 시 자동 로그인 체크
 window.addEventListener("DOMContentLoaded", () => {
-  // 💡 스플래시 스크린 처리 (해당 세션에서 최초 1회만 표시)
+  // 💡 로그인 화면 접속 시 무조건 스플래시 스크린 재생 (F5 새로고침 테스트 가능)
   const splash = document.getElementById('splashScreen');
-  let splashDelay = 0; // 자동 로그인 대기 시간 설정용
+  const splashDelay = 3600; // 스플래시 대기 시간 고정
 
   if (splash) {
-    if (!sessionStorage.getItem('splashShown')) {
-      splashDelay = 3600; // 스플래시가 보일 때는 3.6초 대기
-      setTimeout(() => {
-        splash.classList.add('hidden');
-        sessionStorage.setItem('splashShown', 'true');
-      }, 3600); // 애니메이션(3.5초)이 끝난 직후 컨테이너 숨김
-    } else {
-      splash.style.display = 'none'; // 이미 본 유저는 즉시 로그인 창으로
-    }
+    splash.style.display = 'flex';
+    splash.classList.remove('hidden');
+    setTimeout(() => {
+      splash.classList.add('hidden');
+    }, splashDelay);
   }
 
   const autoAccountId = localStorage.getItem("autoAccountId");
