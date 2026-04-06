@@ -28,7 +28,13 @@ async function loadMain() {
     renderNotice(cachedNotice);
   } else {
     getEl("noticeContainer").style.display = "block";
-    getEl("noticeText").innerHTML = `<div class="skeleton-block" style="height:20px; width:60%; border-radius:6px;"></div>`;
+    getEl("noticeText").innerHTML = `
+      <div class="skeleton-list" style="gap: 6px;">
+        <div class="skeleton-block" style="height: 16px; width: 100%; border-radius: 4px;"></div>
+        <div class="skeleton-block" style="height: 16px; width: 80%; border-radius: 4px;"></div>
+        <div class="skeleton-block" style="height: 16px; width: 40%; border-radius: 4px;"></div>
+      </div>
+    `;
   }
 
   // 백그라운드에서 서버의 최신 데이터(메인 정보 + 공지사항)를 동시에 가져옴
@@ -51,8 +57,11 @@ async function loadMain() {
   }
 }
 
+let currentNoticeText = ""; // 💡 수정 중 취소할 때를 대비한 백업 변수
+
 // 공지사항 렌더링 및 관리자 버튼 처리
 function renderNotice(text) {
+  currentNoticeText = text;
   const container = getEl("noticeContainer");
   const textEl = getEl("noticeText");
   const editBtn = getEl("editNoticeBtn");
@@ -67,15 +76,39 @@ function renderNotice(text) {
 
   if (isAdmin) {
     editBtn.style.display = "inline-flex";
-    editBtn.onclick = () => editNotice(text);
+    editBtn.innerHTML = "✏️";
+    editBtn.onclick = () => startEditNotice();
   }
 }
 
-// 공지사항 수정 (관리자 전용)
-async function editNotice(currentText) {
-  const newText = prompt("공지사항을 입력하세요.\n(줄바꿈 가능, 비워두면 공지가 삭제됩니다)", currentText || "");
-  if (newText === null) return; // 취소 누름
+// 💡 공지사항 인라인 수정 (관리자 전용)
+function startEditNotice() {
+  const textEl = getEl("noticeText");
+  const editBtn = getEl("editNoticeBtn");
   
+  editBtn.style.display = "none"; // 수정 중 연필 아이콘 숨김
+  
+  // 박스를 텍스트 에디터로 즉시 변환
+  textEl.innerHTML = `
+    <textarea id="noticeEditInput" class="main-input" style="width: 100%; min-height: 80px; padding: 10px 12px; font-size: 14px; margin-bottom: 8px; resize: vertical; line-height: 1.5; background: rgba(0,0,0,0.2);">${currentNoticeText || ""}</textarea>
+    <div style="display: flex; gap: 8px; justify-content: flex-end;">
+      <button class="mini-btn" onclick="cancelEditNotice()">취소</button>
+      <button class="mini-btn" id="saveNoticeBtn" style="background: var(--blue-1); color: #fff; border: none;" onclick="saveInlineNotice()">저장</button>
+    </div>
+  `;
+  getEl("noticeEditInput").focus();
+}
+
+function cancelEditNotice() {
+  renderNotice(currentNoticeText); // 원래 상태로 렌더링 복구
+}
+
+async function saveInlineNotice() {
+  const newText = getEl("noticeEditInput").value;
+  const btn = getEl("saveNoticeBtn");
+  btn.disabled = true;
+  btn.textContent = "저장 중...";
+
   const res = await callApi({
     action: "saveNotice",
     adminCode: getAdminCode(),
@@ -85,6 +118,9 @@ async function editNotice(currentText) {
   if (res.success) {
     sessionStorage.removeItem("cache_notice"); // 캐시 삭제 후 리렌더링
     renderNotice(newText);
+  } else {
+    btn.disabled = false;
+    btn.textContent = "저장";
   }
 }
 

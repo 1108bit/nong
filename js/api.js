@@ -5,7 +5,7 @@ const WRITE_ACTIONS_FOR_LOADING = [
   'login', 'adminLogin', 'addCharacter', 'updateCharacter', 'deleteCharacter', 'toggleCharacterType',
   'saveRaidSchedule', 'deleteRaidSchedule', 'savePartyComposition',
   'updateCharacterByAdmin', 'updateAdminCodeSetting', 'changePassword',
-  'toggleAdminRole', 'resetUserPasswordByAdmin'
+  'toggleAdminRole', 'resetUserPasswordByAdmin', 'saveNotice'
 ];
 
 let globalLoadingTimeout;
