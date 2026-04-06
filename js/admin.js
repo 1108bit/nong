@@ -1051,7 +1051,8 @@ function renderPartyEditor(date, time) {
     btnEl.innerHTML = originalText;
 
     if (res.success) {
-      await uiAlert(isDiscordSend ? "파티 저장 및 디스코드 전송이 완료되었습니다!" : "디스코드 발송 없이 조용히 저장되었습니다.");
+      const finalMsg = res.message && res.message.includes("실패") ? res.message : (isDiscordSend ? "파티 저장 및 디스코드 전송이 완료되었습니다!" : "디스코드 발송 없이 조용히 저장되었습니다.");
+      await uiAlert(finalMsg);
       closePartyDetailModal();
       loadAdminSchedule(); // 💡 저장 직후 관리자 화면 데이터를 갱신하여 빈 슬롯 현상 방지
     }

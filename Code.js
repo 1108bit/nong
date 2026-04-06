@@ -155,7 +155,10 @@ function savePartyComposition(adminCode, targetDate, targetTime, partyListJson, 
       
       // 💡 프론트엔드에서 '디코 전송' 버튼을 눌렀을 때만 웹훅 전송
       if (sendDiscord === 'true') {
-        sendDiscordNotification(targetDate, targetTime, partyArray);
+        const discordResult = sendDiscordNotification(targetDate, targetTime, partyArray);
+        if (discordResult !== true) {
+          return { ok: true, message: "시트에는 저장되었으나 디코 전송에 실패했습니다.\n(원인: " + discordResult + ")" };
+        }
       }
       
       return { ok: true, message: "성공적으로 저장되었습니다." };
@@ -172,8 +175,12 @@ function savePartyComposition(adminCode, targetDate, targetTime, partyListJson, 
 function sendDiscordNotification(date, time, partyArray) {
   if (!DISCORD_WEBHOOK_URL) return; // URL이 없으면 작동하지 않음
 
-  const p1 = partyArray.slice(0, 4).map((n, i) => n ? `${i+1}. ${n}` : `${i+1}. (빈자리)`).join("\n");
-  const p2 = partyArray.slice(4, 8).map((n, i) => n ? `${i+1}. ${n}` : `${i+1}. (빈자리)`).join("\n");
+  // 💡 [에러 원천 차단] 데이터가 깨지거나 배열이 아닐 경우 빈 배열로 덮어씌우고 무조건 8칸을 강제 확보합니다.
+  const safeArray = Array.isArray(partyArray) ? partyArray : [];
+  const paddedArray = Array.from({ length: 8 }, (_, i) => safeArray[i] || "");
+
+  const p1 = paddedArray.slice(0, 4).map((n, i) => n ? `${i+1}. ${n}` : `${i+1}. (빈자리)`).join("\n");
+  const p2 = paddedArray.slice(4, 8).map((n, i) => n ? `${i+1}. ${n}` : `${i+1}. (빈자리)`).join("\n");
 
   const message = {
     embeds: [{
@@ -190,7 +197,9 @@ function sendDiscordNotification(date, time, partyArray) {
 
   try {
     UrlFetchApp.fetch(DISCORD_WEBHOOK_URL, { method: "post", contentType: "application/json", payload: JSON.stringify(message) });
+    return true;
   } catch (e) {
     console.error("디스코드 알림 발송 실패:", e);
+    return e.message;
   }
 }
