@@ -17,7 +17,6 @@ async function loadMain() {
   // 데이터를 가져오기 전 가짜 카드를 보여줌
   list.innerHTML = `
     <div class="skeleton-block skeleton-card" style="margin-bottom:10px;"></div>
-    <div class="skeleton-block skeleton-card" style="margin-bottom:10px;"></div>
   `;
 
   const data = await callApi({ action: "getMainData", accountId, hideAlert: true });

@@ -4,8 +4,9 @@
 const State = {
   schedules: [],
   summaries: [],
-  selectedDate: null,
-  selectedMap: new Set()
+  selectedDate: 'ALL', // 기본값을 '전체'로 변경
+  selectedMap: new Set(),
+  filterMode: 'all' // 필터 상태 (all / my)
 };
 
 
@@ -65,12 +66,8 @@ function initDateChips() {
   const today = new Date();
   let html = "";
   
-  if (!State.selectedDate) {
-    const yyyy = today.getFullYear();
-    const mm = String(today.getMonth() + 1).padStart(2, '0');
-    const dd = String(today.getDate()).padStart(2, '0');
-    State.selectedDate = `${yyyy}-${mm}-${dd}`;
-  }
+  // 맨 앞에 '전체 일정' 칩 고정 추가
+  html += `<button type="button" class="chip-btn date-chip ${State.selectedDate === 'ALL' ? 'selected' : ''}" data-date="ALL"><span style="font-size:14px; font-weight:800; margin:auto;">전체<br>일정</span></button>`;
   
   for(let i = 0; i < 14; i++) {
     const d = new Date(today);
@@ -110,6 +107,19 @@ function bindEvents() {
     });
   }
 
+  // 필터 탭 클릭 이벤트 (전체 / 참여 중)
+  const filterGroup = getEl("filterGroup");
+  if (filterGroup) {
+    filterGroup.addEventListener("click", e => {
+      const btn = e.target.closest(".chip-btn");
+      if (!btn) return;
+      filterGroup.querySelectorAll(".chip-btn").forEach(b => b.classList.remove("selected"));
+      btn.classList.add("selected");
+      State.filterMode = btn.dataset.filter;
+      renderList();
+    });
+  }
+
   // 리스트 클릭 이벤트 (이벤트 위임)
   const listEl = getEl("availabilityList");
   if (listEl) {
@@ -140,8 +150,8 @@ function updateDateChipsWithData() {
   });
   
   // 현재 선택된 날짜에 일정이 없고, 일정이 있는 첫 날짜가 존재하면 자동 스크롤/선택 이동
-  const currentHasData = State.schedules.some(s => isSameDate(s.date, State.selectedDate));
-  if (!currentHasData && firstDataDate) {
+  const currentHasData = State.selectedDate === 'ALL' || State.schedules.some(s => isSameDate(s.date, State.selectedDate));
+  if (State.selectedDate !== 'ALL' && !currentHasData && firstDataDate) {
     const targetBtn = group.querySelector(`.chip-btn[data-date="${firstDataDate}"]`);
     if (targetBtn) {
       group.querySelectorAll(".chip-btn").forEach(b => b.classList.remove("selected"));
@@ -154,29 +164,53 @@ function updateDateChipsWithData() {
 
 function renderList() {
   const target = getEl("availabilityList");
-  const filteredItems = State.schedules.filter(s => isSameDate(s.date, State.selectedDate));
+  let filteredItems = State.schedules;
+  
+  // 1. 날짜 필터링
+  if (State.selectedDate !== 'ALL') {
+    filteredItems = filteredItems.filter(s => isSameDate(s.date, State.selectedDate));
+  }
+
+  // 2. '참여 중' 탭 필터링
+  if (State.filterMode === 'my') {
+    filteredItems = filteredItems.filter(s => State.selectedMap.has(`${s.date}__${s.time_slot}`));
+  }
   
   if (filteredItems.length === 0) {
-    target.innerHTML = `<div class="availability-empty">선택한 날짜에 등록된 일정이 없습니다.</div>`;
+    target.innerHTML = `<div class="availability-empty">${State.filterMode === 'my' ? '참여 중인 일정이 없습니다.' : '선택한 날짜에 등록된 일정이 없습니다.'}</div>`;
     return;
   }
 
-  // 시간순 정렬
-  filteredItems.sort((a, b) => a.time_slot.localeCompare(b.time_slot));
+  // 날짜순 -> 시간순 정렬
+  filteredItems.sort((a, b) => {
+    if (a.date !== b.date) return a.date.localeCompare(b.date);
+    return a.time_slot.localeCompare(b.time_slot);
+  });
 
-  target.innerHTML = filteredItems.map(i => {
+  let html = "";
+  let currentDate = null;
+
+  filteredItems.forEach(i => {
+    if (currentDate !== i.date) {
+      currentDate = i.date;
+      const shortDate = i.date && i.date.length >= 10 ? i.date.substring(5).replace('-', '.') : i.date;
+      html += `
+        <div style="display: flex; align-items: center; gap: 10px; margin: 24px 0 12px 4px;">
+          <div style="font-size: 15px; font-weight: 800; color: var(--cyan-2); letter-spacing: -0.02em; white-space: nowrap;">📅 ${shortDate} (${escapeHtml(i.day)})</div>
+          <div style="height: 1px; flex: 1; background: linear-gradient(90deg, rgba(67, 217, 255, 0.25), transparent);"></div>
+        </div>
+      `;
+    }
+
     const key = `${i.date}__${i.time_slot}`;
     const isSelected = State.selectedMap.has(key);
-    const shortDate = i.date && i.date.length >= 10 ? i.date.substring(5).replace('-', '.') : i.date;
-    
     const participantsCount = State.summaries.filter(s => isSameDate(s.date, i.date) && s.time_slot === i.time_slot).length;
 
-    return `
+    html += `
       <button class="availability-item ${isSelected ? 'active' : ''}" data-date="${i.date}" data-time="${escapeHtml(i.time_slot)}">
         <div style="display:flex; justify-content:space-between; align-items:center;">
           <div class="row-time" style="flex-direction:row; align-items:center; width:auto; gap:6px;">
-            <span class="row-date">${shortDate} (${escapeHtml(i.day)})</span>
-            <span class="row-hhmm">${escapeHtml(i.time_slot)}</span>
+            <span class="row-hhmm" style="font-size:18px; font-weight:900;">${escapeHtml(i.time_slot)}</span>
           </div>
           <div style="display:flex; align-items:center; gap:10px;">
             <span class="participant-count" style="font-size:12px; font-weight:600; color:var(--text-sub); display:flex; align-items:center; gap:4px;">
@@ -188,7 +222,9 @@ function renderList() {
         ${i.note ? `<div class="row-note" style="margin-top:6px; max-width:100%; white-space:normal;">${escapeHtml(i.note)}</div>` : ''}
       </button>
     `;
-  }).join("");
+  });
+  
+  target.innerHTML = html;
   
   applyTouchPop();
 }

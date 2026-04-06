@@ -26,8 +26,13 @@
           <div class="horizontal-scroll-chips chip-select-group" id="dateChipGroup" style="margin-bottom: 12px;"></div>
           <div class="scroll-indicator" style="margin-bottom: 24px;"><div class="scroll-indicator-dot" id="dateScrollInd"></div></div>
 
-          <div class="card-head"><h2 class="section-title">일정 선택</h2></div>
-          <div class="page-message" id="pageMessage">참여 가능한 시간을 선택하세요. (자동 저장)</div>
+          <div class="card-head" style="align-items: center; border-top: 1px solid rgba(255,255,255,0.05); padding-top: 18px; margin-bottom: 8px;">
+            <h2 class="section-title">레이드 목록</h2>
+            <div class="chip-select-group" style="margin-top:0;" id="filterGroup">
+              <button class="chip-btn selected" style="height:32px; min-width:auto; padding:0 14px; font-size:12px; border-radius:8px;" data-filter="all">전체</button>
+              <button class="chip-btn" style="height:32px; min-width:auto; padding:0 14px; font-size:12px; border-radius:8px;" data-filter="my">참여 중</button>
+            </div>
+          </div>
           <div class="availability-list" id="availabilityList">
             <div class="availability-empty">일정을 불러오는 중...</div>
           </div>
