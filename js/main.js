@@ -491,7 +491,6 @@ window.closeSettingsActionSheet = function() {
   document.body.classList.remove("modal-open");
 };
 
-getEl("goAllCharactersBtn").onclick = () => movePage("all-characters.html");
 getEl("logoutBtn").onclick = () => {
     // 로그아웃 시 sessionStorage 정리
     sessionStorage.clear();
