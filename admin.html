@@ -97,6 +97,14 @@
                 <div class="admin-action-row" style="margin-top: 20px;">
                   <button class="btn btn-primary" id="changeAdminCodeButton" style="width: 100%;">코드 변경</button>
                 </div>
+                <div class="form-group" style="grid-column: 1 / -1;">
+                  <label class="input-label">공개 여부</label>
+                  <div class="chip-select-group" data-target="openYnInput" id="openYnGroup">
+                    <button type="button" class="chip-btn selected" data-value="Y" style="min-width: 80px;">공개</button>
+                    <button type="button" class="chip-btn" data-value="N" style="min-width: 80px;">비공개 (임시저장)</button>
+                  </div>
+                  <input type="hidden" id="openYnInput" value="Y" />
+                </div>
               </div>
             </article>
           </div>
@@ -107,6 +115,14 @@
               <h2 class="section-title">📅 대시보드</h2>
               <div class="scroll-indicator" style="width: 100%; height: 4px; background: rgba(255, 255, 255, 0.08); border-radius: 2px; margin-top: 4px;">
                 <div id="dashboardProgress" style="width: 0%; height: 100%; background: var(--blue-1); transition: width 0.3s ease; border-radius: 2px;"></div>
+              </div>
+              <div class="form-group" style="grid-column: 1 / -1;">
+                <label class="input-label">공개 여부</label>
+                <div class="chip-select-group" data-target="editOpenYnInput" id="editOpenYnGroup">
+                  <button type="button" class="chip-btn selected" data-value="Y" style="min-width: 80px;">공개</button>
+                  <button type="button" class="chip-btn" data-value="N" style="min-width: 80px;">비공개 (임시저장)</button>
+                </div>
+                <input type="hidden" id="editOpenYnInput" value="Y" />
               </div>
             </div>
             <div id="miniCalendar" class="mini-calendar-grid"></div>

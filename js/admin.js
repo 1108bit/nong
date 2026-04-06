@@ -322,13 +322,15 @@ function renderScheduleList(dateStr) {
     
     const timeFormatted = formatDisplayTime(i.time_slot);
     const title = i.note ? i.note : "레이드 일정";
+    const isHidden = i.open_yn === 'N';
+    const hiddenBadge = isHidden ? `<span class="chip-class" style="background: rgba(244, 63, 94, 0.15); color: #fda4af; border: 1px solid rgba(244, 63, 94, 0.3); margin-right: 6px;">비공개</span>` : '';
     const animDelay = idx * 0.05;
 
     html += `
       <div class="slim-schedule-card" style="animation-delay: ${animDelay}s; ${riskBorder}">
         <div class="slim-time" style="cursor:pointer;" onclick="openPartyDetail('${escapeHtml(i.date)}', '${escapeHtml(i.day)}', '${escapeHtml(timeFormatted)}')">${timeFormatted}</div>
         <div class="slim-info" style="cursor:pointer;" onclick="openPartyDetail('${escapeHtml(i.date)}', '${escapeHtml(i.day)}', '${escapeHtml(timeFormatted)}')">
-          <div class="slim-title">${escapeHtml(title)}</div>
+          <div class="slim-title">${hiddenBadge}${escapeHtml(title)}</div>
           <div class="slim-progress-wrapper">
             <div class="slim-progress-bar">
               <div class="slim-progress-fill ${fillClass}" style="width: ${progressPercent}%;"></div>
@@ -337,7 +339,7 @@ function renderScheduleList(dateStr) {
           </div>
         </div>
         <div class="slim-actions">
-          <button type="button" class="icon-btn edit-btn" title="수정" onclick="editSchedule('${escapeHtml(i.date)}', '${escapeHtml(i.day)}', '${escapeHtml(timeFormatted)}', '${escapeHtml(i.note)}')">✏️</button>
+          <button type="button" class="icon-btn edit-btn" title="수정" onclick="editSchedule('${escapeHtml(i.date)}', '${escapeHtml(i.day)}', '${escapeHtml(timeFormatted)}', '${escapeHtml(i.note)}', '${escapeHtml(i.open_yn || 'Y')}')">✏️</button>
           <button type="button" class="icon-btn delete-btn" title="삭제" onclick="deleteSchedule('${escapeHtml(i.date)}', '${escapeHtml(i.day)}', '${escapeHtml(timeFormatted)}')">🗑️</button>
         </div>
       </div>
@@ -376,7 +378,7 @@ async function saveSchedule() {
     day: getEl("dayInput").value,
     timeSlot: getEl("timeSlotInput").value,
     note: targetNote,
-    openYn: "Y", status: "OPEN"
+    openYn: getEl("openYnInput").value || "Y", status: "OPEN"
   });
   
   btn.disabled = false;
@@ -402,7 +404,7 @@ function scrollToSelectedChip(containerId) {
   }
 }
 
-function editSchedule(date, day, time, note) {
+function editSchedule(date, day, time, note, openYn = 'Y') {
   // 원본 데이터 저장 (날짜/시간 변경 시 기존 일정 삭제용)
   getEl("editOriginalDate").value = date;
   getEl("editOriginalDay").value = day;
@@ -412,6 +414,7 @@ function editSchedule(date, day, time, note) {
   getEl("editDayInput").value = day;
   getEl("editTimeSlotInput").value = time;
   getEl("editNoteInput").value = note;
+  getEl("editOpenYnInput").value = openYn;
 
   const editCal = getEl("editCalendarPicker");
   if (editCal) editCal.value = date;
@@ -432,6 +435,11 @@ function editSchedule(date, day, time, note) {
   const timeGroup = getEl("editTimeChipGroup");
   if (timeGroup) {
     timeGroup.querySelectorAll(".chip-btn").forEach(b => b.classList.toggle("selected", b.dataset.value === time));
+  }
+
+  const openGroup = getEl("editOpenYnGroup");
+  if (openGroup) {
+    openGroup.querySelectorAll(".chip-btn").forEach(b => b.classList.toggle("selected", b.dataset.value === openYn));
   }
 
   getEl("scheduleModal").classList.add("show");
@@ -467,6 +475,7 @@ if(getEl("submitScheduleModalBtn")) {
     const nDay = getEl("editDayInput").value;
     const nTime = getEl("editTimeSlotInput").value;
     const nNote = getEl("editNoteInput").value;
+    const nOpenYn = getEl("editOpenYnInput").value || "Y";
 
     // 일자나 시간이 변경된 경우 기존 데이터를 지우고 새 데이터를 생성하여 덮어씌움 방지
     if (oDate !== nDate || oTime !== nTime) {
@@ -475,7 +484,7 @@ if(getEl("submitScheduleModalBtn")) {
 
     const res = await callApi({
       action: "saveRaidSchedule", adminCode: getAdminCode(),
-      date: nDate, day: nDay, timeSlot: nTime, note: nNote, openYn: "Y", status: "OPEN"
+      date: nDate, day: nDay, timeSlot: nTime, note: nNote, openYn: nOpenYn, status: "OPEN"
     });
 
     btn.disabled = false;
