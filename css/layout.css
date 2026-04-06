@@ -92,5 +92,7 @@
   .main-shell { max-width: 920px; }
   .main-grid,
   .party-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .availability-card-full,
+  .admin-card-full,
   .party-card-full { grid-column: 1 / -1; }
 }
