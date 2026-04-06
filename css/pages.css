@@ -145,14 +145,14 @@
 }
 
 .splash-logo {
-  width: 320px;
-  max-width: 65vw;
+  width: 640px;
+  max-width: 90vw;
   filter: drop-shadow(0 0 30px rgba(67, 217, 255, 0.2));
 }
 
 .splash-greeting {
-  margin-top: 24px;
-  font-size: 16px;
+  margin-top: 36px;
+  font-size: 26px;
   font-weight: 500;
   color: var(--text-sub);
   letter-spacing: -0.03em;
