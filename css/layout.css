@@ -1,0 +1,95 @@
+/* ==========================================
+   2. BACKGROUNDS & LAYOUT (배경 그래픽, 공통 쉘/그리드)
+========================================== */
+
+.bg-logo {
+  position: fixed;
+  inset: 0;
+  background-image: var(--login-logo-url);
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: cover;
+  opacity: 0.07;
+  filter: saturate(1.1);
+  pointer-events: none;
+  z-index: 0;
+}
+
+.bg-dim {
+  position: fixed;
+  inset: 0;
+  background:
+    radial-gradient(circle at top, rgba(56, 189, 248, 0.08), transparent 32%),
+    linear-gradient(180deg, rgba(2, 6, 23, 0.26) 0%, rgba(6, 17, 29, 0.2) 100%);
+  pointer-events: none;
+  z-index: 1;
+}
+
+.page,
+.app-page {
+  position: relative;
+  z-index: 2;
+  min-height: 100vh;
+  padding: 16px 14px 28px;
+}
+
+/* 하단 액션바를 위한 여백 */
+.page {
+  padding-bottom: 110px;
+}
+
+.main-shell {
+  width: 100%;
+  max-width: 880px;
+  margin: 0 auto;
+}
+
+.main-grid,
+.availability-grid,
+.party-grid,
+.admin-grid {
+  display: grid;
+  gap: 18px;
+}
+
+.availability-card-full,
+.party-card-full,
+.admin-card-full {
+  width: 100%;
+}
+
+/* 관리자 페이지 레이아웃 4:6 고정 분할 */
+.admin-content-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 4fr) minmax(0, 6fr);
+  gap: 20px;
+  align-items: start;
+}
+
+/* =========================
+   모바일 & 태블릿 반응형 처리
+========================= */
+
+@media (max-width: 991px) {
+  .admin-content-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+@media (max-width: 480px) {
+  .page,
+  .app-page {
+    padding: 14px 12px 24px;
+  }
+}
+
+@media (min-width: 768px) {
+  .page,
+  .app-page {
+    padding: 24px 20px 36px;
+  }
+  .main-shell { max-width: 920px; }
+  .main-grid,
+  .party-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .party-card-full { grid-column: 1 / -1; }
+}

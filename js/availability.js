@@ -8,14 +8,6 @@ const State = {
   selectedMap: new Set()
 };
 
-// 날짜 표준화 헬퍼 (2026. 3. 8 -> 2026-03-08)
-function normalizeDateStr(val) {
-  if (!val) return '';
-  let text = String(val).replace(/[\.\/]/g, '-').replace(/\s/g, '').trim();
-  if (text.includes('-')) text = text.split('-').map(p => p.padStart(2, '0')).join('-');
-  return text;
-}
-const isSameDate = (d1, d2) => normalizeDateStr(d1) === normalizeDateStr(d2);
 
 /**
  * 💡 [2순위: 패턴 일관성] 초기화 ➔ 이벤트 등록 ➔ 데이터 로드 ➔ 렌더링

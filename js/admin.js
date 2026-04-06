@@ -172,16 +172,6 @@ function formatDisplayTime(ts) {
   return ts;
 }
 
-// ==========================================
-// 날짜 표준화 및 완벽 비교 헬퍼 ("2026. 3. 8" -> "2026-03-08")
-function normalizeDateStr(val) {
-  if (!val) return '';
-  let text = String(val).replace(/[\.\/]/g, '-').replace(/\s/g, '').trim();
-  if (text.includes('-')) text = text.split('-').map(p => p.padStart(2, '0')).join('-');
-  return text;
-}
-const isSameDate = (d1, d2) => normalizeDateStr(d1) === normalizeDateStr(d2);
-// ==========================================
 
 async function loadAdminSchedule() {
   const adminCode = getAdminCode();
@@ -498,14 +488,6 @@ if(getEl("submitScheduleModalBtn")) {
     }
   }; 
 }
-
-  const searchArea = getEl("userSearchResultArea");
-  if (searchArea) searchArea.style.display = "block";
-  getEl("userMessage").innerHTML = "검색 중입니다...";
-  getEl("userCharacterList").innerHTML = "";
-  
-  await openUserCharacterManager(searchValue);
-};
 
 
 // 특정 유저의 캐릭터 정보를 불러와서 편집 모달 띄우기
