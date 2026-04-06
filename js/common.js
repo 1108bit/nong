@@ -149,3 +149,13 @@ function setupAppleScroll(scrollBoxId, indicatorId) {
     if (Math.abs(velX) > 0.5) momentumID = requestAnimationFrame(beginMomentum);
   }
 }
+
+// 💡 [캐시 강력 파괴] 악명 높은 PWA 서비스 워커 캐시를 강제로 해제하여 최신 코드를 즉각 반영
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.getRegistrations().then(registrations => {
+    for(let registration of registrations) {
+      registration.unregister();
+      console.log('🗑️ [캐시 비우기] 서비스 워커 해제 완료');
+    }
+  });
+}

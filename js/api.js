@@ -16,8 +16,15 @@ async function callApi(params) {
     const json = await res.json();
     console.log(`⬅️ [API 응답] ${params.action} :`, json);
     
+    // 💡 [궁극의 방어 코드] 구글 서버 갱신 지연으로 옛날 규격({ok:true})이 오더라도 프론트에서 강제로 새 규격으로 포장!
+    if (typeof json.success === 'undefined' && json.ok !== undefined) {
+      json.success = json.ok;
+      json.data = { ...json };
+      console.log(`♻️ [데이터 호환성 패치 적용 완료]`);
+    }
+
     // 💡 [1순위] 통합 에러 핸들링: 실패 시 공통 알림창을 띄워 개별 화면의 중복 코드를 제거
-    if (!json.success) {
+    if (!json.success && !hideAlert) {
       alert(json.message || "서버 통신 중 오류가 발생했습니다.");
     }
     return json;
