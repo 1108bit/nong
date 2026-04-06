@@ -1036,6 +1036,7 @@ function renderPartyEditor(date, time) {
     if (res.success) {
       await uiAlert("파티 구성이 성공적으로 저장되었습니다!");
       closePartyDetailModal();
+      loadAdminSchedule(); // 💡 저장 직후 관리자 화면 데이터를 갱신하여 빈 슬롯 현상 방지
     }
   };
 

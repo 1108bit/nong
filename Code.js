@@ -151,6 +151,7 @@ function savePartyComposition(adminCode, targetDate, targetTime, partyListJson) 
       // p1 열이 없으면 기본값으로 I열(9)부터 8칸에 배열의 값을 그대로 덮어씁니다.
       const targetCol = p1Col !== -1 ? p1Col + 1 : 9;
       sheet.getRange(foundRow, targetCol, 1, 8).setValues([partyArray]);
+      SpreadsheetApp.flush(); // 💡 구글 시트에 즉시 쓰기 강제 확정
       
       // 💡 [디스코드 알림 발송] 파티 저장이 성공하면 웹훅 전송
       sendDiscordNotification(targetDate, targetTime, partyArray);

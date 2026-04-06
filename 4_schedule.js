@@ -227,7 +227,45 @@ function getMainData(accountId) {
 }
 
 function getPartyComposition(weekKey, day, timeSlot) {
-  const summary = getAvailabilitySummary(weekKey).items.filter(item => normalizeValue(item.day) === normalizeValue(day) && normalizeValue(item.time_slot) === normalizeValue(timeSlot));
+  const actualWeekKey = normalizeValue(weekKey) || getCurrentWeekKey().weekKey;
+  
+  // 1. 관리자가 저장한 파티 구성이 있는지 시트에서 직접 확인 (p1~p8)
+  const scheduleRows = getRowsAsObjects(SHEET_NAMES.RAID_SCHEDULE);
+  const targetSchedule = scheduleRows.find(row => 
+    formatDate(row.week_key) === actualWeekKey && 
+    normalizeValue(row.day) === normalizeValue(day) && 
+    formatTime(row.time_slot) === normalizeValue(timeSlot)
+  );
+
+  let savedParty = [];
+  if (targetSchedule) {
+    savedParty = [targetSchedule.p1, targetSchedule.p2, targetSchedule.p3, targetSchedule.p4, targetSchedule.p5, targetSchedule.p6, targetSchedule.p7, targetSchedule.p8].map(v => normalizeValue(v));
+  }
+
+  // 2. 관리자가 확정한 파티가 있을 경우
+  if (savedParty.some(n => n)) {
+    const fullCharMap = {};
+    getRowsAsObjects(SHEET_NAMES.CHARACTERS).forEach(c => {
+       fullCharMap[normalizeValue(c.name)] = { character_name: c.name, className: c.class_name, power_value: Number(c.power||0), power: c.power, type: c.type };
+    });
+
+    const party1 = [], party2 = [];
+    for(let i=0; i<4; i++) {
+      if (savedParty[i]) party1.push(fullCharMap[savedParty[i]] || { character_name: savedParty[i], className: '알수없음', power_value: 0, power: 0, type: '부캐' });
+    }
+    for(let i=4; i<8; i++) {
+      if (savedParty[i]) party2.push(fullCharMap[savedParty[i]] || { character_name: savedParty[i], className: '알수없음', power_value: 0, power: 0, type: '부캐' });
+    }
+
+    return {
+      ok: true, warning: '', // 확정된 파티는 경고 없음
+      party1, party2, totalCount: party1.length + party2.length,
+      hasHeal: party1.some(i => i.className === ROLE.HEALER), party2HasHeal: party2.some(i => i.className === ROLE.HEALER)
+    };
+  }
+
+  // 3. 관리자가 파티를 저장하지 않은 경우 (자동 생성 Fallback)
+  const summary = getAvailabilitySummary(actualWeekKey).items.filter(item => normalizeValue(item.day) === normalizeValue(day) && normalizeValue(item.time_slot) === normalizeValue(timeSlot));
   const byAccount = {};
   summary.forEach(item => {
     const key = normalizeValue(item.account_id);
@@ -258,7 +296,7 @@ function getPartyComposition(weekKey, day, timeSlot) {
 
   return {
     ok: true,
-    warning: healers.length === 0 ? '선택된 시간대에 치유성 캐릭터가 없습니다.' : '',
+    warning: healers.length === 0 ? '선택된 시간대에 치유성 캐릭터가 없습니다.' : '⚠️ 관리자가 아직 확정하지 않은 "예상 파티"입니다.',
     party1, party2, totalCount: party1.length + party2.length,
     hasHeal: party1.some(i => i.className === ROLE.HEALER), party2HasHeal: party2.some(i => i.className === ROLE.HEALER)
   };
