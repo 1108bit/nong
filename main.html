@@ -10,7 +10,7 @@
   <link rel="stylesheet" href="./css/variables.css?v=1" />
   <link rel="stylesheet" href="./css/layout.css?v=2" />
   <link rel="stylesheet" href="./css/components.css?v=4" />
-  <link rel="stylesheet" href="./css/pages.css?v=1" />
+  <link rel="stylesheet" href="./css/pages.css?v=6" />
   <!-- character-delete.css 내용은 components.css로 병합될 예정입니다 -->
 </head>
 <body>
@@ -29,6 +29,15 @@
           <button type="button" class="btn btn-secondary" id="logoutButton">로그아웃</button>
         </div>
         
+        <!-- 공지사항 영역 -->
+        <div id="noticeContainer" class="notice-container" style="display: none;">
+          <div class="notice-head">
+            <span class="notice-badge">📢 레기온 공지</span>
+            <button id="editNoticeBtn" class="icon-btn edit-btn" style="display: none; width: 24px; height: 24px; min-height: 24px; font-size: 12px;" title="공지 수정">✏️</button>
+          </div>
+          <div id="noticeText" class="notice-text"></div>
+        </div>
+
         <!-- 헤더로 통합된 내 정보 바 -->
         <div class="hero-info-bar">
           <div class="hero-info-item">

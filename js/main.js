@@ -16,23 +16,76 @@ async function loadMain() {
   // 💡 [SWR 캐시 패턴] 이전에 저장된 데이터가 있으면 즉시(0.01초) 화면에 렌더링
   const cacheKey = `cache_main_${accountId}`;
   const cachedData = sessionStorage.getItem(cacheKey);
+  const cachedNotice = sessionStorage.getItem('cache_notice');
   
   if (cachedData) {
     try { updateMainUI(JSON.parse(cachedData)); } catch(e){}
   } else {
     getEl("characterList").innerHTML = `<div class="skeleton-block skeleton-card" style="margin-bottom:10px;"></div>`;
   }
+  
+  if (cachedNotice !== null) {
+    renderNotice(cachedNotice);
+  } else {
+    getEl("noticeContainer").style.display = "block";
+    getEl("noticeText").innerHTML = `<div class="skeleton-block" style="height:20px; width:60%; border-radius:6px;"></div>`;
+  }
 
-  // 백그라운드에서 서버의 최신 데이터를 가져옴
-  const data = await callApi({ action: "getMainData", accountId, hideAlert: true });
-  if (!data.success) {
-    if (!cachedData) getEl("characterList").innerHTML = `<div class="character-empty" style="color: #fda4af;">에러: ${data.message || "데이터를 불러올 수 없습니다."}</div>`;
+  // 백그라운드에서 서버의 최신 데이터(메인 정보 + 공지사항)를 동시에 가져옴
+  const [data, noticeRes] = await Promise.all([
+    callApi({ action: "getMainData", accountId, hideAlert: true, background: true }),
+    callApi({ action: "getNotice", hideAlert: true, background: true })
+  ]);
+
+  if (!data.success && !cachedData) {
     return;
   }
 
-  // 최신 데이터로 캐시 갱신 및 UI 업데이트
-  sessionStorage.setItem(cacheKey, JSON.stringify(data.data));
-  updateMainUI(data.data);
+  if (data.success) {
+    sessionStorage.setItem(cacheKey, JSON.stringify(data.data));
+    updateMainUI(data.data);
+  }
+  if (noticeRes.success) {
+    sessionStorage.setItem('cache_notice', noticeRes.data.notice);
+    renderNotice(noticeRes.data.notice);
+  }
+}
+
+// 공지사항 렌더링 및 관리자 버튼 처리
+function renderNotice(text) {
+  const container = getEl("noticeContainer");
+  const textEl = getEl("noticeText");
+  const editBtn = getEl("editNoticeBtn");
+  const isAdmin = sessionStorage.getItem("isAdmin") === "true";
+
+  if (text || isAdmin) {
+    container.style.display = "block";
+    textEl.innerHTML = text ? escapeHtml(text).replace(/\n/g, "<br>") : "<span style='opacity:0.5; font-size:13px;'>등록된 공지사항이 없습니다.</span>";
+  } else {
+    container.style.display = "none";
+  }
+
+  if (isAdmin) {
+    editBtn.style.display = "inline-flex";
+    editBtn.onclick = () => editNotice(text);
+  }
+}
+
+// 공지사항 수정 (관리자 전용)
+async function editNotice(currentText) {
+  const newText = prompt("공지사항을 입력하세요.\n(줄바꿈 가능, 비워두면 공지가 삭제됩니다)", currentText || "");
+  if (newText === null) return; // 취소 누름
+  
+  const res = await callApi({
+    action: "saveNotice",
+    adminCode: getAdminCode(),
+    notice: newText
+  });
+  
+  if (res.success) {
+    sessionStorage.removeItem("cache_notice"); // 캐시 삭제 후 리렌더링
+    renderNotice(newText);
+  }
 }
 
 // UI 업데이트 로직 분리

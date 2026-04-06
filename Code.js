@@ -9,7 +9,7 @@ const WRITE_ACTIONS = [
   'addCharacter', 'updateCharacter', 'deleteCharacter', 'toggleCharacterType',
   'saveRaidSchedule', 'deleteRaidSchedule', 'saveAvailability', 'savePartyComposition',
   'updateCharacterByAdmin', 'updateAdminCodeSetting', 'changePassword',
-  'toggleAdminRole', 'resetUserPasswordByAdmin'
+  'toggleAdminRole', 'resetUserPasswordByAdmin', 'saveNotice'
 ];
 
 function doGet(e) {
@@ -62,6 +62,8 @@ function doGet(e) {
       case 'changePassword': result = changePassword(e.parameter.accountId, e.parameter.oldPassword, e.parameter.newPassword); break;
       case 'toggleAdminRole': result = toggleAdminRole(e.parameter.adminCode, e.parameter.targetAccountId, e.parameter.callerAccountId); break;
       case 'resetUserPasswordByAdmin': result = resetUserPasswordByAdmin(e.parameter.adminCode, e.parameter.targetAccountId); break;
+      case 'getNotice': result = getNotice(); break;
+      case 'saveNotice': result = saveNotice(e.parameter.adminCode, e.parameter.notice); break;
       default: return outputStandard(false, null, '잘못된 요청입니다.', 400);
     }
     
@@ -81,6 +83,19 @@ function doGet(e) {
     // 💡 락(Lock) 해제: 통신이 성공하든 실패하든 무조건 마지막에 락을 풀어주어 다음 유저가 쓸 수 있게 함
     if (lock) lock.releaseLock();
   }
+}
+
+// =========================
+// 공지사항 관리 (빠른 응답을 위해 PropertiesService 활용)
+// =========================
+function getNotice() {
+  return { ok: true, notice: PropertiesService.getScriptProperties().getProperty('LEGION_NOTICE') || '' };
+}
+function saveNotice(adminCode, notice) {
+  const auth = adminLogin(adminCode);
+  if (!auth.ok) return auth;
+  PropertiesService.getScriptProperties().setProperty('LEGION_NOTICE', notice || '');
+  return { ok: true, message: '공지사항이 저장되었습니다.' };
 }
 
 function doPost(e) {
