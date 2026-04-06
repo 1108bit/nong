@@ -880,8 +880,9 @@ function renderPartyEditor(date, time) {
         ${slotsHtml}
       </div>
     </div>
-    <div class="admin-action-row" style="margin-top: 16px;">
-      <button class="btn btn-primary" id="savePartyBtn" style="width: 100%;">파티 구성 저장</button>
+    <div class="admin-action-row" style="margin-top: 16px; align-items: center;">
+      <button class="btn btn-secondary" id="autoHealerBtn" style="flex: 1; padding: 0 8px; font-size: 13px;">💖 치유 분배</button>
+      <button class="btn btn-primary" id="savePartyBtn" style="flex: 2;">파티 구성 저장</button>
     </div>
   `;
 
@@ -936,6 +937,58 @@ function renderPartyEditor(date, time) {
         updateSynergy();
       }
     });
+  }
+
+  // 7.5 치유 자동 분배 지능형 로직
+  const autoHealerBtn = document.getElementById('autoHealerBtn');
+  if (autoHealerBtn) {
+    autoHealerBtn.onclick = () => {
+      const waitingListEl = document.getElementById('waitingList');
+      const p1Slots = [1, 2, 3, 4].map(i => document.getElementById(`partySlot${i}`));
+      const p2Slots = [5, 6, 7, 8].map(i => document.getElementById(`partySlot${i}`));
+
+      // 빈 슬롯을 역순(4번, 8번부터)으로 찾기
+      const getEmptySlot = (slots) => slots.slice().reverse().find(s => !s.querySelector('.applicant-card'));
+      // 슬롯 내 배치 가능한 치유성 찾기
+      const getHealers = (slots) => slots.map(s => s.querySelector('.applicant-card')).filter(c => c && c.dataset.class === '치유성' && !c.classList.contains('already-placed'));
+
+      const p1Healers = getHealers(p1Slots);
+      const p2Healers = getHealers(p2Slots);
+      const availableHealers = [];
+      
+      // 파티에 치유성이 2명 이상이면 1명만 남기고 나머지는 대기열로 복귀
+      p1Healers.slice(1).forEach(h => { waitingListEl.appendChild(h); availableHealers.push(h); });
+      p2Healers.slice(1).forEach(h => { waitingListEl.appendChild(h); availableHealers.push(h); });
+      
+      // 대기열에 있는 치유성 싹 쓸어오기
+      Array.from(waitingListEl.querySelectorAll('.applicant-card')).forEach(card => {
+          if (card.dataset.class === '치유성' && !card.classList.contains('already-placed') && !availableHealers.includes(card)) {
+              availableHealers.push(card);
+          }
+      });
+
+      if (availableHealers.length === 0 && p1Healers.length <= 1 && p2Healers.length <= 1) {
+          alert("배치할 치유성이 없거나 이미 균등하게 분배되어 있습니다.");
+          return;
+      }
+
+      // 치유성이 없는 파티의 가장 뒷번호 빈자리에 치유성 꽂아넣기
+      if (p1Healers.length === 0 && availableHealers.length > 0) {
+          const emptySlot = getEmptySlot(p1Slots);
+          if (emptySlot) emptySlot.appendChild(availableHealers.shift());
+      }
+      if (p2Healers.length === 0 && availableHealers.length > 0) {
+          const emptySlot = getEmptySlot(p2Slots);
+          if (emptySlot) emptySlot.appendChild(availableHealers.shift());
+      }
+
+      updateSynergy(); // 시너지 현황판 즉시 갱신
+      
+      // 쫀득한 버튼 클릭 피드백
+      autoHealerBtn.classList.remove("touch-pop");
+      void autoHealerBtn.offsetWidth;
+      autoHealerBtn.classList.add("touch-pop");
+    };
   }
 
   // 8. 파티 저장 기능 연동
