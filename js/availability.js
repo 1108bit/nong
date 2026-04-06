@@ -43,7 +43,6 @@ async function loadAvailabilityData() {
     if (target) {
       target.innerHTML = `
         <div class="skeleton-block skeleton-card tall" style="margin-bottom:10px;"></div>
-        <div class="skeleton-block skeleton-card tall" style="margin-bottom:10px;"></div>
       `;
     }
   }
@@ -92,7 +91,7 @@ function initDateChips() {
   // 맨 앞에 '전체 일정' 칩 고정 추가
   html += `<button type="button" class="chip-btn date-chip ${State.selectedDate === 'ALL' ? 'selected' : ''}" data-date="ALL"><span style="font-size:14px; font-weight:800; margin:auto;">전체<br>일정</span></button>`;
   
-  for(let i = 0; i < 14; i++) {
+  for(let i = 0; i < 8; i++) {
     const d = new Date(today);
     d.setDate(today.getDate() + i);
     const yyyy = d.getFullYear();
@@ -192,12 +191,16 @@ function renderList() {
   const today = new Date();
   const todayStr = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
 
+  const maxDate = new Date(today);
+  maxDate.setDate(today.getDate() + 7);
+  const maxDateStr = `${maxDate.getFullYear()}-${String(maxDate.getMonth() + 1).padStart(2, '0')}-${String(maxDate.getDate()).padStart(2, '0')}`;
+
   // 1. 날짜 필터링
   if (State.selectedDate !== 'ALL') {
     filteredItems = filteredItems.filter(s => isSameDate(s.date, State.selectedDate));
   } else {
-    // 💡 '전체 일정' 선택 시 오늘보다 과거인 일정은 자동으로 제외
-    filteredItems = filteredItems.filter(s => s.date >= todayStr);
+    // 💡 '전체 일정' 선택 시 오늘부터 +7일(총 8일)까지만 표시되도록 제한
+    filteredItems = filteredItems.filter(s => s.date >= todayStr && s.date <= maxDateStr);
   }
 
   // 2. '참여 중' 탭 필터링

@@ -17,7 +17,7 @@ function showGlobalLoading() {
     globalLoadingEl.id = "globalLoadingOverlay";
     globalLoadingEl.innerHTML = `
       <div style="background: rgba(14, 26, 40, 0.95); padding: 28px 36px; border-radius: 20px; border: 1px solid rgba(67, 217, 255, 0.25); display: flex; flex-direction: column; align-items: center; box-shadow: 0 10px 40px rgba(0,0,0,0.6); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);">
-        <div style="font-size: 36px; margin-bottom: 16px; animation: spin 1s linear infinite;">⏳</div>
+        <div style="font-size: 36px; margin-bottom: 16px; animation: spin 1s linear infinite; display: inline-block;">⏳</div>
         <div id="globalLoadingText" style="font-size: 16px; font-weight: 800; color: var(--text-main); text-align: center; line-height: 1.5;">요청을 처리하고 있습니다</div>
         <div id="globalLoadingSubText" style="font-size: 13px; font-weight: 600; color: var(--cyan-1); margin-top: 10px; opacity: 0; transition: opacity 0.4s ease; text-align: center;">서버 접속량이 많아 대기 중입니다<br><span style="color:var(--text-sub); font-size:11px; font-weight:400;">(최대 5초 소요)</span></div>
       </div>
