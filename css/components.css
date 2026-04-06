@@ -212,21 +212,18 @@
 }
 .bottom-action-btn {
   min-height: 54px; border: none; border-radius: 999px; padding: 8px 4px; cursor: pointer;
-  background: transparent; color: var(--text-sub);
+  background: transparent !important; color: var(--text-sub); /* 💡 모든 버튼 투명 배경 고정 */
   display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px;
-  opacity: 0.55; transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275); /* 💡 흑백 필터 제거: 이모지 원색은 살리고 투명도만 낮춤 */
+  transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275); /* 💡 전체 투명도 제거, 이모지 원색 100% 복구 */
 }
 .bottom-action-btn .action-icon { font-size: 20px; line-height: 1; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.4)); transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275), filter 0.2s ease; }
-.bottom-action-btn .action-text { font-size: 11px; font-weight: 600; letter-spacing: -0.02em; }
-.bottom-action-btn:hover, .bottom-action-btn.active { opacity: 1; background: rgba(255, 255, 255, 0.06); color: var(--text-main); }
+.bottom-action-btn .action-text { font-size: 11px; font-weight: 600; letter-spacing: -0.02em; color: var(--text-sub); transition: color 0.2s ease; }
+.bottom-action-btn:hover .action-text, .bottom-action-btn.active .action-text { color: var(--text-main); } /* 💡 호버 시에만 텍스트 밝게 */
 .bottom-action-btn:hover .action-icon, .bottom-action-btn.active .action-icon { transform: scale(1.15) translateY(-2px); }
-/* 💡 .active 이거나 Hover 시 각자의 시그니처 색상 불 켜기 & 이모지 글로우 효과 */
-.bottom-action-btn.primary:hover, .bottom-action-btn.primary.active { background: rgba(67, 217, 255, 0.12); color: var(--cyan-2); border: 1px solid rgba(67, 217, 255, 0.15); }
-.bottom-action-btn.primary:hover .action-icon, .bottom-action-btn.primary.active .action-icon { filter: drop-shadow(0 0 10px rgba(67, 217, 255, 0.8)); }
-.bottom-action-btn.accent:hover, .bottom-action-btn.accent.active { background: rgba(52, 211, 153, 0.12); color: var(--green-1); border: 1px solid rgba(52, 211, 153, 0.15); }
-.bottom-action-btn.accent:hover .action-icon, .bottom-action-btn.accent.active .action-icon { filter: drop-shadow(0 0 10px rgba(52, 211, 153, 0.8)); }
-.bottom-action-btn.gold:hover, .bottom-action-btn.gold.active { background: rgba(246, 211, 122, 0.12); color: var(--gold-1); border: 1px solid rgba(246, 211, 122, 0.15); }
-.bottom-action-btn.gold:hover .action-icon, .bottom-action-btn.gold.active .action-icon { filter: drop-shadow(0 0 10px rgba(246, 211, 122, 0.8)); }
+/* 💡 배경색 변경 완전 제거, 오직 이모지 형광 글로우(Drop-shadow)만 적용 */
+.bottom-action-btn.primary:hover .action-icon, .bottom-action-btn.primary.active .action-icon { filter: drop-shadow(0 0 12px rgba(67, 217, 255, 0.9)); }
+.bottom-action-btn.accent:hover .action-icon, .bottom-action-btn.accent.active .action-icon { filter: drop-shadow(0 0 12px rgba(52, 211, 153, 0.9)); }
+.bottom-action-btn.gold:hover .action-icon, .bottom-action-btn.gold.active .action-icon { filter: drop-shadow(0 0 12px rgba(246, 211, 122, 0.9)); }
 
 /* -------------------------
    모달 & 팝업 (Modals & Action Sheets)
