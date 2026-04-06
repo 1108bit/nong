@@ -259,10 +259,11 @@ body.modal-open { overflow: hidden; }
 .action-sheet-group { background: rgba(30, 41, 59, 0.85); border-radius: 16px; overflow: hidden; backdrop-filter: blur(20px); }
 .action-sheet-head { padding: 12px; text-align: center; border-bottom: 1px solid rgba(255, 255, 255, 0.05); }
 .action-sheet-btn { width: 100%; padding: 16px; background: transparent; border: none; border-bottom: 1px solid rgba(255, 255, 255, 0.05); color: var(--text-main); font-size: 15px; font-weight: 700; cursor: pointer; }
-.action-sheet-btn:active { background: rgba(255, 255, 255, 0.1); }
+.action-sheet-btn { font-weight: 500; } /* iOS 순정 느낌으로 굵기 하향 */
+.action-sheet-btn:active { background: rgba(255, 255, 255, 0.15); }
 .action-sheet-btn.danger { color: #fb7185; }
 .action-sheet-gap { height: 8px; }
-.action-sheet-btn.cancel { background: rgba(30, 41, 59, 0.95); border-radius: 16px; font-weight: 800; border: none; }
+.action-sheet-btn.cancel { background: rgba(30, 41, 59, 0.95); border-radius: 16px; font-weight: 600; border: none; }
 
 /* -------------------------
    가로 스크롤 & 선택 칩 (Apple Scroll)
@@ -280,22 +281,36 @@ body.modal-open { overflow: hidden; }
 .horizontal-scroll-chips::-webkit-scrollbar { display: none !important; }
 .horizontal-scroll-chips:active { cursor: grabbing !important; }
 
+/* 일반 모달/폼용 칩 (알약 모양) */
 .chip-btn {
-  flex: 0 0 auto !important; display: flex !important; flex-direction: column !important; align-items: center !important; justify-content: center !important;
-  min-width: 56px !important; height: 64px !important; border-radius: 16px !important;
-  border: 1px solid rgba(255, 255, 255, 0.1) !important; background: rgba(255, 255, 255, 0.05) !important;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important; color: var(--text-muted) !important;
-  scroll-snap-align: center !important; user-select: none !important; -webkit-user-drag: none !important; position: relative; cursor: pointer;
+  position: relative; cursor: pointer; opacity: 0.6; filter: grayscale(0.8);
+  transition: all 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  border: none; background: rgba(255, 255, 255, 0.06);
+  padding: 8px 14px; font-size: 13px; border-radius: 999px; font-weight: 600; color: var(--text-muted);
+  white-space: nowrap; flex-shrink: 0;
 }
-.chip-btn:hover { background: rgba(255, 255, 255, 0.1) !important; }
+.chip-btn:hover { background: rgba(255, 255, 255, 0.1); }
 .chip-btn.selected {
-  background: #ffffff !important; color: #000000 !important; transform: scale(1.1) translateY(-2px) !important;
-  box-shadow: 0 4px 12px rgba(255, 255, 255, 0.15) !important; z-index: 10 !important; border-color: transparent !important;
+  opacity: 1; filter: grayscale(0); background: rgba(67, 217, 255, 0.12);
+  transform: scale(1.05); border: 1px solid rgba(67, 217, 255, 0.4);
+  z-index: 10; color: #fff; font-weight: 800; box-shadow: none;
 }
-.chip-btn.selected span { color: #000000 !important; opacity: 1 !important; font-weight: 800; }
-.chip-btn:disabled { cursor: not-allowed; opacity: 0.15; transform: none; box-shadow: none; }
+.chip-btn:disabled { cursor: not-allowed; opacity: 0.15; transform: none; box-shadow: none; border: none; }
 
-.date-chip { padding: 8px 12px !important; border-radius: 14px !important; min-width: 48px; line-height: 1; }
+/* 가로 스크롤 전용 애플 캘린더 스타일 칩 */
+.date-chip {
+  flex: 0 0 auto !important; display: flex !important; flex-direction: column !important; align-items: center !important; justify-content: center !important;
+  min-width: 56px !important; height: 64px !important; border-radius: 14px !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important; background: rgba(255, 255, 255, 0.05) !important;
+  padding: 8px 12px !important; line-height: 1; opacity: 1; filter: none; color: var(--text-muted) !important;
+  scroll-snap-align: center !important; user-select: none !important; -webkit-user-drag: none !important;
+}
+.date-chip:hover { background: rgba(255, 255, 255, 0.1) !important; }
+.date-chip.selected {
+  background: #ffffff !important; color: #000000 !important; transform: scale(1.1) translateY(-2px) !important;
+  box-shadow: 0 4px 12px rgba(255, 255, 255, 0.15) !important; border-color: transparent !important;
+}
+.date-chip.selected span { color: #000000 !important; opacity: 1 !important; font-weight: 800; }
 
 .scroll-indicator { width: 60px; height: 4px; background: rgba(255, 255, 255, 0.1); border-radius: 2px; position: relative; overflow: hidden; margin: 0 auto; }
 .scroll-indicator-dot { width: 0%; height: 100%; background: var(--cyan-1); border-radius: 2px; position: absolute; left: 0; top: 0; transition: width 0.1s ease-out; }
@@ -361,7 +376,7 @@ body.modal-open { overflow: hidden; }
 .character-sub { display: flex; align-items: center; gap: 4px; flex-shrink: 0; }
 .character-name { font-size: 16px; font-weight: 700; letter-spacing: -0.02em; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .character-right { display: flex; flex-direction: row; align-items: center; gap: 12px; flex-shrink: 0; }
-.character-power { font-size: 15px; font-weight: 800 !important; color: var(--cyan-2) !important; text-shadow: 0 0 8px rgba(108, 185, 255, 0.4); letter-spacing: -0.02em; line-height: 1; white-space: nowrap; }
+.character-power { font-size: 15px; font-weight: 700 !important; color: var(--cyan-2) !important; text-shadow: 0 0 8px rgba(108, 185, 255, 0.4); letter-spacing: -0.02em; line-height: 1; white-space: nowrap; font-variant-numeric: tabular-nums; }
 .unit-k { font-size: 0.8em; opacity: 0.55; font-weight: 600; margin-left: 1px; }
 .character-state { font-size: 11px; font-weight: 800; padding: 4px 8px; border-radius: 999px; }
 .character-state.on { background: rgba(16, 185, 129, 0.16); color: #a7f3d0; }

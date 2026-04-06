@@ -50,10 +50,12 @@ function initDateChips() {
     const dateVal = `${yyyy}-${mm}-${dd}`;
     const displayVal = `${mm}.${dd} (${dayStr})`;
     
-    const isWeekend = (dayStr === '토' || dayStr === '일') ? 'color: var(--blue-1);' : '';
+    let isWeekend = '';
+    if (dayStr === '토') isWeekend = 'color: var(--blue-1);';
+    else if (dayStr === '일') isWeekend = 'color: var(--red-1);';
     const isSelected = i === 0 ? "selected" : "";
     
-    const appleDisplay = `<span style="font-size:11px; opacity:0.6; font-weight:700; ${isWeekend}">${dayStr}</span><span style="font-size:16px; font-weight:900; margin-top:4px;">${dd}</span>`;
+    const appleDisplay = `<span style="font-size:11px; opacity:0.6; font-weight:600; ${isWeekend}">${dayStr}</span><span style="font-size:16px; font-weight:700; margin-top:4px; font-variant-numeric: tabular-nums;">${dd}</span>`;
     html += `<button type="button" class="chip-btn date-chip ${isSelected}" data-date="${dateVal}" data-day="${dayStr}">${appleDisplay}</button>`;
   }
   
@@ -106,7 +108,7 @@ function initTimeChips() {
     const dateVal = `${valueH}:${m}`;
     const isSelected = h === 9 ? "selected" : "";
     
-    const appleDisplay = `<span style="font-size:11px; font-weight:700;">${ampm}</span><span style="font-size:16px; font-weight:900; margin-top:4px;">${displayH}:${m}</span>`;
+    const appleDisplay = `<span style="font-size:11px; font-weight:600;">${ampm}</span><span style="font-size:16px; font-weight:700; margin-top:4px; font-variant-numeric: tabular-nums;">${displayH}:${m}</span>`;
     html += `<button type="button" class="chip-btn date-chip ${isSelected}" data-value="${dateVal}">${appleDisplay}</button>`;
   }
   
@@ -240,7 +242,9 @@ function renderCalendar() {
     const dateVal = `${yyyy}-${mm}-${dd}`;
     const cleanDateVal = normalizeDateStr(dateVal);
     
-    const isWeekend = (dayStr === '토' || dayStr === '일') ? 'color: var(--blue-1);' : '';
+    let isWeekend = '';
+    if (dayStr === '토') isWeekend = 'color: var(--blue-1);';
+    else if (dayStr === '일') isWeekend = 'color: var(--red-1);';
     const isActive = isSameDate(dateVal, State.selectedDashboardDate) ? 'active' : '';
     if (isActive) selectedIndex = i; // 현재 선택된 날짜의 인덱스 저장
     const hasData = State.schedules.some(s => isSameDate(s.date, dateVal)) ? 'has-data' : '';

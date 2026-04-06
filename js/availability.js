@@ -101,7 +101,9 @@ function initDateChips() {
     
     const dateVal = `${yyyy}-${mm}-${dd}`;
     
-    const isWeekend = (dayStr === '토' || dayStr === '일') ? 'color: var(--blue-1);' : '';
+    let isWeekend = '';
+    if (dayStr === '토') isWeekend = 'color: var(--blue-1);';
+    else if (dayStr === '일') isWeekend = 'color: var(--red-1);';
     const isSelected = isSameDate(dateVal, State.selectedDate) ? "selected" : "";
     
     const appleDisplay = `<span style="font-size:11px; opacity:0.6; font-weight:700; ${isWeekend}">${dayStr}</span><span style="font-size:16px; font-weight:900; margin-top:4px;">${dd}</span>`;
@@ -242,7 +244,7 @@ function renderList() {
       <button class="availability-item ${isSelected ? 'active' : ''}" data-date="${i.date}" data-time="${escapeHtml(i.time_slot)}">
         <div style="display:flex; justify-content:space-between; align-items:center;">
           <div class="row-time" style="flex-direction:row; align-items:center; width:auto; gap:6px;">
-            <span class="row-hhmm" style="font-size:18px; font-weight:900;">${escapeHtml(i.time_slot)}</span>
+            <span class="row-hhmm" style="font-size:18px; font-weight:700; font-variant-numeric: tabular-nums;">${escapeHtml(i.time_slot)}</span>
           </div>
           <div style="display:flex; align-items:center; gap:10px;">
             <span class="participant-count" style="font-size:12px; font-weight:600; color:var(--text-sub); display:flex; align-items:center; gap:4px;">

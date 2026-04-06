@@ -73,11 +73,11 @@ function renderTable() {
     const isMainChar = c.type === '본캐';
     return `
       <tr>
-        <td style="font-weight: 800;">${escapeHtml(c.mainName)}</td>
-        <td style="font-weight: 700; color: var(--text-main);">${escapeHtml(c.name)}</td>
+        <td style="font-weight: 600;">${escapeHtml(c.mainName)}</td>
+        <td style="font-weight: 500; color: var(--text-main);">${escapeHtml(c.name)}</td>
         <td><span class="chip chip-class ${classNameEscaped}">${classNameEscaped}</span></td>
         <td><span class="chip chip-type ${isMainChar ? 'main' : 'sub'}">${escapeHtml(c.type)}</span></td>
-        <td style="font-weight: 900; color: var(--cyan-2);">${getPowerRange(c.power)}</td>
+        <td style="font-weight: 700; color: var(--cyan-2); font-variant-numeric: tabular-nums;">${getPowerRange(c.power)}</td>
       </tr>
     `;
   }).join("");
