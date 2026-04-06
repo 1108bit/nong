@@ -203,28 +203,30 @@
    플로팅 네비게이션 바 (Floating Action Bar)
 ------------------------- */
 .bottom-action-bar {
-  position: fixed; left: 16px; right: 16px; bottom: 16px; z-index: 50;
+  position: fixed; left: 16px; right: 16px; bottom: 24px; z-index: 50; /* 💡 하단 여백을 24px로 띄워 터치 안전성 및 심미성 확보 */
   display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 4px;
   padding: 8px 12px; border-radius: 999px; background: rgba(14, 26, 40, 0.65);
   border: 1px solid rgba(255, 255, 255, 0.08); box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.15), 0 20px 40px rgba(0, 0, 0, 0.6);
-  backdrop-filter: blur(20px) saturate(180%); -webkit-backdrop-filter: blur(20px) saturate(180%);
+  backdrop-filter: blur(12px) saturate(180%); -webkit-backdrop-filter: blur(12px) saturate(180%); /* 💡 은은하고 몽환적인 유리 질감 블러 */
   padding-bottom: calc(8px + env(safe-area-inset-bottom, 0px));
 }
 .bottom-action-btn {
   min-height: 54px; border: none; border-radius: 999px; padding: 8px 4px; cursor: pointer;
   background: transparent; color: var(--text-sub);
   display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px;
+  opacity: 0.5; filter: grayscale(0.8); transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275); /* 💡 기본 상태는 어둡고 회색빛으로 처리 */
 }
 .bottom-action-btn .action-icon { font-size: 20px; line-height: 1; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.4)); transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
 .bottom-action-btn .action-text { font-size: 11px; font-weight: 600; letter-spacing: -0.02em; }
-.bottom-action-btn:hover { background: rgba(255, 255, 255, 0.06); color: var(--text-main); }
-.bottom-action-btn:hover .action-icon { transform: scale(1.15) translateY(-2px); }
-.bottom-action-btn.primary { background: rgba(67, 217, 255, 0.12); color: var(--cyan-2); border: 1px solid rgba(67, 217, 255, 0.15); }
-.bottom-action-btn.primary .action-icon { filter: drop-shadow(0 0 8px rgba(67, 217, 255, 0.6)); }
-.bottom-action-btn.accent { background: rgba(52, 211, 153, 0.12); color: var(--green-1); border: 1px solid rgba(52, 211, 153, 0.15); }
-.bottom-action-btn.accent .action-icon { filter: drop-shadow(0 0 8px rgba(52, 211, 153, 0.6)); }
-.bottom-action-btn.gold { background: rgba(246, 211, 122, 0.12); color: var(--gold-1); border: 1px solid rgba(246, 211, 122, 0.15); }
-.bottom-action-btn.gold .action-icon { filter: drop-shadow(0 0 8px rgba(246, 211, 122, 0.6)); }
+.bottom-action-btn:hover, .bottom-action-btn.active { opacity: 1; filter: grayscale(0); background: rgba(255, 255, 255, 0.06); color: var(--text-main); }
+.bottom-action-btn:hover .action-icon, .bottom-action-btn.active .action-icon { transform: scale(1.15) translateY(-2px); }
+/* 💡 .active가 붙었을 때만 각자의 시그니처 색상 불 켜기 */
+.bottom-action-btn.primary.active { background: rgba(67, 217, 255, 0.12); color: var(--cyan-2); border: 1px solid rgba(67, 217, 255, 0.15); }
+.bottom-action-btn.primary.active .action-icon { filter: drop-shadow(0 0 8px rgba(67, 217, 255, 0.6)); }
+.bottom-action-btn.accent.active { background: rgba(52, 211, 153, 0.12); color: var(--green-1); border: 1px solid rgba(52, 211, 153, 0.15); }
+.bottom-action-btn.accent.active .action-icon { filter: drop-shadow(0 0 8px rgba(52, 211, 153, 0.6)); }
+.bottom-action-btn.gold.active { background: rgba(246, 211, 122, 0.12); color: var(--gold-1); border: 1px solid rgba(246, 211, 122, 0.15); }
+.bottom-action-btn.gold.active .action-icon { filter: drop-shadow(0 0 8px rgba(246, 211, 122, 0.6)); }
 
 /* -------------------------
    모달 & 팝업 (Modals & Action Sheets)
