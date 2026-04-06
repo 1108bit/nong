@@ -61,7 +61,8 @@ html {
 
 body {
   margin: 0;
-  min-height: 100vh;
+  min-height: 100vh; /* Fallback for older browsers */
+  min-height: 100dvh; /* iOS Safari URL 바 겹침 완벽 방지 */
   font-family: -apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo", "Pretendard", "Noto Sans KR", sans-serif;
   text-rendering: optimizeLegibility; /* 💡 폰트를 가장 예쁘고 또렷하게 렌더링 */
   letter-spacing: -0.015em; /* 전체적으로 글자 간격을 살짝 좁혀 네이티브 앱 특유의 밀도감 생성 */

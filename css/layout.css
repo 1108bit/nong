@@ -30,7 +30,8 @@
 .app-page {
   position: relative;
   z-index: 2;
-  min-height: 100vh;
+  min-height: 100vh; /* Fallback */
+  min-height: 100dvh; /* iOS Safari URL 바 겹침 완벽 방지 */
   padding: max(16px, env(safe-area-inset-top)) 14px 28px;
 }
 
