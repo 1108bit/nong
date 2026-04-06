@@ -55,19 +55,19 @@ async function showComposition(day, time) {
     getEl("party2Badges").innerHTML = `<span class="party-stat-chip skeleton" style="width:60px; height:26px;"></span>`;
 
     const res = await callApi({ action: "getPartyComposition", day, time_slot: time });
-    if(!res.ok) return alert(res.message);
+    if(!res.success) return; // 에러처리는 api.js에서 일괄 담당
 
-    if (res.warning) {
-        alert(res.warning);
+    if (res.data.warning) {
+        alert(res.data.warning);
     }
 
     // 1파티, 2파티 렌더링
-    renderParty("party1List", res.party1 || []);
-    renderParty("party2List", res.party2 || []);
+    renderParty("party1List", res.data.party1 || []);
+    renderParty("party2List", res.data.party2 || []);
     
     // 배지 업데이트 (인원, 치유 등)
-    renderBadges("party1Badges", res.party1 || []);
-    renderBadges("party2Badges", res.party2 || []);
+    renderBadges("party1Badges", res.data.party1 || []);
+    renderBadges("party2Badges", res.data.party2 || []);
 }
 
 function renderParty(id, list) {
