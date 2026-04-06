@@ -2,6 +2,9 @@
  * 99. 라우팅 허브 (Routes)
  ************************************************/
 
+// 💡 [디스코드 연동] 발급받은 웹훅 URL을 아래 따옴표 사이에 붙여넣으세요!
+const DISCORD_WEBHOOK_URL = "https://discord.com/api/webhooks/1490631778942062673/73rxOWE1w3Uwe1o3qgi5g_LMV3PD6-BysxqduBxZyUWWSUjEgcNWBvMikrPwmvV4Z8fD";
+
 // 💡 [동시성 보수적 잠금] 구글 시트의 치명적인 단점(행 밀림 삭제 버그, 중복 가입 등)을 원천 차단하기 위해
 // 데이터를 조금이라도 수정하는 "모든 쓰기(Write) 작업"에 스크립트 락을 엄격하게 적용합니다.
 const WRITE_ACTIONS = [
@@ -139,10 +142,43 @@ function savePartyComposition(adminCode, targetDate, targetTime, partyListJson) 
     if (foundRow !== -1) {
       // I열(9)부터 8칸(1행 8열)에 배열의 값을 그대로 덮어씁니다.
       sheet.getRange(foundRow, 9, 1, 8).setValues([partyArray]);
+      
+      // 💡 [디스코드 알림 발송] 파티 저장이 성공하면 웹훅 전송
+      sendDiscordNotification(targetDate, targetTime, partyArray);
+      
       return { ok: true, message: "성공적으로 저장되었습니다." };
     }
     return { ok: false, message: "해당 일정을 찾을 수 없습니다." };
   } catch (err) {
     return { ok: false, message: "저장 중 오류 발생: " + err.message };
+  }
+}
+
+// =========================
+// 디스코드 웹훅 알림 발송 로직
+// =========================
+function sendDiscordNotification(date, time, partyArray) {
+  if (!DISCORD_WEBHOOK_URL) return; // URL이 없으면 작동하지 않음
+
+  const p1 = partyArray.slice(0, 4).map((n, i) => n ? `${i+1}. ${n}` : `${i+1}. (빈자리)`).join("\n");
+  const p2 = partyArray.slice(4, 8).map((n, i) => n ? `${i+1}. ${n}` : `${i+1}. (빈자리)`).join("\n");
+
+  const message = {
+    embeds: [{
+      title: "⚔️ 파티 조율 완료 안내",
+      description: `**${date} ${time}** 레이드 파티 구성이 업데이트되었습니다.\n인게임 접속 전 파티를 확인해 주세요!`,
+      color: 4445183, // 그림자 레기온의 시그니처 Cyan 블루 색상
+      fields: [
+        { name: "🔹 1파티", value: p1, inline: true },
+        { name: "🔹 2파티", value: p2, inline: true }
+      ],
+      footer: { text: "그림자 · LEGION MANAGER" }
+    }]
+  };
+
+  try {
+    UrlFetchApp.fetch(DISCORD_WEBHOOK_URL, { method: "post", contentType: "application/json", payload: JSON.stringify(message) });
+  } catch (e) {
+    console.error("디스코드 알림 발송 실패:", e);
   }
 }
