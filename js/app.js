@@ -39,23 +39,23 @@ async function login() {
 
   resultEl.textContent = "확인 중입니다...";
   resultEl.classList.remove("error"); // 이전 에러 텍스트 스타일(빨간색) 초기화
-  const data = await callApi({ action: "login", mainName, password });
+  const data = await callApi({ action: "login", mainName, password, hideAlert: true });
 
-  if (data.ok) {
-    if (data.isAdmin) {
+  if (data.success) {
+    if (data.data.isAdmin) {
       sessionStorage.setItem("isAdmin", "true");
-      if (data.adminCode) sessionStorage.setItem("adminCode", data.adminCode);
+      if (data.data.adminCode) sessionStorage.setItem("adminCode", data.data.adminCode);
     } else {
       sessionStorage.removeItem("isAdmin");
       sessionStorage.removeItem("adminCode");
     }
 
     if (isAutoLogin) {
-      localStorage.setItem("autoAccountId", data.accountId);
-      localStorage.setItem("autoMainName", data.mainName);
-      if (data.isAdmin) {
+      localStorage.setItem("autoAccountId", data.data.accountId);
+      localStorage.setItem("autoMainName", data.data.mainName);
+      if (data.data.isAdmin) {
         localStorage.setItem("autoIsAdmin", "true");
-        if (data.adminCode) localStorage.setItem("autoAdminCode", data.adminCode);
+        if (data.data.adminCode) localStorage.setItem("autoAdminCode", data.data.adminCode);
       } else {
         localStorage.removeItem("autoIsAdmin");
         localStorage.removeItem("autoAdminCode");
@@ -67,10 +67,10 @@ async function login() {
       localStorage.removeItem("autoAdminCode");
     }
 
-    if (data.accountId === "MASTER_ADMIN") {
-      location.href = `./admin.html?mainName=${encodeURIComponent(data.mainName)}&accountId=${data.accountId}`;
+    if (data.data.accountId === "MASTER_ADMIN") {
+      location.href = `./admin.html?mainName=${encodeURIComponent(data.data.mainName)}&accountId=${data.data.accountId}`;
     } else {
-      location.href = `./main.html?mainName=${encodeURIComponent(data.mainName)}&accountId=${data.accountId}`;
+      location.href = `./main.html?mainName=${encodeURIComponent(data.data.mainName)}&accountId=${data.data.accountId}`;
     }
   } else {
     resultEl.textContent = data.message || "입장에 실패했습니다.";
@@ -103,12 +103,10 @@ if (adminSecretBtn) {
       if (!code) return;
       
       const res = await callApi({ action: "adminLogin", adminCode: code });
-      if (res.ok) {
+      if (res.success) {
         sessionStorage.setItem("isAdmin", "true");
         sessionStorage.setItem("adminCode", code);
         location.href = `./admin.html?mainName=${encodeURIComponent('👑 마스터')}&accountId=MASTER_ADMIN`;
-      } else {
-        alert("관리자 코드가 일치하지 않습니다.");
       }
     }
   });

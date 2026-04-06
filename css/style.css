@@ -2808,7 +2808,8 @@ body.modal-open {
 /* 파티 조율 모달만 가로로 넓게 확장 & 스크롤 최적화 */
 #partyDetailModal .modal-sheet {
   max-width: 880px;
-  max-height: 85vh; /* 화면 높이 85% 제한 (하단 버튼 짤림 완벽 방지) */
+  max-height: 85vh; /* Fallback (구형 브라우저) */
+  max-height: 85dvh; /* 모바일 동적 뷰포트 완벽 대응 (키보드, URL바) */
   display: flex;
   flex-direction: column;
 }
@@ -2983,7 +2984,7 @@ body.modal-open {
 #partyContainer .applicant-card {
   flex-direction: column;
   padding: 14px 4px 8px;
-  gap: 6px;
+  gap: 4px; /* 모바일 세로 공간 확보를 위해 간격 축소 */
   margin: 0;
   height: 100%;
 }
@@ -3005,6 +3006,10 @@ body.modal-open {
   }
   #partyContainer {
     grid-template-columns: repeat(2, 1fr);
+  }
+  #partyDetailModal .modal-sheet {
+    padding: 20px 12px 12px; /* 모바일에서 상하좌우 여백을 줄여 조율 공간 최대 확보 */
+    max-height: 90dvh; /* 모바일에서는 화면을 조금 더 넓게 사용 */
   }
 }
 

@@ -1,8 +1,37 @@
 // 페이지 진입 시 즉각적인 권한 검사 (비정상 접근 원천 차단)
 if (sessionStorage.getItem("isAdmin") !== "true" || !getAdminCode()) {
-  alert("관리자 권한이 필요합니다.");
+  alert("세션이 만료되었거나 관리자 권한이 없습니다.\n다시 로그인해 주세요.");
   location.replace("index.html");
 }
+
+/**
+ * 💡 [2순위: 상태 관리] 전역 변수를 State 객체로 묶어 예측 가능성 향상
+ */
+const State = {
+  schedules: [],
+  summaries: [],
+  selectedDashboardDate: null
+};
+
+/**
+ * 💡 [2순위: 패턴 일관성] 초기화 ➔ 이벤트 등록 ➔ 데이터 로드 ➔ 렌더링
+ */
+document.addEventListener('DOMContentLoaded', () => {
+  initDateChips();
+  initTimeChips();
+  bindEvents();
+  loadAdminSchedule();
+
+  // 칩 스크롤 및 인디케이터 활성화 (안전하게 약간의 지연)
+  setTimeout(() => {
+    if (typeof setupAppleScroll === 'function') {
+      setupAppleScroll('dateChipGroup', 'dateScrollInd');
+      setupAppleScroll('timeChipGroup', 'timeScrollInd');
+      setupAppleScroll('editDateChipGroup', 'editDateScrollInd');
+      setupAppleScroll('editTimeChipGroup', 'editTimeScrollInd');
+    }
+  }, 100);
+});
 
 // 날짜 칩 자동 생성 로직 (오늘부터 14일)
 function initDateChips() {
@@ -154,10 +183,6 @@ function normalizeDateStr(val) {
 const isSameDate = (d1, d2) => normalizeDateStr(d1) === normalizeDateStr(d2);
 // ==========================================
 
-let allSchedules = [];
-let allSummaries = [];
-let selectedDashboardDate = null;
-
 async function loadAdminSchedule() {
   const adminCode = getAdminCode();
   if (!adminCode) return movePage("index.html");
@@ -179,22 +204,23 @@ async function loadAdminSchedule() {
     callApi({ action: "getAvailabilitySummary" })
   ]);
 
-  if (!scheduleData.ok) return movePage("index.html");
-  if (!summaryData.ok) return alert("참여 현황을 가져오는데 실패했습니다.");
+  // 💡 [1순위] 통신 규격 변경 대응 (res.success, res.data 사용)
+  if (!scheduleData.success) return movePage("index.html");
+  if (!summaryData.success) return; // 에러 메시지는 api.js에서 일괄 처리
 
-  allSchedules = scheduleData.items || [];
-  allSummaries = summaryData.items || [];
+  State.schedules = scheduleData.data.items || [];
+  State.summaries = summaryData.data.items || [];
 
-  if (!selectedDashboardDate) {
+  if (!State.selectedDashboardDate) {
     const today = new Date();
     const yyyy = today.getFullYear();
     const mm = String(today.getMonth() + 1).padStart(2, '0');
     const dd = String(today.getDate()).padStart(2, '0');
-    selectedDashboardDate = `${yyyy}-${mm}-${dd}`;
+    State.selectedDashboardDate = `${yyyy}-${mm}-${dd}`;
   }
 
   renderCalendar();
-  renderScheduleList(selectedDashboardDate);
+  renderScheduleList(State.selectedDashboardDate);
 }
 
 function renderCalendar() {
@@ -208,7 +234,7 @@ function renderCalendar() {
   let selectedIndex = 0; // 진행 바를 위한 인덱스 추적
 
   // 1. 반복문 밖에서 날짜별 신청 인원수를 미리 계산하여 Map 형태로 저장 (수십 배 빠른 렌더링 성능)
-  const countsByDate = allSummaries.reduce((acc, s) => {
+  const countsByDate = State.summaries.reduce((acc, s) => {
     const cleanDate = normalizeDateStr(s.date);
     acc[cleanDate] = (acc[cleanDate] || 0) + 1;
     return acc;
@@ -225,9 +251,9 @@ function renderCalendar() {
     const cleanDateVal = normalizeDateStr(dateVal);
     
     const isWeekend = (dayStr === '토' || dayStr === '일') ? 'color: var(--blue-1);' : '';
-    const isActive = isSameDate(dateVal, selectedDashboardDate) ? 'active' : '';
+    const isActive = isSameDate(dateVal, State.selectedDashboardDate) ? 'active' : '';
     if (isActive) selectedIndex = i; // 현재 선택된 날짜의 인덱스 저장
-    const hasData = allSchedules.some(s => isSameDate(s.date, dateVal)) ? 'has-data' : '';
+    const hasData = State.schedules.some(s => isSameDate(s.date, dateVal)) ? 'has-data' : '';
     
     // 2. 미리 계산해둔 객체에서 값만 쏙 뽑아오기 (데이터가 수천 개여도 렉 없음)
     const totalApplicants = countsByDate[cleanDateVal] || 0;
@@ -264,7 +290,7 @@ function renderCalendar() {
     cell.addEventListener('click', () => {
       calEl.querySelectorAll('.cal-day-cell').forEach(c => c.classList.remove('active'));
       cell.classList.add('active');
-      selectedDashboardDate = cell.dataset.date;
+      State.selectedDashboardDate = cell.dataset.date;
       
       // 클릭 시 인디케이터 부드럽게 이동
       if (progress) {
@@ -273,7 +299,7 @@ function renderCalendar() {
         progress.style.width = `${percent}%`;
       }
       
-      renderScheduleList(selectedDashboardDate);
+      renderScheduleList(State.selectedDashboardDate);
     });
   });
 }
@@ -282,7 +308,7 @@ function renderScheduleList(dateStr) {
   const list = getEl("scheduleList");
   if (!list) return;
   
-  const filtered = allSchedules.filter(s => isSameDate(s.date, dateStr));
+  const filtered = State.schedules.filter(s => isSameDate(s.date, dateStr));
   list.innerHTML = "";
   
   if (filtered.length === 0) {
@@ -294,7 +320,7 @@ function renderScheduleList(dateStr) {
   
   let html = "";
   filtered.forEach((i, idx) => {
-    const participants = allSummaries.filter(s => isSameDate(s.date, i.date) && String(s.time_slot).trim() === String(i.time_slot).trim());
+    const participants = State.summaries.filter(s => isSameDate(s.date, i.date) && String(s.time_slot).trim() === String(i.time_slot).trim());
     const count = participants.length;
     const maxCount = 8;
     const progressPercent = Math.min(100, Math.round((count / maxCount) * 100));
@@ -340,10 +366,10 @@ async function saveSchedule() {
   // 지능형 넘버링 (N차 파티 생성 로직)
   let targetNote = getEl("noteInput").value;
   const summaryData = await callApi({ action: "getAvailabilitySummary" });
-  if (summaryData.ok && summaryData.items) {
+  if (summaryData.success && summaryData.data.items) {
       const targetDate = getEl("dateInput").value;
       const targetTime = getEl("timeSlotInput").value;
-      const sameSlotCount = summaryData.items.filter(s => s.date === targetDate && s.time_slot === targetTime).length;
+      const sameSlotCount = summaryData.data.items.filter(s => s.date === targetDate && s.time_slot === targetTime).length;
       
       if (sameSlotCount >= 8) {
           const suffix = `(${Math.floor(sameSlotCount / 8) + 1})`;
@@ -366,15 +392,13 @@ async function saveSchedule() {
   btn.disabled = false;
   btn.textContent = originalText;
 
-  if(res.ok) { alert("저장되었습니다."); loadAdminSchedule(); }
-  else { alert(res.message || "일정 저장에 실패했습니다."); }
+  if(res.success) { alert("저장되었습니다."); loadAdminSchedule(); }
 }
 
 async function deleteSchedule(date, day, time) {
   if(!confirm("정말 삭제하시겠습니까?")) return;
   const res = await callApi({ action: "deleteRaidSchedule", adminCode: getAdminCode(), date, day, timeSlot: time });
-  if(res.ok) loadAdminSchedule();
-  else alert(res.message || "삭제에 실패했습니다.");
+  if(res.success) loadAdminSchedule();
 }
 
 // 가로 스크롤 컨테이너 내에서 선택된 칩으로 부드럽게 자동 스크롤하는 함수
@@ -467,47 +491,14 @@ if(getEl("submitScheduleModalBtn")) {
     btn.disabled = false;
     btn.textContent = "완료";
 
-    if (res.ok) {
+    if (res.success) {
        alert("일정이 성공적으로 수정되었습니다.");
        closeScheduleModal();
        loadAdminSchedule();
-    } else {
-       alert(res.message || "수정에 실패했습니다.");
     }
   }; 
 }
 
-getEl("saveButton").onclick = saveSchedule; 
-getEl("checkSchemaButton").onclick = async () => {
-  const res = await callApi({ action: "validateDatabaseSchema" });
-  if (!res.ok) return alert(res.message || "검증에 실패했습니다.");
-
-  if (res.isValid) { 
-    alert("DB 스키마가 정상입니다.");
-  } else {
-    alert("DB 스키마 오류:\n" + (res.errors || []).join("\n"));
-  }
-};
-
-const backBtn = getEl("backButton");
-if (getAccountId() === "MASTER_ADMIN") {
-  backBtn.textContent = "로그아웃";
-  backBtn.onclick = () => {
-    sessionStorage.clear();
-    localStorage.removeItem("autoAccountId");
-    localStorage.removeItem("autoMainName");
-    localStorage.removeItem("autoIsAdmin");
-    localStorage.removeItem("autoAdminCode");
-    location.href = "index.html";
-  };
-} else {
-  backBtn.onclick = () => movePage("main.html");
-}
-
-getEl("searchUserButton").onclick = async () => {
-  const searchValue = getEl("userAccountIdInput").value.trim();
-  if (!searchValue) return alert("유저 본캐명을 입력하세요.");
-  
   const searchArea = getEl("userSearchResultArea");
   if (searchArea) searchArea.style.display = "block";
   getEl("userMessage").innerHTML = "검색 중입니다...";
@@ -515,18 +506,6 @@ getEl("searchUserButton").onclick = async () => {
   
   await openUserCharacterManager(searchValue);
 };
-
-initDateChips();
-initTimeChips();
-loadAdminSchedule();
-
-// 칩 생성 직후 스크롤 및 인디케이터 기능 활성화 (안전하게 0.1초 대기)
-setTimeout(() => {
-  setupAppleScroll('dateChipGroup', 'dateScrollInd');
-  setupAppleScroll('timeChipGroup', 'timeScrollInd');
-  setupAppleScroll('editDateChipGroup', 'editDateScrollInd');
-  setupAppleScroll('editTimeChipGroup', 'editTimeScrollInd');
-}, 100);
 
 
 // 특정 유저의 캐릭터 정보를 불러와서 편집 모달 띄우기
@@ -536,15 +515,15 @@ async function openUserCharacterManager(searchValue) {
     accountId: searchValue 
   });
   
-  if (!data.ok) {
+  if (!data.success) {
     getEl("userMessage").textContent = data.message || "유저를 찾을 수 없습니다.";
     getEl("userCharacterList").innerHTML = "";
     return;
   }
 
-  const targetAccountId = data.targetAccountId;
-  const targetMainName = data.mainName;
-  const roleText = data.adminYn === 'Y' 
+  const targetAccountId = data.data.targetAccountId;
+  const targetMainName = data.data.mainName;
+  const roleText = data.data.adminYn === 'Y' 
     ? '<span class="availability-status crowded">👑 운영진</span>' 
     : '<span class="availability-status normal">👤 일반 유저</span>';
   const isMaster = getAccountId() === 'MASTER_ADMIN';
@@ -553,7 +532,7 @@ async function openUserCharacterManager(searchValue) {
   getEl("userMessage").innerHTML = `
     <div style="font-size: 15px; font-weight: 800; color: var(--text-main);">[ ${escapeHtml(targetMainName)} ] 님의 정보</div>
     <div style="margin-top: 6px; font-size: 13px; color: var(--text-sub);">
-      현재 권한: <strong>${roleText}</strong> | 등록 캐릭터: ${data.items.length}개
+      현재 권한: <strong>${roleText}</strong> | 등록 캐릭터: ${data.data.items.length}개
     </div>
     <div style="margin-top: 12px; display: flex; gap: 8px;">
       ${roleButtonHtml}
@@ -562,7 +541,7 @@ async function openUserCharacterManager(searchValue) {
   `;
 
   const list = getEl("userCharacterList");
-  list.innerHTML = data.items.map(c => `
+  list.innerHTML = data.data.items.map(c => `
     <div class="character-card">
       <div class="character-left">
         <div class="character-name">${escapeHtml(c.name)}</div>
@@ -655,12 +634,10 @@ getEl("submitAdminCharacterButton").onclick = async () => {
   btn.disabled = false;
   btn.textContent = originalText;
  
-  if (res.ok) {
+  if (res.success) {
     alert("수정되었습니다.");
     closeAdminModal();
     openUserCharacterManager(accountId); // 목록 새로고침
-  } else {
-    alert(res.message || "수정 실패");
   }
 };
 
@@ -668,15 +645,15 @@ getEl("submitAdminCharacterButton").onclick = async () => {
 async function toggleUserAdmin(targetAccountId, searchValue) {
   if(!confirm(`해당 유저의 운영진 권한을 변경하시겠습니까?`)) return;
   const res = await callApi({ action: "toggleAdminRole", adminCode: getAdminCode(), targetAccountId, callerAccountId: getAccountId() });
-  alert(res.message);
-  if (res.ok) openUserCharacterManager(searchValue || targetAccountId); // UI 갱신
+  if (res.success) alert(res.message);
+  if (res.success) openUserCharacterManager(searchValue || targetAccountId); // UI 갱신
 }
 
 // 유저 비밀번호 강제 초기화
 async function resetUserPassword(targetAccountId) {
   if(!confirm(`[${targetAccountId}] 유저의 비밀번호를 '0000'으로 초기화하시겠습니까?`)) return;
   const res = await callApi({ action: "resetUserPasswordByAdmin", adminCode: getAdminCode(), targetAccountId });
-  alert(res.message);
+  if (res.success) alert(res.message);
 }
 
 // =========================
@@ -705,9 +682,9 @@ if (changeAdminCodeBtn) {
     changeAdminCodeBtn.disabled = false;
     changeAdminCodeBtn.textContent = "코드 변경";
 
-    alert(res.message); // 성공 또는 검증 실패(기존 코드 불일치 등) 메시지 출력
+    if (res.success) alert(res.message); 
     
-    if (res.ok) {
+    if (res.success) {
       sessionStorage.setItem("adminCode", newCode); 
       getEl("oldAdminCodeInput").value = "";
       getEl("newAdminCodeInput").value = "";
@@ -754,7 +731,6 @@ function closePartyDetailModal() {
   if (modal) modal.classList.remove("show");
   document.body.classList.remove("modal-open");
 }
-if (getEl("closePartyDetailBtn")) getEl("closePartyDetailBtn").onclick = closePartyDetailModal;
 
 async function openPartyDetail(date, day, time) {
   const modal = getEl("partyDetailModal");
@@ -788,7 +764,7 @@ function renderPartyEditor(date, time) {
   const content = getEl("partyDetailContent");
   if (!content) return;
 
-  let participants = allSummaries.filter(s => s.date === date && s.time_slot === time);
+  let participants = State.summaries.filter(s => s.date === date && s.time_slot === time);
 
   // 1. 직업 우선순위 정렬 (수호/검성(1) > 살/궁(2) > 마/정(3) > 호법(4) > 치유(5) + 같은 직업 내 전투력 내림차순)
   const classPriority = {
@@ -817,14 +793,14 @@ function renderPartyEditor(date, time) {
   }
 
   // 3. 저장된 파티 데이터 및 이번 주차 중복 참여자 데이터 수집
-  const targetSchedule = allSchedules.find(s => isSameDate(s.date, date) && String(s.time_slot).trim() === String(time).trim());
+  const targetSchedule = State.schedules.find(s => isSameDate(s.date, date) && String(s.time_slot).trim() === String(time).trim());
   const savedParty = targetSchedule && targetSchedule.partyList ? targetSchedule.partyList : [];
   const currentWeekKey = targetSchedule ? targetSchedule.week_key : null;
   let waitingList = [...participants]; // 슬롯에 배치될 인원은 여기서 뺄 예정
 
   const alreadyPlacedNames = new Set();
   if (currentWeekKey) {
-    allSchedules.forEach(s => {
+    State.schedules.forEach(s => {
       if (isSameDate(s.week_key, currentWeekKey) && !(isSameDate(s.date, date) && String(s.time_slot).trim() === String(time).trim())) {
         if (Array.isArray(s.partyList)) {
           s.partyList.forEach(name => {
@@ -1005,13 +981,50 @@ function renderPartyEditor(date, time) {
     btn.disabled = false;
     btn.textContent = originalText;
 
-    if (res.ok) {
+    if (res.success) {
       alert("파티 구성이 성공적으로 저장되었습니다!");
       closePartyDetailModal();
-    } else {
-      alert(res.message || "파티 구성 저장에 실패했습니다.");
     }
   };
 
   updateSynergy();
+}
+
+// 💡 [2순위: 패턴 일관성] 관리자 페이지의 모든 이벤트 리스너를 한 곳에서 관리
+function bindEvents() {
+  if(getEl("saveButton")) getEl("saveButton").onclick = saveSchedule; 
+  
+  if(getEl("checkSchemaButton")) getEl("checkSchemaButton").onclick = async () => {
+    const res = await callApi({ action: "validateDatabaseSchema" });
+    if (!res.success) return; // 에러 알림은 api.js가 담당
+    if (res.data.isValid) { alert("DB 스키마가 정상입니다."); }
+    else { alert("DB 스키마 오류:\n" + (res.data.errors || []).join("\n")); }
+  };
+
+  const backBtn = getEl("backButton");
+  if (backBtn) {
+    if (getAccountId() === "MASTER_ADMIN") {
+      backBtn.textContent = "로그아웃";
+      backBtn.onclick = () => {
+        sessionStorage.clear();
+        localStorage.removeItem("autoAccountId"); localStorage.removeItem("autoMainName");
+        localStorage.removeItem("autoIsAdmin"); localStorage.removeItem("autoAdminCode");
+        location.href = "index.html";
+      };
+    } else { backBtn.onclick = () => movePage("main.html"); }
+  }
+
+  if(getEl("searchUserButton")) getEl("searchUserButton").onclick = async () => {
+    const searchValue = getEl("userAccountIdInput").value.trim();
+    if (!searchValue) return alert("유저 본캐명을 입력하세요.");
+    const searchArea = getEl("userSearchResultArea");
+    if (searchArea) searchArea.style.display = "block";
+    getEl("userMessage").innerHTML = "검색 중입니다...";
+    getEl("userCharacterList").innerHTML = "";
+    await openUserCharacterManager(searchValue);
+  };
+
+  if(getEl("closeAdminModalButton")) getEl("closeAdminModalButton").onclick = closeAdminModal;
+  if(getEl("cancelAdminModalButton")) getEl("cancelAdminModalButton").onclick = closeAdminModal;
+  if(getEl("closePartyDetailBtn")) getEl("closePartyDetailBtn").onclick = closePartyDetailModal;
 }

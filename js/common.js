@@ -1,33 +1,3 @@
-const API_URL = "https://script.google.com/macros/s/AKfycbxgoannrkzyrAaIF8FeJP-ZJyFUrhdtT1d_iJdrY0JiJwqebPYbToS5r-nUYp6Ow-2fYw/exec";
-
-// 서버 통신 함수
-
-async function callApi(params) {
-  try {
-    console.log(`➡️ [API 요청] ${params.action} :`, params);
-    params.t = new Date().getTime(); // 브라우저 캐싱 강력 방지
-    const url = `${API_URL}?${new URLSearchParams(params).toString()}`;
-    
-    // 구글 GAS의 악명높은 302 리다이렉트를 강제로 따라가도록 옵션 부여
-    const res = await fetch(url, {
-      method: 'GET',
-      mode: 'cors',
-      redirect: 'follow'
-    });
-    if (!res.ok) {
-      console.error(`❌ [API HTTP 오류] (${res.status}):`, res.statusText);
-      return { ok: false, message: `서버 오류 (${res.status})` };
-    }
-    const data = await res.json();
-    console.log(`⬅️ [API 응답] ${params.action} :`, data);
-    return data;
-  } catch (e) {
-    console.error("❌ [API 연결 실패]:", e);
-    return { ok: false, message: `통신 차단됨: ${e.message}` };
-  }
-}
-
-
 // URL 정보 추출 (accountId, mainName 등)
 
 function getParameter(key) {

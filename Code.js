@@ -8,41 +8,50 @@ function doGet(e) {
   const action = (e && e.parameter && e.parameter.action) ? e.parameter.action : '';
 
   if (!action) {
-    return outputJson({ ok: true, message: "LEGION MANAGER API 서버가 정상 동작 중입니다." });
+    return outputStandard(true, null, "LEGION MANAGER API 서버가 정상 동작 중입니다.", 200);
   }
 
   try {
+    let result;
     switch (action) {
-      case 'init': return outputJson(handleInit());
-      case 'login': return outputJson(login(e.parameter.mainName, e.parameter.password));
-      case 'getCharacters': return outputJson(getCharacters(e.parameter.accountId));
-      case 'getAllCharacters': return outputJson(getAllCharacters());
-      case 'addCharacter': return outputJson(addCharacter(e));
-      case 'updateCharacter': return outputJson(updateCharacter(e));
-      case 'deleteCharacter': return outputJson(deleteCharacter(e.parameter.accountId, e.parameter.characterName));
-      case 'toggleCharacterType': return outputJson(toggleCharacterType(e.parameter.accountId, e.parameter.characterName));
-      case 'getCurrentWeekKey': return outputJson(getCurrentWeekKey());
-      case 'getRaidSchedule': return outputJson(getRaidSchedule(e.parameter.weekKey));
-      case 'getRaidScheduleAdmin': return outputJson(getRaidScheduleAdmin(e.parameter.weekKey, e.parameter.adminCode));
-      case 'saveRaidSchedule': return outputJson(saveRaidSchedule(e.parameter.weekKey, e.parameter.date, e.parameter.day, e.parameter.timeSlot, e.parameter.openYn, e.parameter.status, e.parameter.note, e.parameter.sort, e.parameter.adminCode));
-      case 'deleteRaidSchedule': return outputJson(deleteRaidSchedule(e.parameter.weekKey, e.parameter.date, e.parameter.day, e.parameter.timeSlot, e.parameter.adminCode));
-      case 'getAvailability': return outputJson(getAvailability(e.parameter.accountId, e.parameter.characterName, e.parameter.weekKey));
-      case 'saveAvailability': return outputJson(saveAvailability(e.parameter.accountId, e.parameter.mainName, e.parameter.characterName, e.parameter.type, e.parameter.weekKey, e.parameter.slotList));
-      case 'getAvailabilitySummary': return outputJson(getAvailabilitySummary(e.parameter.weekKey));
-      case 'getMainData': return outputJson(getMainData(e.parameter.accountId));
-      case 'validateDatabaseSchema': return outputJson(validateDatabaseSchema());
-      case 'getPartyComposition': return outputJson(getPartyComposition(e.parameter.weekKey, e.parameter.day, e.parameter.time_slot));
-      case 'savePartyComposition': return outputJson(savePartyComposition(e.parameter.adminCode, e.parameter.date, e.parameter.timeSlot, e.parameter.partyList));
-      case 'adminLogin': return outputJson(adminLogin(e.parameter.adminCode));
-      case 'updateCharacterByAdmin': return outputJson(updateCharacterByAdmin(e));
-      case 'updateAdminCodeSetting': return outputJson(updateAdminCodeSetting(e.parameter.adminCode, e.parameter.newAdminCode, e.parameter.callerAccountId));
-      case 'changePassword': return outputJson(changePassword(e.parameter.accountId, e.parameter.oldPassword, e.parameter.newPassword));
-      case 'toggleAdminRole': return outputJson(toggleAdminRole(e.parameter.adminCode, e.parameter.targetAccountId, e.parameter.callerAccountId));
-      case 'resetUserPasswordByAdmin': return outputJson(resetUserPasswordByAdmin(e.parameter.adminCode, e.parameter.targetAccountId));
-      default: return outputJson({ ok: false, message: '잘못된 요청입니다.' });
+      case 'init': result = handleInit(); break;
+      case 'login': result = login(e.parameter.mainName, e.parameter.password); break;
+      case 'getCharacters': result = getCharacters(e.parameter.accountId); break;
+      case 'getAllCharacters': result = getAllCharacters(); break;
+      case 'addCharacter': result = addCharacter(e); break;
+      case 'updateCharacter': result = updateCharacter(e); break;
+      case 'deleteCharacter': result = deleteCharacter(e.parameter.accountId, e.parameter.characterName); break;
+      case 'toggleCharacterType': result = toggleCharacterType(e.parameter.accountId, e.parameter.characterName); break;
+      case 'getCurrentWeekKey': result = getCurrentWeekKey(); break;
+      case 'getRaidSchedule': result = getRaidSchedule(e.parameter.weekKey); break;
+      case 'getRaidScheduleAdmin': result = getRaidScheduleAdmin(e.parameter.weekKey, e.parameter.adminCode); break;
+      case 'saveRaidSchedule': result = saveRaidSchedule(e.parameter.weekKey, e.parameter.date, e.parameter.day, e.parameter.timeSlot, e.parameter.openYn, e.parameter.status, e.parameter.note, e.parameter.sort, e.parameter.adminCode); break;
+      case 'deleteRaidSchedule': result = deleteRaidSchedule(e.parameter.weekKey, e.parameter.date, e.parameter.day, e.parameter.timeSlot, e.parameter.adminCode); break;
+      case 'getAvailability': result = getAvailability(e.parameter.accountId, e.parameter.characterName, e.parameter.weekKey); break;
+      case 'saveAvailability': result = saveAvailability(e.parameter.accountId, e.parameter.mainName, e.parameter.characterName, e.parameter.type, e.parameter.weekKey, e.parameter.slotList); break;
+      case 'getAvailabilitySummary': result = getAvailabilitySummary(e.parameter.weekKey); break;
+      case 'getMainData': result = getMainData(e.parameter.accountId); break;
+      case 'validateDatabaseSchema': result = validateDatabaseSchema(); break;
+      case 'getPartyComposition': result = getPartyComposition(e.parameter.weekKey, e.parameter.day, e.parameter.time_slot); break;
+      case 'savePartyComposition': result = savePartyComposition(e.parameter.adminCode, e.parameter.date, e.parameter.timeSlot, e.parameter.partyList); break;
+      case 'adminLogin': result = adminLogin(e.parameter.adminCode); break;
+      case 'updateCharacterByAdmin': result = updateCharacterByAdmin(e); break;
+      case 'updateAdminCodeSetting': result = updateAdminCodeSetting(e.parameter.adminCode, e.parameter.newAdminCode, e.parameter.callerAccountId); break;
+      case 'changePassword': result = changePassword(e.parameter.accountId, e.parameter.oldPassword, e.parameter.newPassword); break;
+      case 'toggleAdminRole': result = toggleAdminRole(e.parameter.adminCode, e.parameter.targetAccountId, e.parameter.callerAccountId); break;
+      case 'resetUserPasswordByAdmin': result = resetUserPasswordByAdmin(e.parameter.adminCode, e.parameter.targetAccountId); break;
+      default: return outputStandard(false, null, '잘못된 요청입니다.', 400);
     }
+    
+    // 기존 { ok: true, items: [], ... } 객체를 신규 표준 포맷으로 자동 변환
+    const success = result.ok;
+    const message = result.message || (success ? "성공" : "요청 처리 실패");
+    delete result.ok;
+    delete result.message;
+    
+    return outputStandard(success, result, message, success ? 200 : 400);
   } catch (err) {
-    return outputJson({ ok: false, message: err.message || '오류가 발생했습니다.' });
+    return outputStandard(false, null, err.message || '서버 오류가 발생했습니다.', 500);
   }
 }
 
@@ -50,9 +59,10 @@ function doPost(e) {
   return doGet(e);
 }
 
-// JSON 응답을 반환하고 CORS 에러를 방지하는 필수 함수
-function outputJson(data) {
-  return ContentService.createTextOutput(JSON.stringify(data))
+// [1순위] JSON 표준 응답 생성기 (통신 규격 고정)
+function outputStandard(success, data, message, code) {
+  const response = { success, data: data || {}, message, code };
+  return ContentService.createTextOutput(JSON.stringify(response))
     .setMimeType(ContentService.MimeType.JSON);
 }
 

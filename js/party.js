@@ -15,13 +15,13 @@ async function loadPartySummary() {
 
   const data = await callApi({ action: "getAvailabilitySummary" });
   
-  if (!data.ok || !data.items.length) {
+  if (!data.success || !data.data.items.length) {
     target.innerHTML = `<div class="availability-empty">📊 아직 집계된 데이터가 없습니다.</div>`;
     return;
   }
 
   // 시간대별 버튼 생성
-  target.innerHTML = data.items.map(i => `
+  target.innerHTML = data.data.items.map(i => `
     <button type="button" class="party-slot-btn" data-day="${escapeHtml(i.day)}" data-time="${escapeHtml(i.time_slot)}">
       <div style="display:flex; justify-content:space-between; align-items:center;">
         <div class="row-time" style="flex-direction:row; align-items:center; width:auto; gap:6px;">

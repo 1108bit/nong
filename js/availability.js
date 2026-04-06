@@ -1,7 +1,12 @@
-let selectedMap = new Set();
-let allSchedules = [];
-let allSummaries = [];
-let selectedDate = null;
+/**
+ * 💡 [2순위: 상태 관리] 전역 변수를 State 객체로 묶어 예측 가능성 향상
+ */
+const State = {
+  schedules: [],
+  summaries: [],
+  selectedDate: null,
+  selectedMap: new Set()
+};
 
 // 날짜 표준화 헬퍼 (2026. 3. 8 -> 2026-03-08)
 function normalizeDateStr(val) {
@@ -12,7 +17,16 @@ function normalizeDateStr(val) {
 }
 const isSameDate = (d1, d2) => normalizeDateStr(d1) === normalizeDateStr(d2);
 
-async function initAvailability() {
+/**
+ * 💡 [2순위: 패턴 일관성] 초기화 ➔ 이벤트 등록 ➔ 데이터 로드 ➔ 렌더링
+ */
+document.addEventListener('DOMContentLoaded', () => {
+  initDateChips();
+  bindEvents();
+  loadAvailabilityData();
+});
+
+async function loadAvailabilityData() {
   const accountId = getAccountId();
   const characterName = getMainName();
 
@@ -40,12 +54,15 @@ async function initAvailability() {
     callApi({ action: "getAvailabilitySummary" })
   ]);
 
-  allSchedules = schedule.items || [];
-  allSummaries = summaryData.items || [];
+  // 💡 [1순위] 통신 규격 변경 대응 (res.success, res.data 사용)
+  if (!schedule.success || !summaryData.success) return; 
+
+  State.schedules = schedule.data.items || [];
+  State.summaries = summaryData.data.items || [];
   
-  selectedMap.clear();
-  const mySelections = allSummaries.filter(s => String(s.account_id).trim() === String(accountId).trim());
-  mySelections.forEach(s => selectedMap.add(`${s.date}__${s.time_slot}`));
+  State.selectedMap.clear();
+  const mySelections = State.summaries.filter(s => String(s.account_id).trim() === String(accountId).trim());
+  mySelections.forEach(s => State.selectedMap.add(`${s.date}__${s.time_slot}`));
 
   updateDateChipsWithData();
   renderList();
@@ -56,11 +73,11 @@ function initDateChips() {
   const today = new Date();
   let html = "";
   
-  if (!selectedDate) {
+  if (!State.selectedDate) {
     const yyyy = today.getFullYear();
     const mm = String(today.getMonth() + 1).padStart(2, '0');
     const dd = String(today.getDate()).padStart(2, '0');
-    selectedDate = `${yyyy}-${mm}-${dd}`;
+    State.selectedDate = `${yyyy}-${mm}-${dd}`;
   }
   
   for(let i = 0; i < 14; i++) {
@@ -74,7 +91,7 @@ function initDateChips() {
     const dateVal = `${yyyy}-${mm}-${dd}`;
     
     const isWeekend = (dayStr === '토' || dayStr === '일') ? 'color: var(--blue-1);' : '';
-    const isSelected = isSameDate(dateVal, selectedDate) ? "selected" : "";
+    const isSelected = isSameDate(dateVal, State.selectedDate) ? "selected" : "";
     
     const appleDisplay = `<span style="font-size:11px; opacity:0.6; font-weight:700; ${isWeekend}">${dayStr}</span><span style="font-size:16px; font-weight:900; margin-top:4px;">${dd}</span>`;
     html += `<button type="button" class="chip-btn date-chip ${isSelected}" data-date="${dateVal}" data-day="${dayStr}">${appleDisplay}</button>`;
@@ -84,21 +101,34 @@ function initDateChips() {
   if (group) group.innerHTML = html;
 }
 
-// 칩 이벤트 위임
-const dateChipGroup = getEl("dateChipGroup");
-if (dateChipGroup) {
-  dateChipGroup.addEventListener("click", e => {
-     if (window.isDraggingScroll) return; // 드래그 중 클릭 방지
-     const btn = e.target.closest(".chip-btn");
-     if(!btn) return;
-     
-     btn.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
+function bindEvents() {
+  // 칩 스크롤 클릭 이벤트
+  const dateChipGroup = getEl("dateChipGroup");
+  if (dateChipGroup) {
+    dateChipGroup.addEventListener("click", e => {
+       if (window.isDraggingScroll) return;
+       const btn = e.target.closest(".chip-btn");
+       if(!btn) return;
+       
+       btn.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
+       dateChipGroup.querySelectorAll(".chip-btn").forEach(b => b.classList.remove("selected"));
+       btn.classList.add("selected");
+       State.selectedDate = btn.dataset.date; // State 업데이트
+       renderList();
+    });
+  }
 
-     dateChipGroup.querySelectorAll(".chip-btn").forEach(b => b.classList.remove("selected"));
-     btn.classList.add("selected");
-     selectedDate = btn.dataset.date;
-     renderList();
-  });
+  // 리스트 클릭 이벤트 (이벤트 위임)
+  const listEl = getEl("availabilityList");
+  if (listEl) {
+    listEl.addEventListener("click", (e) => {
+      const btn = e.target.closest(".availability-item");
+      if (!btn) return;
+      toggleTime(btn.dataset.date, btn.dataset.time);
+    });
+  }
+
+  getEl("backButton").onclick = () => movePage("main.html");
 }
 
 function updateDateChipsWithData() {
@@ -109,7 +139,7 @@ function updateDateChipsWithData() {
 
   group.querySelectorAll(".chip-btn").forEach(btn => {
     const dateVal = btn.dataset.date;
-    const hasData = allSchedules.some(s => isSameDate(s.date, dateVal));
+    const hasData = State.schedules.some(s => isSameDate(s.date, dateVal));
     if (hasData) {
       btn.style.border = "1px solid rgba(67, 217, 255, 0.4)";
       btn.style.background = "rgba(67, 217, 255, 0.05)";
@@ -118,13 +148,13 @@ function updateDateChipsWithData() {
   });
   
   // 현재 선택된 날짜에 일정이 없고, 일정이 있는 첫 날짜가 존재하면 자동 스크롤/선택 이동
-  const currentHasData = allSchedules.some(s => isSameDate(s.date, selectedDate));
+  const currentHasData = State.schedules.some(s => isSameDate(s.date, State.selectedDate));
   if (!currentHasData && firstDataDate) {
     const targetBtn = group.querySelector(`.chip-btn[data-date="${firstDataDate}"]`);
     if (targetBtn) {
       group.querySelectorAll(".chip-btn").forEach(b => b.classList.remove("selected"));
       targetBtn.classList.add("selected");
-      selectedDate = firstDataDate;
+      State.selectedDate = firstDataDate;
       targetBtn.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
     }
   }
@@ -132,7 +162,7 @@ function updateDateChipsWithData() {
 
 function renderList() {
   const target = getEl("availabilityList");
-  const filteredItems = allSchedules.filter(s => isSameDate(s.date, selectedDate));
+  const filteredItems = State.schedules.filter(s => isSameDate(s.date, State.selectedDate));
   
   if (filteredItems.length === 0) {
     target.innerHTML = `<div class="availability-empty">선택한 날짜에 등록된 일정이 없습니다.</div>`;
@@ -144,10 +174,10 @@ function renderList() {
 
   target.innerHTML = filteredItems.map(i => {
     const key = `${i.date}__${i.time_slot}`;
-    const isSelected = selectedMap.has(key);
+    const isSelected = State.selectedMap.has(key);
     const shortDate = i.date && i.date.length >= 10 ? i.date.substring(5).replace('-', '.') : i.date;
     
-    const participantsCount = allSummaries.filter(s => isSameDate(s.date, i.date) && s.time_slot === i.time_slot).length;
+    const participantsCount = State.summaries.filter(s => isSameDate(s.date, i.date) && s.time_slot === i.time_slot).length;
 
     return `
       <button class="availability-item ${isSelected ? 'active' : ''}" data-date="${i.date}" data-time="${escapeHtml(i.time_slot)}">
@@ -171,23 +201,16 @@ function renderList() {
   applyTouchPop();
 }
 
-// 이벤트 위임(Event Delegation)을 통한 리스너 최적화
-getEl("availabilityList").addEventListener("click", (e) => {
-  const btn = e.target.closest(".availability-item");
-  if (!btn) return;
-  toggleTime(btn.dataset.date, btn.dataset.time);
-});
-
 async function toggleTime(date, time) {
   const key = `${date}__${time}`;
-  const scheduleItem = allSchedules.find(s => s.date === date && s.time_slot === time);
+  const scheduleItem = State.schedules.find(s => s.date === date && s.time_slot === time);
   if (!scheduleItem) return;
   const targetWeekKey = scheduleItem.week_key;
   
   // 1. 낙관적 UI 업데이트 (API 응답을 기다리지 않고 화면부터 즉각 변경)
   const btn = document.querySelector(`.availability-item[data-date="${date}"][data-time="${time}"]`);
-  if (selectedMap.has(key)) {
-    selectedMap.delete(key);
+  if (State.selectedMap.has(key)) {
+    State.selectedMap.delete(key);
     if (btn) {
       btn.classList.remove("active");
       btn.querySelector(".status-text").innerHTML = "미선택";
@@ -201,7 +224,7 @@ async function toggleTime(date, time) {
       }
     }
   } else {
-    selectedMap.add(key);
+    State.selectedMap.add(key);
     if (btn) {
       btn.classList.add("active");
       btn.querySelector(".status-text").innerHTML = "✓ 참여";
@@ -218,9 +241,9 @@ async function toggleTime(date, time) {
 
   // 현재 클릭한 일정과 '같은 주차(week_key)'에 속한 항목들만 안전하게 분리해서 모아줌
   const slotsForThisWeek = [];
-  for (const selKey of selectedMap) {
+  for (const selKey of State.selectedMap) {
     const [d, t] = selKey.split("__");
-    const sItem = allSchedules.find(s => s.date === d && s.time_slot === t);
+    const sItem = State.schedules.find(s => s.date === d && s.time_slot === t);
     if (sItem && sItem.week_key === targetWeekKey) {
       slotsForThisWeek.push({ day: sItem.day, time_slot: t });
     }
@@ -236,13 +259,9 @@ async function toggleTime(date, time) {
     weekKey: targetWeekKey,
     slotList: JSON.stringify(slotsForThisWeek)
   }).then(res => {
-    // 3. 실패했을 경우에만 경고 후 원래 상태로 복구
-    if (!res.ok) {
-      alert("저장에 실패했습니다. 상태를 다시 동기화합니다.");
-      initAvailability(); 
+    // 💡 1순위: 에러 알림은 api.js에서 띄워주므로, 여기서는 데이터 롤백만 수행하면 끝!
+    if (!res.success) {
+      loadAvailabilityData(); 
     }
   });
 }
-
-getEl("backButton").onclick = () => movePage("main.html");
-initAvailability();

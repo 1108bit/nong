@@ -8,12 +8,12 @@ async function loadAllCharacters() {
   const res = await callApi({ action: "getAllCharacters" });
   getEl("pageMessage").style.display = "none";
   
-  if (!res.ok) {
+  if (!res.success) {
     getEl("allCharactersTableContainer").innerHTML = `<div class="character-empty">데이터를 불러올 수 없습니다.</div>`;
     return;
   }
   
-  allCharacters = res.items || [];
+  allCharacters = res.data.items || [];
   renderTable();
 }
 

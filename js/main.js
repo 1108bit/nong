@@ -20,20 +20,20 @@ async function loadMain() {
     <div class="skeleton-block skeleton-card" style="margin-bottom:10px;"></div>
   `;
 
-  const data = await callApi({ action: "getMainData", accountId });
-  if (!data.ok) {
+  const data = await callApi({ action: "getMainData", accountId, hideAlert: true });
+  if (!data.success) {
     list.innerHTML = `<div class="character-empty" style="color: #fda4af;">에러: ${data.message || "데이터를 불러올 수 없습니다."}</div>`;
     return;
   }
 
-  setText("accountMainName", data.mainName || "계정 없음");
-  setText("characterCount", data.characters?.length || 0);
-  setText("selectedCount", (data.selectedCount || 0) + "개");
+  setText("accountMainName", data.data.mainName || "계정 없음");
+  setText("characterCount", data.data.characters?.length || 0);
+  setText("selectedCount", (data.data.selectedCount || 0) + "개");
   
   // 등록된 캐릭터 중 '본캐'가 있는지 확인
-  hasMainCharacter = data.characters?.some(c => c.type === CHARACTER_TYPES.MAIN);
+  hasMainCharacter = data.data.characters?.some(c => c.type === CHARACTER_TYPES.MAIN);
 
-  characters = data.characters || [];
+  characters = data.data.characters || [];
   renderCharacters(characters);
   applyTouchPop();
 }
@@ -201,7 +201,7 @@ async function submitCharacter() {
   btn.textContent = originalText;
   btn.style.opacity = "1";
 
-  if(res.ok) {
+  if(res.success) {
     closeModal(); // 모달 닫기 및 입력창 완전 초기화
     setTimeout(loadMain, 400); // 구글 시트 저장 대기 후 리스트 새로고침
   } else {
@@ -235,7 +235,7 @@ async function confirmDelete(characterName) {
       characterName: characterName
     });
 
-    if (res.ok) {
+    if (res.success) {
       setTimeout(loadMain, 300); // 삭제 처리 후 대기 및 새로고침
     } else {
       alert(res.message || "캐릭터 삭제에 실패했습니다.");
@@ -312,13 +312,13 @@ async function toggleCharacterType(characterName) {
         characterName: characterName
     });
 
-    if (res.ok) {
+    if (res.success) {
         // 본캐로 성공적 전환 시 브라우저 내부 로그인 세션(URL 파라미터 방어) 동기화
-        if (res.newType === "본캐") {
+        if (res.data?.newType === "본캐") {
             sessionStorage.setItem("mainName", characterName);
             if (localStorage.getItem("autoMainName")) localStorage.setItem("autoMainName", characterName);
         }
-        alert(`'${characterName}' 캐릭터가 ${res.newType}로 설정되었습니다.`);
+        alert(`'${characterName}' 캐릭터 설정이 변경되었습니다.`);
         setTimeout(loadMain, 300); // 타입 변경 후 대기 및 새로고침
     } else {
         alert(res.message || "타입 변경에 실패했습니다.");
@@ -398,7 +398,7 @@ if (changePwdBtn) {
     const newPwd = prompt("새롭게 설정할 비밀번호 4자리를 입력해주세요."); if (!newPwd) return;
     if (oldPwd === newPwd) return alert("기존 비밀번호와 동일합니다.");
     const res = await callApi({ action: "changePassword", accountId: getAccountId(), oldPassword: oldPwd, newPassword: newPwd });
-    alert(res.message);
+    if (res.success) alert(res.message); // 에러는 api.js가 띄우므로 성공 시에만 띄움
   };
 }
 
@@ -440,12 +440,10 @@ if (adminSecretBtn) {
       if (!code) return;
 
       const res = await callApi({ action: "adminLogin", adminCode: code });
-      if (res.ok) {
+      if (res.success) {
         sessionStorage.setItem("isAdmin", "true");
         sessionStorage.setItem("adminCode", code);
         location.href = `./admin.html?mainName=${encodeURIComponent('👑 마스터')}&accountId=MASTER_ADMIN`;
-      } else {
-        alert("관리자 코드가 일치하지 않습니다.");
       }
     }
   });
