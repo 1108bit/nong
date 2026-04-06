@@ -1,13 +1,5 @@
 const API_URL = "https://script.google.com/macros/s/AKfycbxgoannrkzyrAaIF8FeJP-ZJyFUrhdtT1d_iJdrY0JiJwqebPYbToS5r-nUYp6Ow-2fYw/exec";
 
-// 💡 [UX 최적화] 로딩이 길어질 수 있는 쓰기 작업 목록
-const WRITE_ACTIONS_FOR_LOADING = [
-  'login', 'adminLogin', 'addCharacter', 'updateCharacter', 'deleteCharacter', 'toggleCharacterType',
-  'saveRaidSchedule', 'deleteRaidSchedule', 'savePartyComposition', 'saveAvailability',
-  'updateCharacterByAdmin', 'updateAdminCodeSetting', 'changePassword',
-  'toggleAdminRole', 'resetUserPasswordByAdmin', 'saveNotice'
-];
-
 let globalLoadingTimeout;
 let globalLoadingEl;
 
@@ -45,7 +37,8 @@ function hideGlobalLoading() {
 }
 
 async function callApi(params) {
-  const isWriteAction = WRITE_ACTIONS_FOR_LOADING.includes(params.action);
+  // 💡 [구조 개선] 하드코딩된 배열 대신, 액션명 패턴(save, update 등)으로 쓰기 작업을 자동 감지하여 로딩창 렌더링
+  const isWriteAction = params.showLoading === true || /^(save|update|delete|add|toggle|reset|login)/i.test(params.action);
   const isBackground = params.background; // 명시적으로 백그라운드 요청인 경우 오버레이 제외
 
   try {
