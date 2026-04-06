@@ -6,7 +6,7 @@
   <meta name="theme-color" content="#06111d" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-  <title>洹몃┝???덇린??- 硫붿씤</title>
+  <title>그림자 레기온 - 메인</title>
   <link rel="stylesheet" href="./css/variables.css?v=20260406191807" />
   <link rel="stylesheet" href="./css/layout.css?v=20260406191807" />
   <link rel="stylesheet" href="./css/components.css?v=20260406191807" />
@@ -41,21 +41,21 @@
           <div id="noticeText" class="notice-text"></div>
         </div>
 
-        <!-- ?ㅻ뜑濡??듯빀?????뺣낫 諛?-->
+        <!-- 헤더로 통합된 내 정보 바 -->
         <div class="hero-info-bar">
           <div class="hero-info-item">
-            <span class="hero-info-label">蹂몄틦紐?/span>
+            <span class="hero-info-label">본캐명</span>
             <strong class="hero-info-value" id="accountMainName" style="color: var(--text-main);">-</strong>
           </div>
           <div class="hero-info-divider"></div>
           <div class="hero-info-item">
-            <span class="hero-info-label">罹먮┃??/span>
+            <span class="hero-info-label">캐릭터</span>
             <strong class="hero-info-value" id="characterCount">0</strong>
           </div>
           <div class="hero-info-divider"></div>
           <div class="hero-info-item">
-            <span class="hero-info-label">?좏깮 ?쒓컙</span>
-            <strong class="hero-info-value" id="selectedCount">0媛?/strong>
+            <span class="hero-info-label">선택 시간</span>
+            <strong class="hero-info-value" id="selectedCount">0개</strong>
           </div>
         </div>
       </section>
@@ -147,42 +147,42 @@
           </div>
           
           <div class="modal-action-row">
-            <button class="btn btn-secondary" id="cancelCharacterButton">痍⑥냼</button>
-            <button class="btn btn-primary" id="submitCharacterButton">?깅줉?섍린</button>
+            <button class="btn btn-secondary" id="cancelCharacterButton">취소</button>
+            <button class="btn btn-primary" id="submitCharacterButton">등록하기</button>
           </div>
         </div>
       </div>
     </div>
 
-    <!-- ?좏뵆 ?ㅽ???Action Sheet (?붾낫湲? -->
+    <!-- 심플 액션 Action Sheet (더보기) -->
     <div class="action-sheet-overlay" id="characterActionSheet" onclick="if(event.target===this) closeCharacterActionSheet()">
       <div class="action-sheet">
         <div class="action-sheet-group">
           <div class="action-sheet-head">
-            <span id="actionSheetCharName" style="font-weight: 800; font-size: 13px; color: var(--text-sub);">罹먮┃?곕챸</span>
+            <span id="actionSheetCharName" style="font-weight: 800; font-size: 13px; color: var(--text-sub);">캐릭터명</span>
           </div>
-          <button class="action-sheet-btn" onclick="closeCharacterActionSheet(); openEditModal(selectedCharNameForAction)">?륅툘 ?몄쭛</button>
-          <button class="action-sheet-btn" id="actionSheetToggleBtn" onclick="closeCharacterActionSheet(); toggleCharacterType(selectedCharNameForAction)">??蹂몄틦/遺罹??꾪솚</button>
-          <button class="action-sheet-btn danger" id="actionSheetDeleteBtn" onclick="closeCharacterActionSheet(); confirmDelete(selectedCharNameForAction)">?뿊截???젣</button>
+          <button class="action-sheet-btn" onclick="closeCharacterActionSheet(); openEditModal(selectedCharNameForAction)">✏️ 편집</button>
+          <button class="action-sheet-btn" id="actionSheetToggleBtn" onclick="closeCharacterActionSheet(); toggleCharacterType(selectedCharNameForAction)">⇄ 본캐/부캐 전환</button>
+          <button class="action-sheet-btn danger" id="actionSheetDeleteBtn" onclick="closeCharacterActionSheet(); confirmDelete(selectedCharNameForAction)">🗑️ 삭제</button>
         </div>
         <div class="action-sheet-gap"></div>
-        <button class="action-sheet-btn cancel" onclick="closeCharacterActionSheet()">痍⑥냼</button>
+        <button class="action-sheet-btn cancel" onclick="closeCharacterActionSheet()">취소</button>
       </div>
     </div>
 
-    <!-- ?좏뵆 ?ㅽ????ㅼ젙 硫붾돱 Action Sheet -->
+    <!-- 심플 액션 설정 메뉴 Action Sheet -->
     <div class="action-sheet-overlay" id="settingsActionSheet" onclick="if(event.target===this) closeSettingsActionSheet()">
       <div class="action-sheet">
         <div class="action-sheet-group">
           <div class="action-sheet-head">
-            <span style="font-weight: 800; font-size: 13px; color: var(--text-sub);">?쒖뒪??諛?怨꾩젙 ?ㅼ젙</span>
+            <span style="font-weight: 800; font-size: 13px; color: var(--text-sub);">시스템 및 계정 설정</span>
           </div>
-          <button class="action-sheet-btn" id="changePwdBtn">?뵏 鍮꾨?踰덊샇 蹂寃?/button>
-          <button class="action-sheet-btn" id="goAdminBtn" style="display: none; color: var(--gold-1);">?몣 愿由ъ옄 ?섏씠吏</button>
-          <button class="action-sheet-btn danger" id="logoutBtn">?슞 濡쒓렇?꾩썐</button>
+          <button class="action-sheet-btn" id="changePwdBtn">🔑 비밀번호 변경</button>
+          <button class="action-sheet-btn" id="goAdminBtn" style="display: none; color: var(--gold-1);">👑 관리자 페이지</button>
+          <button class="action-sheet-btn danger" id="logoutBtn">🚪 로그아웃</button>
         </div>
         <div class="action-sheet-gap"></div>
-        <button class="action-sheet-btn cancel" onclick="closeSettingsActionSheet()">?リ린</button>
+        <button class="action-sheet-btn cancel" onclick="closeSettingsActionSheet()">닫기</button>
       </div>
     </div>
   </main>
@@ -191,4 +191,3 @@
   <script src="./js/main.js?v=20260406191807"></script>
 </body>
 </html>
-

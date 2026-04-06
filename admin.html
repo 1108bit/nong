@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>洹몃┝???덇린??- ?쇱젙 愿由?/title>
+  <title>그림자 레기온 - 일정 관리</title>
   <script src="https://cdn.jsdelivr.net/npm/sortablejs@latest/Sortable.min.js"></script>
   <link rel="stylesheet" href="./css/variables.css?v=20260406191807" />
   <link rel="stylesheet" href="./css/layout.css?v=20260406191807" />
@@ -17,24 +17,24 @@
     <div class="main-shell">
       <section class="main-header-hero">
         <div class="main-hero-top">
-          <h1 class="main-page-title">?몣 愿由??섏씠吏</h1>
+          <h1 class="main-page-title">운영 관리 페이지</h1>
           <div>
-            <button class="btn btn-secondary" id="backButton" style="padding: 0 16px; min-height: 40px; border-radius: 12px; font-size: 13px;">??硫붿씤?쇰줈</button>
+            <button class="btn btn-secondary" id="backButton" style="padding: 0 16px; min-height: 40px; border-radius: 12px; font-size: 13px;">메인으로</button>
           </div>
         </div>
       </section>
 
-      <!-- 媛뺤젣 怨좎젙 ?덉씠?꾩썐 而⑦뀒?대꼫 -->
+      <!-- 강제 고정 레이아웃 컨테이너 -->
       <section class="admin-main-container" style="display: flex; flex-direction: column; gap: 20px;">
         
-        <!-- ?곷떒: 寃???뱀뀡 -->
+        <!-- 상단: 검색 섹션 -->
         <article class="main-card search-section">
-          <div class="card-head"><h2 class="section-title">?좎? 罹먮┃??愿由?/h2></div>
+          <div class="card-head"><h2 class="section-title">유저 캐릭터 관리</h2></div>
           <div class="form-group">
-            <label class="input-label">?좎? 寃??(蹂몄틦紐?</label>
+            <label class="input-label">유저 검색 (본캐명)</label>
             <div style="display: flex; gap: 8px; align-items: center;">
               <input type="text" id="userAccountIdInput" class="main-input" autocomplete="off" style="flex: 1; height: 52px;" />
-              <button class="btn btn-primary" id="searchUserButton" style="flex-shrink: 0; width: 90px; height: 52px; min-height: 52px; padding: 0;">寃??/button>
+              <button class="btn btn-primary" id="searchUserButton" style="flex-shrink: 0; width: 90px; height: 52px; min-height: 52px; padding: 0;">검색</button>
             </div>
           </div>
           <div id="userSearchResultArea" class="user-search-result-box" style="display: none;">
@@ -43,16 +43,16 @@
           </div>
         </article>
 
-        <!-- ?섎떒: 2遺꾪븷 (??| 紐⑸줉) -->
+        <!-- 하단: 2분할 (폼 | 목록) -->
         <div class="admin-content-grid">
           <div style="display: flex; flex-direction: column; gap: 20px;">
-            <!-- ?깅줉 ??-->
+            <!-- 등록 폼 -->
             <article class="main-card form-section">
-              <div class="card-head"><h2 class="section-title">???쇱젙 ?깅줉</h2></div>
+              <div class="card-head"><h2 class="section-title">새 일정 등록</h2></div>
               <div class="admin-form-grid">
                 <div class="form-group" style="margin-bottom: 0;">
                   <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
-                    <label class="input-label" style="margin: 0;">?쇱옄 ?좏깮</label>
+                    <label class="input-label" style="margin: 0;">일자 선택</label>
                     <div class="scroll-indicator" id="dateScrollInd"><div class="scroll-indicator-dot"></div></div>
                   </div>
                   <div class="chip-select-group horizontal-scroll-chips" id="dateChipGroup" style="margin-top: 0;"></div>
@@ -61,47 +61,47 @@
                 </div>
                 <div class="form-group" style="margin-bottom: 0;">
                   <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
-                    <label class="input-label" style="margin: 0;">?쒓컙 ?좏깮</label>
+                    <label class="input-label" style="margin: 0;">시간 선택</label>
                     <div class="scroll-indicator" id="timeScrollInd"><div class="scroll-indicator-dot"></div></div>
                   </div>
                   <div class="chip-select-group horizontal-scroll-chips" id="timeChipGroup" data-target="timeSlotInput" style="margin-top: 0;"></div>
                   <input type="hidden" id="timeSlotInput" value="21:00" />
                 </div>
                 <div class="form-group" style="grid-column: 1 / -1;">
-                  <label class="input-label">硫붾え (?좏깮)</label>
-                  <input type="text" id="noteInput" class="main-input" autocomplete="off" placeholder="?? 蹂몄틦 ?꾩＜ ?? />
+                  <label class="input-label">메모 (선택)</label>
+                  <input type="text" id="noteInput" class="main-input" autocomplete="off" placeholder="ex) 본캐 위주 파티" />
                 </div>
               </div>
               <div class="admin-action-row" style="margin: 20px auto 0; display: block;">
-                <button class="btn btn-primary" id="saveButton" style="width: 100%; display: block;">?쇱젙 ???/button>
+                <button class="btn btn-primary" id="saveButton" style="width: 100%; display: block;">일정 저장</button>
               </div>
-              <div class="page-message" id="adminMessage" style="margin-top: 12px;">?댁슜 ?낅젰 ?????踰꾪듉???뚮윭二쇱꽭??</div>
+              <div class="page-message" id="adminMessage" style="margin-top: 12px;">내용 입력 후 저장 버튼을 눌러주세요.</div>
             </article>
 
-            <!-- 蹂댁븞 ?ㅼ젙 -->
+            <!-- 보안 설정 -->
             <article class="main-card" id="securitySettingsCard">
-              <div class="card-head"><h2 class="section-title">?쒖뒪??諛?蹂댁븞 ?ㅼ젙</h2></div>
+              <div class="card-head"><h2 class="section-title">시스템 및 보안 설정</h2></div>
               <div class="form-group" style="margin-bottom: 24px; padding-bottom: 24px; border-bottom: 1px solid rgba(138, 188, 233, 0.1);">
-                <label class="input-label">?곗씠?곕쿋?댁뒪 愿由?/label>
-                <button class="btn btn-secondary" id="checkSchemaButton" style="width: auto; padding: 0 24px;">DB ?곹깭 ?먭?</button>
+                <label class="input-label">데이터베이스 관리</label>
+                <button class="btn btn-secondary" id="checkSchemaButton" style="width: auto; padding: 0 24px;">DB 상태 점검</button>
               </div>
               <div style="max-width: 380px;">
                 <div class="form-group">
-                  <label class="input-label">?꾩옱 愿由ъ옄 肄붾뱶</label>
+                  <label class="input-label">현재 관리자 코드</label>
                   <input type="password" id="oldAdminCodeInput" class="main-input" autocomplete="new-password" />
                 </div>
                 <div class="form-group">
-                  <label class="input-label">??愿由ъ옄 肄붾뱶</label>
+                  <label class="input-label">새 관리자 코드</label>
                   <input type="password" id="newAdminCodeInput" class="main-input" autocomplete="new-password" />
                 </div>
                 <div class="admin-action-row" style="margin-top: 20px;">
-                  <button class="btn btn-primary" id="changeAdminCodeButton" style="width: 100%;">肄붾뱶 蹂寃?/button>
+                  <button class="btn btn-primary" id="changeAdminCodeButton" style="width: 100%;">코드 변경</button>
                 </div>
                 <div class="form-group" style="grid-column: 1 / -1;">
-                  <label class="input-label">怨듦컻 ?щ?</label>
+                  <label class="input-label">공개 여부</label>
                   <div class="chip-select-group" data-target="openYnInput" id="openYnGroup">
-                    <button type="button" class="chip-btn selected" data-value="Y" style="min-width: 80px;">怨듦컻</button>
-                    <button type="button" class="chip-btn" data-value="N" style="min-width: 80px;">鍮꾧났媛?(?꾩떆???</button>
+                    <button type="button" class="chip-btn selected" data-value="Y" style="min-width: 80px;">공개</button>
+                    <button type="button" class="chip-btn" data-value="N" style="min-width: 80px;">비공개 (임시저장)</button>
                   </div>
                   <input type="hidden" id="openYnInput" value="Y" />
                 </div>
@@ -109,18 +109,18 @@
             </article>
           </div>
 
-          <!-- ?곗륫 ?⑤꼸 (?쇱젙 ??쒕낫??- 60%) -->
+          <!-- 우측 패널 (일정 대시보드 - 60%) -->
           <article class="main-card list-section" style="display: flex; flex-direction: column;">
             <div class="card-head" style="flex-direction: column; align-items: stretch; gap: 10px; margin-bottom: 16px;">
-              <h2 class="section-title">?뱟 ??쒕낫??/h2>
+              <h2 class="section-title">일정 대시보드</h2>
               <div class="scroll-indicator" style="width: 100%; height: 4px; background: rgba(255, 255, 255, 0.08); border-radius: 2px; margin-top: 4px;">
                 <div id="dashboardProgress" style="width: 0%; height: 100%; background: var(--blue-1); transition: width 0.3s ease; border-radius: 2px;"></div>
               </div>
               <div class="form-group" style="grid-column: 1 / -1;">
-                <label class="input-label">怨듦컻 ?щ?</label>
+                <label class="input-label">공개 여부</label>
                 <div class="chip-select-group" data-target="editOpenYnInput" id="editOpenYnGroup">
-                  <button type="button" class="chip-btn selected" data-value="Y" style="min-width: 80px;">怨듦컻</button>
-                  <button type="button" class="chip-btn" data-value="N" style="min-width: 80px;">鍮꾧났媛?(?꾩떆???</button>
+                  <button type="button" class="chip-btn selected" data-value="Y" style="min-width: 80px;">공개</button>
+                  <button type="button" class="chip-btn" data-value="N" style="min-width: 80px;">비공개 (임시저장)</button>
                 </div>
                 <input type="hidden" id="editOpenYnInput" value="Y" />
               </div>
@@ -131,47 +131,47 @@
         </div>
       </section>
 
-      <!-- ?좎? 罹먮┃???몄쭛 紐⑤떖 -->
+      <!-- 유저 캐릭터 편집 모달 -->
       <div class="modal-overlay" id="adminCharacterModal">
         <div class="modal-sheet">
           <div class="modal-head">
-            <h3 class="modal-title">?좎? 罹먮┃???몄쭛</h3>
-            <button class="modal-close-btn" id="closeAdminModalButton">?リ린</button>
+            <h3 class="modal-title">유저 캐릭터 편집</h3>
+            <button class="modal-close-btn" id="closeAdminModalButton">닫기</button>
           </div>
           <div class="modal-form">
             <input type="hidden" id="adminModalAccountId" />
             <input type="hidden" id="adminModalOriginalName" />
             <div class="form-group">
-              <label class="input-label">罹먮┃?곕챸</label>
-              <input type="text" id="adminModalCharacterName" class="main-input" placeholder="罹먮┃?곕챸 ?낅젰" />
+              <label class="input-label">캐릭터명</label>
+              <input type="text" id="adminModalCharacterName" class="main-input" placeholder="캐릭터명 입력" />
             </div>
             <div class="form-group">
-              <label class="input-label">?대옒??/label>
+              <label class="input-label">클래스</label>
               <div class="chip-select-group" data-target="adminModalCharacterClass">
-                <button type="button" class="chip-btn chip-class 寃?? data-value="寃??>寃??/button>
-                <button type="button" class="chip-btn chip-class ?섑샇?? data-value="?섑샇??>?섑샇??/button>
-                <button type="button" class="chip-btn chip-class ?댁꽦" data-value="?댁꽦">?댁꽦</button>
-                <button type="button" class="chip-btn chip-class 沅곸꽦" data-value="沅곸꽦">沅곸꽦</button>
-                <button type="button" class="chip-btn chip-class 留덈룄?? data-value="留덈룄??>留덈룄??/button>
-                <button type="button" class="chip-btn chip-class ?뺣졊?? data-value="?뺣졊??>?뺣졊??/button>
-                <button type="button" class="chip-btn chip-class 移섏쑀?? data-value="移섏쑀??>移섏쑀??/button>
-                <button type="button" class="chip-btn chip-class ?몃쾿?? data-value="?몃쾿??>?몃쾿??/button>
+                <button type="button" class="chip-btn chip-class 검성" data-value="검성">검성</button>
+                <button type="button" class="chip-btn chip-class 수호성" data-value="수호성">수호성</button>
+                <button type="button" class="chip-btn chip-class 살성" data-value="살성">살성</button>
+                <button type="button" class="chip-btn chip-class 궁성" data-value="궁성">궁성</button>
+                <button type="button" class="chip-btn chip-class 마도성" data-value="마도성">마도성</button>
+                <button type="button" class="chip-btn chip-class 정령성" data-value="정령성">정령성</button>
+                <button type="button" class="chip-btn chip-class 치유성" data-value="치유성">치유성</button>
+                <button type="button" class="chip-btn chip-class 호법성" data-value="호법성">호법성</button>
               </div>
               <input type="hidden" id="adminModalCharacterClass" />
             </div>
             
             <div class="form-group">
-              <label class="input-label">???/label>
+              <label class="input-label">타입</label>
               <div class="chip-select-group" data-target="adminModalCharacterType">
-                <button type="button" class="chip-btn chip-type main" data-value="蹂몄틦">蹂몄틦</button>
-                <button type="button" class="chip-btn chip-type sub" data-value="遺罹?>遺罹?/button>
+                <button type="button" class="chip-btn chip-type main" data-value="본캐">본캐</button>
+                <button type="button" class="chip-btn chip-type sub" data-value="부캐">부캐</button>
               </div>
               <input type="hidden" id="adminModalCharacterType" />
             </div>
             <div class="form-group">
-              <label class="input-label">?꾪닾??/label>
+              <label class="input-label">전투력</label>
               <div class="chip-select-group" data-target="adminModalCharacterPower">
-                <button type="button" class="chip-btn" data-value="0">100<span class="unit-k">K</span> 誘몃쭔</button>
+                <button type="button" class="chip-btn" data-value="0">100<span class="unit-k">K</span> 미만</button>
                 <button type="button" class="chip-btn" data-value="100">100<span class="unit-k">K</span> ~ 150<span class="unit-k">K</span></button>
                 <button type="button" class="chip-btn" data-value="150">150<span class="unit-k">K</span> ~ 200<span class="unit-k">K</span></button>
                 <button type="button" class="chip-btn" data-value="200">200<span class="unit-k">K</span> ~ 250<span class="unit-k">K</span></button>
@@ -180,28 +180,28 @@
                 <button type="button" class="chip-btn" data-value="350">350<span class="unit-k">K</span> ~ 400<span class="unit-k">K</span></button>
                 <button type="button" class="chip-btn" data-value="400">400<span class="unit-k">K</span> ~ 450<span class="unit-k">K</span></button>
                 <button type="button" class="chip-btn" data-value="450">450<span class="unit-k">K</span> ~ 500<span class="unit-k">K</span></button>
-                <button type="button" class="chip-btn" data-value="500">500<span class="unit-k">K</span> ?댁긽</button>
+                <button type="button" class="chip-btn" data-value="500">500<span class="unit-k">K</span> 이상</button>
               </div>
               <input type="hidden" id="adminModalCharacterPower" />
             </div>
             
             <div class="modal-action-row">
-              <button class="btn btn-secondary" id="cancelAdminModalButton">痍⑥냼</button>
-              <button class="btn btn-primary" id="submitAdminCharacterButton">?섏젙?섍린</button>
+              <button class="btn btn-secondary" id="cancelAdminModalButton">취소</button>
+              <button class="btn btn-primary" id="submitAdminCharacterButton">수정하기</button>
             </div>
           </div>
         </div>
       </div>
 
-      <!-- ?쇱젙 ?몄쭛 紐⑤떖 -->
+      <!-- 일정 수정 모달 -->
       <div class="modal-overlay" id="scheduleModal">
         <div class="modal-sheet">
           <div class="modal-head">
             <div>
-              <h3 class="modal-title">?쇱젙 ?섏젙</h3>
+              <h3 class="modal-title">일정 수정</h3>
               <p id="editScheduleInfo" style="font-size: 13px; color: #94a3b8; margin-top: 4px; font-weight: 400;"></p>
             </div>
-            <button class="modal-close-btn" id="closeScheduleModalBtn">?リ린</button>
+            <button class="modal-close-btn" id="closeScheduleModalBtn">닫기</button>
           </div>
           <div class="modal-form">
             <input type="hidden" id="editOriginalDate" />
@@ -211,7 +211,7 @@
             <div class="admin-form-grid">
               <div class="form-group" style="margin-bottom: 0;">
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
-                  <label class="input-label" style="margin: 0;">?쇱옄 蹂寃?/label>
+                  <label class="input-label" style="margin: 0;">일자 변경</label>
                   <div class="scroll-indicator" id="editDateScrollInd"><div class="scroll-indicator-dot"></div></div>
                 </div>
                 <div class="chip-select-group horizontal-scroll-chips" id="editDateChipGroup" style="margin-top: 0;"></div>
@@ -220,34 +220,34 @@
               </div>
               <div class="form-group" style="margin-bottom: 0;">
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
-                  <label class="input-label" style="margin: 0;">?쒓컙 蹂寃?/label>
+                  <label class="input-label" style="margin: 0;">시간 변경</label>
                   <div class="scroll-indicator" id="editTimeScrollInd"><div class="scroll-indicator-dot"></div></div>
                 </div>
                 <div class="chip-select-group horizontal-scroll-chips" id="editTimeChipGroup" data-target="editTimeSlotInput" style="margin-top: 0;"></div>
                 <input type="hidden" id="editTimeSlotInput" value="21:00" />
               </div>
               <div class="form-group" style="grid-column: 1 / -1;">
-                <label class="input-label">硫붾え 蹂寃?/label>
-                  <input type="text" id="editNoteInput" class="main-input" autocomplete="off" placeholder="?? 蹂몄틦 ?꾩＜ ?? />
+                <label class="input-label">메모 변경</label>
+                  <input type="text" id="editNoteInput" class="main-input" autocomplete="off" placeholder="ex) 본캐 위주 파티" />
               </div>
             </div>
             <div class="admin-action-row" style="margin: 20px auto 0; display: flex; justify-content: center; gap: 12px;">
-              <button class="btn btn-secondary" id="cancelScheduleModalBtn" style="flex: 1; max-width: 150px;">痍⑥냼</button>
-              <button class="btn btn-primary" id="submitScheduleModalBtn" style="flex: 1; max-width: 150px;">?섏젙 ?꾨즺?섍린</button>
+              <button class="btn btn-secondary" id="cancelScheduleModalBtn" style="flex: 1; max-width: 150px;">취소</button>
+              <button class="btn btn-primary" id="submitScheduleModalBtn" style="flex: 1; max-width: 150px;">수정 완료하기</button>
             </div>
           </div>
         </div>
       </div>
 
-      <!-- ?뚰떚 ?곸꽭 援ъ꽦 紐⑤떖 -->
+      <!-- 파티 상세 구성 모달 -->
       <div class="modal-overlay" id="partyDetailModal">
         <div class="modal-sheet">
           <div class="modal-head">
-            <h3 class="modal-title" id="partyDetailTitle">?뚰떚 ?곸꽭 援ъ꽦</h3>
-            <button class="modal-close-btn" id="closePartyDetailBtn">?リ린</button>
+            <h3 class="modal-title" id="partyDetailTitle">파티 상세 구성</h3>
+            <button class="modal-close-btn" id="closePartyDetailBtn">닫기</button>
           </div>
           <div class="modal-form">
-            <div id="partyDetailContent">遺덈윭?ㅻ뒗 以?..</div>
+            <div id="partyDetailContent">불러오는 중...</div>
           </div>
         </div>
       </div>
@@ -259,4 +259,3 @@
   <script src="./js/admin.js?v=20260406191807"></script>
 </body>
 </html>
-

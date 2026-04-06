@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>洹몃┝???덇린??- ?쒓컙 ?좏깮</title>
+  <title>그림자 레기온 - 시간 선택</title>
   <link rel="stylesheet" href="./css/variables.css?v=20260406191807" />
   <link rel="stylesheet" href="./css/layout.css?v=20260406191807" />
   <link rel="stylesheet" href="./css/components.css?v=20260406191807" />
@@ -16,25 +16,25 @@
     <div class="main-shell">
       <section class="main-header-hero">
         <div class="main-hero-top">
-          <h1 class="main-page-title">?쒓컙 ?좏깮</h1>
-          <button class="btn btn-secondary" id="backButton">硫붿씤?쇰줈</button>
+          <h1 class="main-page-title">시간 선택</h1>
+          <button class="btn btn-secondary" id="backButton">메인으로</button>
         </div>
       </section>
       <section class="main-grid">
         <article class="main-card availability-card-full">
-          <div class="card-head"><h2 class="section-title">?좎쭨 ?좏깮</h2></div>
+          <div class="card-head"><h2 class="section-title">날짜 선택</h2></div>
           <div class="horizontal-scroll-chips chip-select-group" id="dateChipGroup" style="margin-bottom: 12px;"></div>
           <div class="scroll-indicator" style="margin-bottom: 24px;"><div class="scroll-indicator-dot" id="dateScrollInd"></div></div>
 
           <div class="card-head" style="align-items: center; border-top: 1px solid rgba(255,255,255,0.05); padding-top: 18px; margin-bottom: 8px;">
-            <h2 class="section-title">?덉씠??紐⑸줉</h2>
+            <h2 class="section-title">레이드 목록</h2>
             <div class="chip-select-group" style="margin-top:0;" id="filterGroup">
-              <button class="chip-btn selected" style="height:32px; min-width:auto; padding:0 14px; font-size:12px; border-radius:8px;" data-filter="all">?꾩껜</button>
-              <button class="chip-btn" style="height:32px; min-width:auto; padding:0 14px; font-size:12px; border-radius:8px;" data-filter="my">李몄뿬 以?/button>
+              <button class="chip-btn selected" style="height:32px; min-width:auto; padding:0 14px; font-size:12px; border-radius:8px;" data-filter="all">전체</button>
+              <button class="chip-btn" style="height:32px; min-width:auto; padding:0 14px; font-size:12px; border-radius:8px;" data-filter="my">참여 중</button>
             </div>
           </div>
           <div class="availability-list" id="availabilityList">
-            <div class="availability-empty">?쇱젙??遺덈윭?ㅻ뒗 以?..</div>
+            <div class="availability-empty">일정을 불러오는 중...</div>
           </div>
         </article>
       </section>
@@ -45,4 +45,3 @@
   <script src="./js/availability.js?v=20260406191807"></script>
 </body>
 </html>
-

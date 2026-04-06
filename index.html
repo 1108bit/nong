@@ -6,7 +6,7 @@
   <meta name="theme-color" content="#06111d" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-  <title>LEGION MANAGER - 濡쒓렇??/title>
+  <title>LEGION MANAGER - 로그인</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;800;900&display=swap" rel="stylesheet" />
@@ -16,11 +16,11 @@
   <link rel="stylesheet" href="./css/pages.css?v=20260406191807" />
 </head>
 <body>
-  <!-- ?ㅽ뵆?섏떆 ?ㅽ겕由?(?명듃濡? -->
+  <!-- 스플래시 스크린 (인트로) -->
   <div id="splashScreen" class="splash-screen">
     <div class="splash-logo-wrap">
       <img src="./images/logo_main1.png" alt="Legion Mark" class="splash-logo" />
-      <div class="splash-greeting">?댁꽌?ㅼ꽭?? 洹몃┝?먯엯?덈떎.</div>
+      <div class="splash-greeting">어서오세요, 그림자입니다.</div>
     </div>
   </div>
 
@@ -29,46 +29,46 @@
   <main class="page">
     <div class="login-shell">
       <section class="login-brand">
-        <div class="brand-badge">AION2 쨌 洹몃┝???덇린??/div>
+        <div class="brand-badge">AION2 · 그림자 레기온</div>
         <h1 class="brand-title">LEGION MANAGER</h1>
-        <p class="brand-sub">?덉씠???쇱젙怨??뚰떚瑜??ㅻ쭏?명븯寃?愿由ы븯?몄슂.</p>
+        <p class="brand-sub">레이드 일정과 파티를 스마트하게 관리하세요.</p>
       </section>
       <section class="login-card">
         <div class="form-group">
-          <label class="input-label" for="mainName">蹂몄틦紐?/label>
-          <input type="text" id="mainName" class="main-input" placeholder="?뺥솗???됰꽕?꾩쓣 ?낅젰?섏꽭?? autocomplete="off" />
+          <label class="input-label" for="mainName">본캐명</label>
+          <input type="text" id="mainName" class="main-input" placeholder="정확한 닉네임을 입력하세요" autocomplete="off" />
         </div>
         <div class="form-group">
-          <label class="input-label" for="password">鍮꾨?踰덊샇</label>
-          <input type="password" id="password" class="main-input" placeholder="?レ옄 4?먮━" maxlength="4" autocomplete="off" />
+          <label class="input-label" for="password">비밀번호</label>
+          <input type="password" id="password" class="main-input" placeholder="숫자 4자리" maxlength="4" autocomplete="off" />
         </div>
         <div class="login-options-row">
           <label class="checkbox-label">
             <input type="checkbox" id="autoLoginCheck" checked />
-            <span class="checkbox-text">?먮룞 濡쒓렇??/span>
+            <span class="checkbox-text">자동 로그인</span>
           </label>
-          <span id="forgotPasswordBtn" class="forgot-link">鍮꾨?踰덊샇瑜??딆쑝?⑤굹??</span>
+          <span id="forgotPasswordBtn" class="forgot-link">비밀번호를 잊으셨나요?</span>
         </div>
-        <button type="button" class="main-button" id="loginButton">濡쒓렇??/button>
-        <div class="page-message" id="loginResult">蹂몄틦紐낆쓣 ?낅젰?댁＜?몄슂.</div>
+        <button type="button" class="main-button" id="loginButton">로그인</button>
+        <div class="page-message" id="loginResult">본캐명을 입력해주세요.</div>
       </section>
-      <p class="copyright-text" id="adminSecretBtn" style="cursor: pointer; user-select: none; -webkit-user-select: none;">짤 ???좎뭅]. All Rights Reserved.</p>
+      <p class="copyright-text" id="adminSecretBtn" style="cursor: pointer; user-select: none; -webkit-user-select: none;">© 그림자 레기온. All Rights Reserved.</p>
     </div>
 
-    <!-- 鍮꾨?踰덊샇 李얘린 ?됰룞 媛뺣졊 紐⑤떖 -->
+    <!-- 비밀번호 찾기 모달 -->
     <div class="modal-overlay" id="helpModal">
       <div class="modal-sheet">
         <div class="modal-head">
-          <h3 class="modal-title">鍮꾨?踰덊샇 李얘린 ?덈궡</h3>
-          <button class="modal-close-btn" id="closeHelpModalBtn">?リ린</button>
+          <h3 class="modal-title">비밀번호 찾기 안내</h3>
+          <button class="modal-close-btn" id="closeHelpModalBtn">닫기</button>
         </div>
         <div class="modal-form">
           <div style="padding: 10px 0 24px; line-height: 1.6; color: var(--text-sub); font-size: 14px; text-align: left;">
-            鍮꾨?踰덊샇媛 湲곗뼲?섏? ?딆쑝?좉???<br><br>
-            ?덇린??援곕떒??留덉뒪???대굹 ?댁쁺吏꾩뿉寃?臾몄쓽?섏뿬 <strong>鍮꾨?踰덊샇 珥덇린??/strong>瑜??붿껌??二쇱꽭??<br>
-            珥덇린?붽? ?꾨즺?섎㈃ 鍮꾨?踰덊샇??<strong style="color: var(--cyan-2); font-size: 16px; letter-spacing: 2px;">0000</strong>?쇰줈 ?꾩떆 ?ㅼ젙?섎ŉ, 濡쒓렇????硫붿씤 ?붾㈃?먯꽌 ?ㅼ떆 蹂寃쏀븯?????덉뒿?덈떎.
+            비밀번호가 기억나지 않으신가요?<br><br>
+            레기온 군단장 마스터님이나 운영진에게 문의하여 <strong>비밀번호 초기화</strong>를 요청해 주세요.<br>
+            초기화가 완료되면 비밀번호는 <strong style="color: var(--cyan-2); font-size: 16px; letter-spacing: 2px;">0000</strong>으로 임시 설정되며, 로그인 후 메인 화면에서 다시 변경하실 수 있습니다.
           </div>
-          <button type="button" class="main-button" id="confirmHelpModalBtn">?뺤씤</button>
+          <button type="button" class="main-button" id="confirmHelpModalBtn">확인</button>
         </div>
       </div>
     </div>
@@ -78,4 +78,3 @@
   <script src="./js/app.js?v=20260406191807"></script>
 </body>
 </html>
-
