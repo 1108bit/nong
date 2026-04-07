@@ -204,20 +204,29 @@ function renderMySchedules(summary) {
   });
 
   let html = "";
+  let currentDate = null;
+
   myItems.forEach(i => {
     const shortDate = i.date && i.date.length >= 10 ? i.date.substring(5).replace('-', '.') : i.date;
     const totalParticipants = summary.filter(s => s.date === i.date && s.time_slot === i.time_slot).length;
 
+    // 💡 [프롬프트 반영 1&2] 날짜 기준으로 그룹화하여 Sticky Header 스타일의 섹션 추가
+    if (currentDate !== i.date) {
+      currentDate = i.date;
+      html += `
+        <div style="position: sticky; top: -16px; z-index: 10; background: rgba(14, 28, 44, 0.95); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); padding: 12px 4px 8px; margin-top: 8px; margin-bottom: 8px; border-bottom: 1px solid rgba(255,255,255,0.05); display: flex; align-items: center;">
+          <span style="font-size: 13px; font-weight: 700; color: var(--text-sub); letter-spacing: -0.02em;">🗓️ ${shortDate} (${escapeHtml(i.day)})</span>
+        </div>
+      `;
+    }
+
+    // 💡 [프롬프트 반영 3&4] 개별 카드 내부의 날짜 제거, 테두리 최소화 및 시간에 포커싱
     html += `
-      <div class="character-card touch-pop" style="cursor: pointer; padding: 16px 14px;" onclick="goToParty('${escapeHtml(i.day)}', '${escapeHtml(i.time_slot)}')">
+      <div class="character-card touch-pop" style="cursor: pointer; padding: 14px 16px; margin-bottom: 8px; border: none; background: rgba(255, 255, 255, 0.03);" onclick="goToParty('${escapeHtml(i.day)}', '${escapeHtml(i.time_slot)}')">
         <div class="character-left">
-          <div style="display:flex; flex-direction:column; gap:6px;">
-            <div style="font-size:15px; font-weight:800; color:var(--text-main); letter-spacing:-0.02em;">
-              📅 ${shortDate} (${escapeHtml(i.day)}) <span style="color:var(--cyan-2); margin-left:4px; font-variant-numeric:tabular-nums;">${escapeHtml(i.time_slot)}</span>
-            </div>
-            <div style="font-size:12px; color:var(--text-sub); font-weight:600;">
-              참여 캐릭터: <span style="color:var(--text-main); font-weight:700;">${escapeHtml(i.character_name)}</span>
-            </div>
+          <div style="display:flex; flex-direction:column; gap:4px;">
+            <div style="font-size:18px; font-weight:800; color:var(--text-main); font-variant-numeric:tabular-nums;">${escapeHtml(i.time_slot)}</div>
+            <div style="font-size:13px; color:var(--text-sub); font-weight:600;">캐릭터: <span style="color:var(--cyan-2); font-weight:700;">${escapeHtml(i.character_name)}</span></div>
           </div>
         </div>
         <div class="character-right">
