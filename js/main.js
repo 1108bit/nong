@@ -239,7 +239,7 @@ function renderMySchedules(summary) {
 
     // 💡 [프롬프트 반영] 정보 밀집도 강화, 메모 영역 추가, 폰트/아이콘 계층화 (Tight & Compact)
     html += `
-      <div class="character-card touch-pop" style="cursor: pointer; padding: 12px 14px; margin-bottom: 8px; border: none; background: rgba(255, 255, 255, 0.03);" onclick="goToParty('${escapeHtml(i.day)}', '${escapeHtml(i.time_slot)}')">
+      <div class="character-card touch-pop" style="cursor: pointer; padding: 12px 14px; margin-bottom: 8px; border: none; background: rgba(255, 255, 255, 0.03);" onclick="goToParty('${escapeHtml(i.day)}', '${escapeHtml(i.time_slot)}', '${escapeHtml(i.date)}')">
         <div style="display: flex; justify-content: space-between; align-items: center; width: 100%; gap: 8px;">
           <div style="display: flex; align-items: center; gap: 10px; flex: 1; min-width: 0;">
             <div style="font-size:18px; font-weight:800; color:var(--text-main); font-variant-numeric:tabular-nums; display:flex; align-items:center; gap:4px; flex-shrink: 0;">
@@ -269,10 +269,16 @@ function renderMySchedules(summary) {
   list.innerHTML = html;
 }
 
-window.goToParty = function(day, time) {
+window.goToParty = function(day, time, date) {
   sessionStorage.setItem('autoOpenPartyDay', day);
   sessionStorage.setItem('autoOpenPartyTime', time);
-  movePage('party.html');
+  
+  if (sessionStorage.getItem("isAdmin") === "true") {
+    sessionStorage.setItem('autoOpenPartyDate', date); // 관리자 전용 일자 저장
+    movePage('admin.html');
+  } else {
+    movePage('party.html');
+  }
 };
 
 // Action Sheet 열기/닫기

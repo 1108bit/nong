@@ -216,6 +216,34 @@ async function loadAdminSchedule() {
 
   renderCalendar();
   renderScheduleList(State.selectedDashboardDate);
+
+  // 💡 [UX] 메인화면에서 일정을 누르고 넘어왔을 때 자동 파티 모달 팝업
+  const autoDate = sessionStorage.getItem('autoOpenPartyDate');
+  const autoDay = sessionStorage.getItem('autoOpenPartyDay');
+  const autoTime = sessionStorage.getItem('autoOpenPartyTime');
+  if (autoDate && autoDay && autoTime) {
+    sessionStorage.removeItem('autoOpenPartyDate');
+    sessionStorage.removeItem('autoOpenPartyDay');
+    sessionStorage.removeItem('autoOpenPartyTime');
+    
+    State.selectedDashboardDate = autoDate;
+    renderCalendar();
+    renderScheduleList(autoDate);
+    setTimeout(() => openPartyDetail(autoDate, autoDay, autoTime), 200);
+  }
+
+  // 💡 [UX] 멤버 리스트에서 계정을 누르고 넘어왔을 때 자동 유저 검색
+  const autoSearchUser = sessionStorage.getItem('autoSearchUser');
+  if (autoSearchUser) {
+    sessionStorage.removeItem('autoSearchUser');
+    const searchInput = getEl("userAccountIdInput");
+    const searchBtn = getEl("searchUserButton");
+    if (searchInput && searchBtn) {
+      searchInput.value = autoSearchUser;
+      searchBtn.click();
+      setTimeout(() => searchInput.scrollIntoView({ behavior: 'smooth', block: 'center' }), 300);
+    }
+  }
 }
 
 // 💡 [UX 개선] 화면 깜빡임 없이 데이터를 백그라운드에서 조용히 갱신 (SWR 패턴)
