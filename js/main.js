@@ -270,14 +270,14 @@ function renderMySchedules(summary) {
 }
 
 window.goToParty = function(day, time, date) {
-  sessionStorage.setItem('autoOpenPartyDay', day);
-  sessionStorage.setItem('autoOpenPartyTime', time);
+  // 💡 [뒤로가기 복구] 이동하기 전 현재 스크롤 위치를 기억하여 나중에 정확히 돌아옴
+  sessionStorage.setItem('scrollPos_main', window.scrollY || document.documentElement.scrollTop);
   
   if (sessionStorage.getItem("isAdmin") === "true") {
-    sessionStorage.setItem('autoOpenPartyDate', date); // 관리자 전용 일자 저장
-    movePage('admin.html');
+    // 💡 [딥링크 최적화] 무거운 세션 스토리지 대신 URL 파라미터로 즉각 전달
+    movePage(`admin.html?autoPartyDate=${date}&autoPartyDay=${encodeURIComponent(day)}&autoPartyTime=${encodeURIComponent(time)}`);
   } else {
-    movePage('party.html');
+    movePage(`party.html?autoPartyDay=${encodeURIComponent(day)}&autoPartyTime=${encodeURIComponent(time)}`);
   }
 };
 
@@ -657,6 +657,13 @@ window.addEventListener('pageshow', (e) => {
   // 이전 화면의 낡은 캐시가 그대로 노출되는 현상(BFCache)을 방지하고 최신 데이터로 조용히 갱신합니다.
   if (e.persisted) {
     syncMainData();
+    
+    // 기억해둔 스크롤 위치가 있다면 즉시 복구 (Jumping 방지)
+    const savedScroll = sessionStorage.getItem('scrollPos_main');
+    if (savedScroll) {
+      window.scrollTo({ top: parseInt(savedScroll, 10), behavior: 'instant' });
+      sessionStorage.removeItem('scrollPos_main');
+    }
   }
 });
 

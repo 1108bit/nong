@@ -57,9 +57,16 @@ function applyTouchPop() {
   });
 }
 
-// 페이지 이동 (세션 기반 로그인 유지)
+// 💡 [UX 개선] 페이지 이동 시 흰 화면 딜레이를 없애고 부드러운 페이드아웃 전환(Seamless Transition) 적용
 function movePage(url) {
-  location.href = url;
+  const overlay = document.createElement('div');
+  overlay.style.cssText = 'position:fixed; inset:0; background:var(--bg-0); z-index:999999; opacity:0; transition:opacity 0.2s ease; pointer-events:none;';
+  document.body.appendChild(overlay);
+  
+  void overlay.offsetWidth; // Reflow 강제 발생으로 애니메이션 트리거
+  overlay.style.opacity = '1';
+  
+  setTimeout(() => { location.href = url; }, 200);
 }
 
 // 숫자를 전투력 구간 텍스트로 변환하는 함수 ("100<span class='unit-k'>K</span> ~ 150<span class='unit-k'>K</span>")

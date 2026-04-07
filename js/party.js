@@ -57,12 +57,9 @@ async function loadPartySummary() {
   });
 
   // 💡 메인 화면에서 '내가 신청한 일정' 클릭하고 넘어왔을 때 자동 오픈 처리
-  const autoDay = sessionStorage.getItem('autoOpenPartyDay');
-  const autoTime = sessionStorage.getItem('autoOpenPartyTime');
+  const autoDay = getParameter('autoPartyDay');
+  const autoTime = getParameter('autoPartyTime');
   if (autoDay && autoTime) {
-    sessionStorage.removeItem('autoOpenPartyDay');
-    sessionStorage.removeItem('autoOpenPartyTime');
-    
     const targetBtn = document.querySelector(`.party-slot-btn[data-day="${autoDay}"][data-time="${autoTime}"]`);
     if (targetBtn) {
       setTimeout(() => {
@@ -169,5 +166,11 @@ function renderBadges(id, list) {
     `;
 }
 
-getEl("backButton").onclick = () => movePage("main.html");
+getEl("backButton").onclick = () => {
+  if (getParameter('autoPartyDay') && document.referrer) {
+    history.back(); // 이전 스크롤 위치로 부드럽게 복귀
+  } else {
+    movePage("main.html");
+  }
+};
 loadPartySummary();

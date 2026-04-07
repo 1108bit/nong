@@ -23,6 +23,34 @@ document.addEventListener('DOMContentLoaded', () => {
   initDateChips();
   initTimeChips();
   bindEvents();
+
+  // 💡 [초고속 딥링크] URL 파라미터 감지 시 최우선 실행 (Optimistic UI)
+  const urlParams = {
+    user: getParameter('autoSearchUser'),
+    date: getParameter('autoPartyDate'),
+    day: getParameter('autoPartyDay'),
+    time: getParameter('autoPartyTime')
+  };
+
+  if (urlParams.user) {
+    const searchInput = getEl("userAccountIdInput");
+    if (searchInput) searchInput.value = urlParams.user;
+    
+    const searchArea = getEl("userSearchResultArea");
+    if (searchArea) searchArea.style.display = "block";
+    
+    const userMsg = getEl("userMessage");
+    if (userMsg) userMsg.innerHTML = `<span class="spinner-icon"></span> 유저 정보를 검색 중입니다...`;
+    
+    // 페이지 전체 로딩과 병렬로 즉시 실행
+    openUserCharacterManager(urlParams.user); 
+  }
+
+  if (urlParams.date && urlParams.day && urlParams.time) {
+    // 파티 모달 뼈대를 즉시 호출
+    openPartyDetail(urlParams.date, urlParams.day, urlParams.time);
+  }
+
   loadAdminSchedule();
 
   // 칩 스크롤 및 인디케이터 활성화 (안전하게 약간의 지연)
@@ -216,34 +244,6 @@ async function loadAdminSchedule() {
 
   renderCalendar();
   renderScheduleList(State.selectedDashboardDate);
-
-  // 💡 [UX] 메인화면에서 일정을 누르고 넘어왔을 때 자동 파티 모달 팝업
-  const autoDate = sessionStorage.getItem('autoOpenPartyDate');
-  const autoDay = sessionStorage.getItem('autoOpenPartyDay');
-  const autoTime = sessionStorage.getItem('autoOpenPartyTime');
-  if (autoDate && autoDay && autoTime) {
-    sessionStorage.removeItem('autoOpenPartyDate');
-    sessionStorage.removeItem('autoOpenPartyDay');
-    sessionStorage.removeItem('autoOpenPartyTime');
-    
-    State.selectedDashboardDate = autoDate;
-    renderCalendar();
-    renderScheduleList(autoDate);
-    setTimeout(() => openPartyDetail(autoDate, autoDay, autoTime), 200);
-  }
-
-  // 💡 [UX] 멤버 리스트에서 계정을 누르고 넘어왔을 때 자동 유저 검색
-  const autoSearchUser = sessionStorage.getItem('autoSearchUser');
-  if (autoSearchUser) {
-    sessionStorage.removeItem('autoSearchUser');
-    const searchInput = getEl("userAccountIdInput");
-    const searchBtn = getEl("searchUserButton");
-    if (searchInput && searchBtn) {
-      searchInput.value = autoSearchUser;
-      searchBtn.click();
-      setTimeout(() => searchInput.scrollIntoView({ behavior: 'smooth', block: 'center' }), 300);
-    }
-  }
 }
 
 // 💡 [UX 개선] 화면 깜빡임 없이 데이터를 백그라운드에서 조용히 갱신 (SWR 패턴)
@@ -1160,7 +1160,16 @@ function bindEvents() {
         localStorage.removeItem("autoIsAdmin"); localStorage.removeItem("autoAdminCode");
         location.href = "index.html";
       };
-    } else { backBtn.onclick = () => movePage("main.html"); }
+    } else { 
+      backBtn.onclick = () => {
+        // 💡 [뒤로가기 복구] 딥링크를 타고 들어온 경우, 브라우저 히스토리 백을 통해 이전 화면(스크롤)으로 완벽히 복귀
+        if ((getParameter('autoSearchUser') || getParameter('autoPartyDate')) && document.referrer) {
+          history.back();
+        } else {
+          movePage("main.html");
+        }
+      }; 
+    }
   }
 
   if(getEl("searchUserButton")) getEl("searchUserButton").onclick = async () => {

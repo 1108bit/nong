@@ -82,8 +82,9 @@ function sortData(column) {
 
 window.goToUserManage = function(mainName) {
   if (sessionStorage.getItem("isAdmin") === "true") {
-    sessionStorage.setItem("autoSearchUser", mainName);
-    movePage("admin.html");
+    // 💡 스크롤 위치 기억 및 URL 파라미터 딥링크 호출
+    sessionStorage.setItem('scrollPos_all_chars', window.scrollY || document.documentElement.scrollTop);
+    movePage(`admin.html?autoSearchUser=${encodeURIComponent(mainName)}`);
   }
 };
 
@@ -168,6 +169,13 @@ function renderTable() {
     if (typeof setupAppleScroll === 'function') {
       setupAppleScroll('charTableScrollBox', 'charTableScrollInd');
     }
+    
+    // 💡 뒤로 가기로 돌아왔을 때 스크롤 위치 즉시 복구
+    const savedScroll = sessionStorage.getItem('scrollPos_all_chars');
+    if (savedScroll) {
+      window.scrollTo({ top: parseInt(savedScroll, 10), behavior: 'instant' });
+      sessionStorage.removeItem('scrollPos_all_chars');
+    }
   }, 50);
 }
 
@@ -183,4 +191,14 @@ if (searchInput) {
 }
 
 getEl("backButton").onclick = () => movePage("main.html");
+
+window.addEventListener('pageshow', (e) => {
+  if (e.persisted) {
+    const savedScroll = sessionStorage.getItem('scrollPos_all_chars');
+    if (savedScroll) {
+      window.scrollTo({ top: parseInt(savedScroll, 10), behavior: 'instant' });
+      sessionStorage.removeItem('scrollPos_all_chars');
+    }
+  }
+});
 loadAllCharacters();
