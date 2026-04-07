@@ -179,14 +179,16 @@
 .input-label { display: block; margin-bottom: 8px; color: var(--text-sub); font-size: 13px; font-weight: 600; letter-spacing: -0.01em; }
 
 .main-input, .character-select {
-  width: 100%; min-height: 52px; padding: 14px 16px; border-radius: 16px;
-  border: none; background: rgba(255, 255, 255, 0.08); /* iOS 스타일 검색창/입력창 질감 */
-  color: var(--text-main); font-size: 16px; outline: none; box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.12); /* iOS 강제 줌 버그 방지(16px) */
+  width: 100%; min-height: 52px; padding: 14px 16px; border-radius: 14px; /* iOS 기본 텍스트필드 곡률 */
+  border: 1px solid transparent; background: rgba(255, 255, 255, 0.06); 
+  color: var(--text-main); font-size: 17px; outline: none; /* 17px은 iOS Safari 강제 확대 방지 및 기본 크기 */
+  transition: all 0.2s cubic-bezier(0.2, 0.8, 0.2, 1);
 }
 .main-input::placeholder { color: rgba(211, 226, 243, 0.4); }
 .main-input:focus, .character-select:focus {
-  background: rgba(255, 255, 255, 0.12); 
-  box-shadow: 0 0 0 2px var(--cyan-1), inset 0 1px 2px rgba(0, 0, 0, 0.2);
+  background: rgba(255, 255, 255, 0.1); 
+  border-color: rgba(10, 132, 255, 0.5);
+  box-shadow: 0 0 0 4px rgba(10, 132, 255, 0.15); /* 은은한 포커스 링 */
 }
 .character-select {
   appearance: none; -webkit-appearance: none; padding-right: 40px;
@@ -292,16 +294,15 @@ body.modal-open { overflow: hidden; }
   padding: 16px; background: rgba(0, 0, 0, 0.5); backdrop-filter: blur(4px); opacity: 0; pointer-events: none; transition: opacity 0.2s ease;
 }
 .action-sheet-overlay.show { opacity: 1; pointer-events: auto; }
-.action-sheet { width: 100%; max-width: 400px; transform: translateY(100%); transition: transform 0.4s cubic-bezier(0.32, 0.72, 0, 1); padding-bottom: env(safe-area-inset-bottom); }
+.action-sheet { width: 100%; max-width: 400px; transform: translateY(100%); transition: transform 0.4s cubic-bezier(0.32, 0.72, 0, 1); padding-bottom: max(16px, env(safe-area-inset-bottom)); }
 .action-sheet-overlay.show .action-sheet { transform: translateY(0); }
-.action-sheet-group { background: rgba(30, 41, 59, 0.85); border-radius: 16px; overflow: hidden; backdrop-filter: blur(20px); }
-.action-sheet-head { padding: 12px; text-align: center; border-bottom: 1px solid rgba(255, 255, 255, 0.05); }
-.action-sheet-btn { width: 100%; padding: 16px; background: transparent; border: none; border-bottom: 1px solid rgba(255, 255, 255, 0.05); color: var(--text-main); font-size: 15px; font-weight: 700; cursor: pointer; }
-.action-sheet-btn { font-weight: 500; } /* iOS 순정 느낌으로 굵기 하향 */
+.action-sheet-group { background: rgba(30, 30, 30, 0.75); border-radius: 14px; overflow: hidden; backdrop-filter: blur(50px) saturate(200%); -webkit-backdrop-filter: blur(50px) saturate(200%); border: 1px solid rgba(255, 255, 255, 0.1); }
+.action-sheet-head { padding: 14px; text-align: center; border-bottom: 1px solid rgba(255, 255, 255, 0.15); }
+.action-sheet-btn { width: 100%; padding: 16px; background: transparent; border: none; border-bottom: 1px solid rgba(255, 255, 255, 0.15); color: #0A84FF; font-size: 17px; font-weight: 400; cursor: pointer; transition: background 0.15s; }
 .action-sheet-btn:active { background: rgba(255, 255, 255, 0.15); }
-.action-sheet-btn.danger { color: #fb7185; }
-.action-sheet-gap { height: 8px; }
-.action-sheet-btn.cancel { background: rgba(30, 41, 59, 0.95); border-radius: 16px; font-weight: 600; border: none; }
+.action-sheet-btn.danger { color: #FF453A; }
+.action-sheet-gap { height: 8px; background: transparent; }
+.action-sheet-btn.cancel { background: rgba(30, 30, 30, 0.85); border-radius: 14px; font-weight: 600; border: none; margin-top: 8px; backdrop-filter: blur(50px) saturate(200%); -webkit-backdrop-filter: blur(50px) saturate(200%); border: 1px solid rgba(255, 255, 255, 0.1); color: #0A84FF; }
 
 /* -------------------------
    가로 스크롤 & 선택 칩 (Apple Scroll)
@@ -480,16 +481,27 @@ body.modal-open { overflow: hidden; }
 /* =========================
    Custom Dialog (Alert / Confirm / Prompt)
 ========================= */
-.custom-dialog { width: 90%; max-width: 320px; background: rgba(28, 28, 30, 0.85); backdrop-filter: blur(24px) saturate(180%); -webkit-backdrop-filter: blur(24px) saturate(180%); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 20px; box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.15), 0 24px 48px rgba(0, 0, 0, 0.6); display: flex; flex-direction: column; overflow: hidden; transform: scale(0.95); animation: dialogPop 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; }
-@keyframes dialogPop { to { transform: scale(1); } }
-.custom-dialog-msg { padding: 24px 20px; text-align: center; font-size: 15px; font-weight: 600; color: var(--text-main); line-height: 1.5; word-break: keep-all; }
-.custom-dialog-input { margin: 0 20px 20px; background: rgba(0, 0, 0, 0.2); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 10px; color: var(--text-main); font-size: 15px; padding: 10px; outline: none; text-align: center; transition: border-color 0.2s; }
-.custom-dialog-input:focus { border-color: var(--cyan-1); }
-.custom-dialog-actions { display: flex; border-top: 1px solid rgba(255, 255, 255, 0.1); }
+.custom-dialog { 
+  width: 270px; /* iOS 시스템 알럿 기본 너비 */
+  background: rgba(30, 30, 30, 0.75); 
+  backdrop-filter: blur(50px) saturate(200%); -webkit-backdrop-filter: blur(50px) saturate(200%); 
+  border: 1px solid rgba(255, 255, 255, 0.15); 
+  border-radius: 14px; 
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5); 
+  display: flex; flex-direction: column; overflow: hidden; 
+  transform: scale(1.15); opacity: 0;
+  animation: appleAlertPop 0.25s cubic-bezier(0.2, 0.8, 0.2, 1) forwards; 
+}
+@keyframes appleAlertPop { to { transform: scale(1); opacity: 1; } }
+.custom-dialog-msg { padding: 20px 16px; text-align: center; font-size: 14px; font-weight: 500; color: #fff; line-height: 1.4; word-break: keep-all; }
+.custom-dialog-input { margin: 0 16px 16px; background: rgba(255, 255, 255, 0.08); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 6px; color: #fff; font-size: 13px; padding: 6px 10px; outline: none; text-align: center; transition: border-color 0.2s; box-shadow: inset 0 1px 2px rgba(0,0,0,0.2); }
+.custom-dialog-input:focus { border-color: #0A84FF; background: rgba(255, 255, 255, 0.12); }
+.custom-dialog-actions { display: flex; border-top: 1px solid rgba(255, 255, 255, 0.15); }
 .custom-dialog-actions.row { flex-direction: row; }
-.custom-dialog-btn { flex: 1; padding: 14px; background: transparent; border: none; font-size: 16px; font-weight: 700; cursor: pointer; color: var(--cyan-1); transition: background 0.2s; }
+.custom-dialog-btn { flex: 1; padding: 12px; background: transparent; border: none; font-size: 17px; cursor: pointer; color: #0A84FF; transition: background 0.15s; }
 .custom-dialog-btn:active { background: rgba(255, 255, 255, 0.1); }
-.custom-dialog-btn.cancel { color: var(--text-sub); border-right: 1px solid rgba(255, 255, 255, 0.1); font-weight: 500; }
+.custom-dialog-btn.cancel { font-weight: 400; border-right: 1px solid rgba(255, 255, 255, 0.15); color: #0A84FF; }
+.custom-dialog-btn.primary { font-weight: 600; }
 @media (prefers-reduced-motion: reduce) {
   .btn, .main-button, .mini-btn, .bottom-action-btn, .character-card, .touch-pop, .skeleton-block::after { animation: none !important; transition: none !important; }
 }

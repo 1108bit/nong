@@ -179,14 +179,14 @@ const CustomUI = {
   alert(message) {
     return new Promise(resolve => {
       const overlay = this.createOverlay();
-      overlay.innerHTML = `<div class="custom-dialog"><div class="custom-dialog-msg">${escapeHtml(message).replace(/\n/g, '<br>')}</div><div class="custom-dialog-actions row"><button class="custom-dialog-btn primary">확인</button></div></div>`;
+      overlay.innerHTML = `<div class="custom-dialog"><div class="custom-dialog-msg" style="font-size:15px; font-weight:600;">${escapeHtml(message).replace(/\n/g, '<br>')}</div><div class="custom-dialog-actions row"><button class="custom-dialog-btn primary">확인</button></div></div>`;
       overlay.querySelector('.primary').onclick = () => { this.closeOverlay(overlay); resolve(); };
     });
   },
   confirm(message) {
     return new Promise(resolve => {
       const overlay = this.createOverlay();
-      overlay.innerHTML = `<div class="custom-dialog"><div class="custom-dialog-msg">${escapeHtml(message).replace(/\n/g, '<br>')}</div><div class="custom-dialog-actions row"><button class="custom-dialog-btn cancel">취소</button><button class="custom-dialog-btn primary">확인</button></div></div>`;
+      overlay.innerHTML = `<div class="custom-dialog"><div class="custom-dialog-msg" style="font-size:15px; font-weight:600;">${escapeHtml(message).replace(/\n/g, '<br>')}</div><div class="custom-dialog-actions row"><button class="custom-dialog-btn cancel">취소</button><button class="custom-dialog-btn primary">확인</button></div></div>`;
       overlay.querySelector('.cancel').onclick = () => { this.closeOverlay(overlay); resolve(false); };
       overlay.querySelector('.primary').onclick = () => { this.closeOverlay(overlay); resolve(true); };
     });
@@ -196,7 +196,7 @@ const CustomUI = {
       const overlay = this.createOverlay();
       const isPassword = message.includes('비밀번호') || message.includes('코드'); // 스마트 마스킹
       const inputType = isPassword ? 'password' : 'text';
-      overlay.innerHTML = `<div class="custom-dialog"><div class="custom-dialog-msg" style="padding-bottom: 12px;">${escapeHtml(message).replace(/\n/g, '<br>')}</div><input type="${inputType}" class="custom-dialog-input" value="${escapeHtml(defaultValue)}" autocomplete="off" /><div class="custom-dialog-actions row"><button class="custom-dialog-btn cancel">취소</button><button class="custom-dialog-btn primary">확인</button></div></div>`;
+      overlay.innerHTML = `<div class="custom-dialog"><div class="custom-dialog-msg" style="font-size:15px; font-weight:600; padding-bottom: 12px;">${escapeHtml(message).replace(/\n/g, '<br>')}</div><input type="${inputType}" class="custom-dialog-input" value="${escapeHtml(defaultValue)}" autocomplete="off" /><div class="custom-dialog-actions row"><button class="custom-dialog-btn cancel">취소</button><button class="custom-dialog-btn primary">확인</button></div></div>`;
       const input = overlay.querySelector('.custom-dialog-input');
       setTimeout(() => input.focus(), 100);
       input.onkeydown = (e) => { if(e.key === 'Enter') overlay.querySelector('.primary').click(); };
