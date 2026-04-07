@@ -355,15 +355,34 @@ function updateSaveButtonVisibility() {
     if (!btn) {
       btn = document.createElement("button");
       btn.id = "floatingSaveBtn";
-      btn.className = "btn btn-primary touch-pop";
-      btn.style.cssText = "position:fixed; bottom:32px; left:50%; transform:translateX(-50%); width:calc(100% - 32px); max-width:560px; z-index:9999; box-shadow:0 12px 30px rgba(0,0,0,0.8); font-size: 16px; font-weight: 800; min-height: 56px;";
+      btn.className = "touch-pop";
+      // 💡 [Apple HIG 스타일] 투명한 유리 질감(Glassmorphism)과 둥근 알약(Pill) 디자인 적용
+      btn.style.cssText = `
+        position: fixed; bottom: max(32px, env(safe-area-inset-bottom, 32px)); left: 50%;
+        transform: translateX(-50%) translateY(40px) scale(0.9); opacity: 0;
+        width: max-content; min-width: 220px; padding: 0 32px; min-height: 54px;
+        z-index: 9999; font-size: 16px; font-weight: 600; letter-spacing: -0.01em;
+        border-radius: 999px; background: rgba(10, 132, 255, 0.85); border: none;
+        backdrop-filter: blur(24px) saturate(150%); -webkit-backdrop-filter: blur(24px) saturate(150%);
+        box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.2), 0 16px 32px rgba(0, 0, 0, 0.4);
+        color: #fff; display: flex; align-items: center; justify-content: center; gap: 6px;
+        transition: all 0.4s cubic-bezier(0.32, 0.72, 0, 1); cursor: pointer;
+      `;
       btn.innerHTML = "💾 변경사항 저장하기";
       btn.onclick = saveAllChanges;
       document.body.appendChild(btn);
     }
-    btn.style.display = "block";
+    btn.style.display = "flex";
+    void btn.offsetWidth; // 💡 애니메이션 트리거를 위한 Reflow 강제 발생
+    btn.style.opacity = "1";
+    btn.style.transform = "translateX(-50%) translateY(0) scale(1)";
   } else {
-    if (btn) btn.style.display = "none";
+    if (btn) {
+      btn.style.opacity = "0";
+      btn.style.transform = "translateX(-50%) translateY(40px) scale(0.9)";
+      // 💡 애니메이션이 끝난 후 화면에서 부드럽게 숨김 처리
+      setTimeout(() => { if (!State.hasChanges) btn.style.display = "none"; }, 400);
+    }
   }
 }
 
@@ -372,7 +391,10 @@ async function saveAllChanges() {
   State.isSaving = true;
   
   const btn = document.getElementById("floatingSaveBtn");
-  if (btn) btn.innerHTML = '<span class="spinner-icon"></span> 저장 중...';
+  if (btn) {
+    btn.innerHTML = '<span class="spinner-icon"></span> 저장 중...';
+    btn.style.pointerEvents = "none"; // 💡 더블 클릭 방지 처리
+  }
 
   // 변경사항이 발생한 모든 주차(week_key) 수집
   const affectedWeekKeys = new Set();
@@ -415,7 +437,10 @@ async function saveAllChanges() {
   }
   
   State.isSaving = false;
-  if (btn) btn.innerHTML = "💾 변경사항 저장하기";
+  if (btn) {
+    btn.innerHTML = "💾 변경사항 저장하기";
+    btn.style.pointerEvents = "auto";
+  }
   
   if (!hasError) {
      await uiAlert("일정이 성공적으로 저장되었습니다.");
