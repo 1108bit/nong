@@ -37,7 +37,7 @@
 
 /* 하단 액션바를 위한 여백 */
 .page {
-  padding-bottom: 110px;
+  padding-bottom: 86px; /* 💡 플로팅 버튼(하단바 제거됨)에 맞춰 불필요한 공백 최적화 */
 }
 
 .main-shell {

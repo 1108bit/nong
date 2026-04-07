@@ -175,8 +175,8 @@
 /* -------------------------
    폼 & 입력창 (Forms)
 ------------------------- */
-.form-group { margin-bottom: 16px; text-align: left; min-width: 0; }
-.input-label { display: block; margin-bottom: 8px; color: var(--text-sub); font-size: 13px; font-weight: 600; letter-spacing: -0.01em; }
+.form-group { margin-bottom: 24px; text-align: left; min-width: 0; }
+.input-label { display: block; margin-bottom: 10px; color: var(--text-sub); font-size: 13px; font-weight: 600; letter-spacing: -0.01em; }
 
 .main-input, .character-select {
   width: 100%; min-height: 52px; padding: 14px 16px; border-radius: 14px; /* iOS 기본 텍스트필드 곡률 */
@@ -275,16 +275,16 @@ body.modal-open { overflow: hidden; }
 .action-sheet-overlay.show .action-sheet { transform: translateY(0); }
 .action-sheet-group { background: rgba(30, 30, 30, 0.75); border-radius: 14px; overflow: hidden; backdrop-filter: blur(50px) saturate(200%); -webkit-backdrop-filter: blur(50px) saturate(200%); border: 1px solid rgba(255, 255, 255, 0.1); }
 .action-sheet-head { padding: 14px; text-align: center; border-bottom: 1px solid rgba(255, 255, 255, 0.15); }
-.action-sheet-btn { width: 100%; padding: 16px; background: transparent; border: none; border-bottom: 1px solid rgba(255, 255, 255, 0.15); color: #0A84FF; font-size: 17px; font-weight: 400; cursor: pointer; transition: background 0.15s; }
+.action-sheet-btn { width: 100%; padding: 16px; background: transparent; border: none; border-bottom: 1px solid rgba(255, 255, 255, 0.15); color: #0A84FF; font-size: 17px; font-weight: 400; cursor: pointer; transition: background 0.15s; display: flex; justify-content: center; align-items: center; gap: 8px; }
 .action-sheet-btn:active { background: rgba(255, 255, 255, 0.15); }
 .action-sheet-btn.danger { color: #FF453A; }
 .action-sheet-gap { height: 8px; background: transparent; }
-.action-sheet-btn.cancel { background: rgba(30, 30, 30, 0.85); border-radius: 14px; font-weight: 600; border: none; margin-top: 8px; backdrop-filter: blur(50px) saturate(200%); -webkit-backdrop-filter: blur(50px) saturate(200%); border: 1px solid rgba(255, 255, 255, 0.1); color: #0A84FF; }
+.action-sheet-btn.cancel { background: rgba(30, 30, 30, 0.85); border-radius: 14px; font-weight: 600; border: none; margin-top: 8px; backdrop-filter: blur(50px) saturate(200%); -webkit-backdrop-filter: blur(50px) saturate(200%); border: 1px solid rgba(255, 255, 255, 0.1); color: #0A84FF; display: flex; justify-content: center; align-items: center; }
 
 /* -------------------------
    가로 스크롤 & 선택 칩 (Apple Scroll)
 ------------------------- */
-.chip-select-group { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 6px; }
+.chip-select-group { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 8px; }
 .horizontal-scroll-chips {
   width: 100% !important; /* 화면을 넘어가지 않도록 100% 고정 */
   flex-wrap: nowrap !important; overflow-x: auto !important; overflow-y: hidden !important;
@@ -301,7 +301,8 @@ body.modal-open { overflow: hidden; }
 .chip-btn {
   position: relative; cursor: pointer; opacity: 0.6; filter: grayscale(0.8);
   transition: all 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-  border: none; background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.08); background: rgba(255, 255, 255, 0.04);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
   padding: 8px 14px; font-size: 13px; border-radius: 999px; font-weight: 600; color: var(--text-muted);
   white-space: nowrap; flex-shrink: 0;
 }
@@ -322,6 +323,10 @@ body.modal-open { overflow: hidden; }
   scroll-snap-align: center !important; user-select: none !important; -webkit-user-drag: none !important;
 }
 .date-chip:hover { background: rgba(255, 255, 255, 0.1) !important; }
+.date-chip.has-data {
+  border: 1px solid rgba(67, 217, 255, 0.4) !important;
+  background: rgba(67, 217, 255, 0.05) !important;
+}
 .date-chip.selected {
   background: #ffffff !important; color: #000000 !important; transform: scale(1.1) translateY(-2px) !important;
   box-shadow: 0 4px 12px rgba(255, 255, 255, 0.15) !important; border-color: transparent !important;

@@ -180,11 +180,9 @@ function updateDateChipsWithData() {
   group.querySelectorAll(".chip-btn").forEach(btn => {
     const dateVal = btn.dataset.date;
     const hasData = State.schedules.some(s => isSameDate(s.date, dateVal));
-    if (hasData) {
-      btn.style.border = "1px solid rgba(67, 217, 255, 0.4)";
-      btn.style.background = "rgba(67, 217, 255, 0.05)";
-      if (!firstDataDate) firstDataDate = dateVal;
-    }
+    
+    btn.classList.toggle("has-data", hasData); // 💡 인라인 스타일 대신 CSS 클래스로 깔끔하게 제어
+    if (hasData && !firstDataDate) firstDataDate = dateVal;
   });
   
   // 현재 선택된 날짜에 일정이 없고, 일정이 있는 첫 날짜가 존재하면 자동 스크롤/선택 이동
