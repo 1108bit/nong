@@ -392,12 +392,28 @@ async function saveSchedule() {
   btn.textContent = originalText;
 
   if(res.success) { await uiAlert("저장되었습니다."); loadAdminSchedule(); }
+  if(res.success) { 
+      await uiAlert("저장되었습니다."); 
+      setTimeout(loadAdminSchedule, 500); // 💡 구글 시트 동기화 딜레이 방어
+  }
 }
 
 async function deleteSchedule(date, day, time) {
   if(!(await uiConfirm("정말 삭제하시겠습니까?"))) return;
   const res = await callApi({ action: "deleteRaidSchedule", adminCode: getAdminCode(), date, day, timeSlot: time });
   if(res.success) loadAdminSchedule();
+  
+  if(res.success) {
+    // 💡 [낙관적 UI] 구글 시트 동기화 지연으로 인해 삭제 직후 데이터를 다시 불러올 때 
+    // 지워진 데이터가 잠깐 다시 나타나는 '유령 현상(Ghosting)' 완벽 차단
+    State.schedules = State.schedules.filter(s => !(isSameDate(s.date, date) && formatDisplayTime(s.time_slot) === time));
+    
+    renderCalendar();
+    renderScheduleList(State.selectedDashboardDate);
+    
+    await uiAlert("일정이 삭제되었습니다.");
+    setTimeout(loadAdminSchedule, 500); // 안전하게 0.5초 뒤 동기화
+  }
 }
 
 // 가로 스크롤 컨테이너 내에서 선택된 칩으로 부드럽게 자동 스크롤하는 함수
@@ -501,6 +517,7 @@ if(getEl("submitScheduleModalBtn")) {
        await uiAlert("일정이 성공적으로 수정되었습니다.");
        closeScheduleModal();
        loadAdminSchedule();
+       setTimeout(loadAdminSchedule, 500); // 💡 구글 시트 동기화 딜레이 방어
     }
   }; 
 }
@@ -1055,6 +1072,7 @@ function renderPartyEditor(date, time) {
       await uiAlert(finalMsg);
       closePartyDetailModal();
       loadAdminSchedule(); // 💡 저장 직후 관리자 화면 데이터를 갱신하여 빈 슬롯 현상 방지
+      setTimeout(loadAdminSchedule, 500); // 💡 구글 시트 동기화 딜레이 방어
     }
   };
 
