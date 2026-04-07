@@ -163,7 +163,7 @@ function renderCharacters(items) {
     const mainIcon = isMainChar ? '<span style="color:var(--gold-1); margin-right:4px; font-size:14px; text-shadow: 0 0 8px rgba(246,211,122,0.4);">⭐️</span>' : '';
     
     return `
-      <div class="character-card">
+      <div class="character-card touch-pop" style="cursor: pointer;" onclick="openCharacterActionSheet('${escapeHtml(c.character_name)}', ${isMainChar})">
         
         <div class="character-left">
           <div class="character-name">${mainIcon}${escapeHtml(c.character_name)}</div>
@@ -174,7 +174,7 @@ function renderCharacters(items) {
         </div>
         
         <div class="character-right">
-          <button class="icon-btn" style="border:none; background:transparent; font-size:18px; color:var(--text-sub);" title="더보기" onclick="openCharacterActionSheet('${escapeHtml(c.character_name)}', ${isMainChar})">⋯</button>
+          <button class="icon-btn" style="border:none; background:transparent; font-size:18px; color:var(--text-sub); pointer-events:none;" title="더보기">⋯</button>
         </div>
 
       </div>
