@@ -220,20 +220,28 @@ function renderMySchedules(summary) {
       `;
     }
 
-    // 💡 [프롬프트 반영 3&4] 개별 카드 내부의 날짜 제거, 테두리 최소화 및 시간에 포커싱
+    // 💡 [프롬프트 반영] 정보 밀집도 강화, 메모 영역 추가, 폰트/아이콘 계층화 (Tight & Compact)
     html += `
-      <div class="character-card touch-pop" style="cursor: pointer; padding: 14px 16px; margin-bottom: 8px; border: none; background: rgba(255, 255, 255, 0.03);" onclick="goToParty('${escapeHtml(i.day)}', '${escapeHtml(i.time_slot)}')">
-        <div class="character-left">
-          <div style="display:flex; flex-direction:column; gap:4px;">
-            <div style="font-size:18px; font-weight:800; color:var(--text-main); font-variant-numeric:tabular-nums;">${escapeHtml(i.time_slot)}</div>
-            <div style="font-size:13px; color:var(--text-sub); font-weight:600;">캐릭터: <span style="color:var(--cyan-2); font-weight:700;">${escapeHtml(i.character_name)}</span></div>
+      <div class="character-card touch-pop" style="cursor: pointer; padding: 12px 14px; margin-bottom: 8px; border: none; background: rgba(255, 255, 255, 0.03); flex-direction: column; align-items: stretch; gap: 8px;" onclick="goToParty('${escapeHtml(i.day)}', '${escapeHtml(i.time_slot)}')">
+        <div style="display: flex; justify-content: space-between; align-items: center;">
+          <div style="display: flex; align-items: center; gap: 10px;">
+            <div style="font-size:18px; font-weight:800; color:var(--text-main); font-variant-numeric:tabular-nums; display:flex; align-items:center; gap:4px;">
+              <span style="font-size:14px; opacity:0.8;">🕒</span>${escapeHtml(i.time_slot)}
+            </div>
+            <div style="font-size:13px; font-weight:600; color:var(--text-sub); display:flex; align-items:center; gap:4px;">
+              <span style="font-size:12px; opacity:0.8;">👤</span><span style="color:var(--cyan-2); font-weight:700;">${escapeHtml(i.character_name)}</span>
+            </div>
+          </div>
+          <div style="font-size:12px; font-weight:800; color:${totalParticipants >= 8 ? 'var(--green-1)' : 'var(--cyan-1)'}; background: rgba(255,255,255,0.06); padding: 4px 8px; border-radius: 8px; letter-spacing: -0.02em;">
+            👥 ${totalParticipants}명
           </div>
         </div>
-        <div class="character-right">
-          <div style="text-align:right;">
-            <div style="font-size:11px; color:var(--text-muted); margin-bottom:4px; font-weight:600;">현재 파티 현황</div>
-            <div style="font-size:14px; font-weight:800; color:${totalParticipants >= 8 ? 'var(--green-1)' : 'var(--cyan-1)'};">${totalParticipants}명 대기중 <span style="font-size:10px;">➔</span></div>
-          </div>
+        <div style="font-size:12px; font-weight:500; padding: 6px 10px; border-radius: 8px; display: flex; align-items: center; gap: 6px; transition: all 0.3s ease; ${
+          totalParticipants >= 8 
+            ? 'background: rgba(16, 185, 129, 0.15); color: #a7f3d0; box-shadow: inset 0 0 12px rgba(16, 185, 129, 0.1); border: 1px solid rgba(16, 185, 129, 0.2);' 
+            : 'background: rgba(0,0,0,0.2); color: var(--text-muted); border: 1px solid transparent;'
+        }">
+           <span style="font-size:11px; opacity:0.8;">${totalParticipants >= 8 ? '✅' : '📝'}</span> ${i.note ? escapeHtml(i.note) : '<span style="opacity:0.4;">등록된 메모가 없습니다.</span>'}
         </div>
       </div>
     `;
