@@ -273,20 +273,31 @@ function sendDiscordNotification(date, time, partyArray) {
   const safeArray = Array.isArray(partyArray) ? partyArray : [];
   const paddedArray = Array.from({ length: 8 }, (_, i) => safeArray[i] || "");
 
-  const p1 = paddedArray.slice(0, 4).map((n, i) => n ? `${i+1}. ${n}` : `${i+1}. (빈자리)`).join("\n");
-  const p2 = paddedArray.slice(4, 8).map((n, i) => n ? `${i+1}. ${n}` : `${i+1}. (빈자리)`).join("\n");
+  // 💡 [UX 디자인] 파티 슬롯별 하이테크 이모지 부여 및 파티장(1번) 강조
+  const emojis = ["⚔️", "🛡️", "🪄", "🌿"];
+  const formatMember = (n, i) => {
+    const nameStr = n ? n : "(빈자리)";
+    return i === 0 ? `${i+1}. ${emojis[i]} **${nameStr}**` : `${i+1}. ${emojis[i]} ${nameStr}`;
+  };
+
+  const p1 = paddedArray.slice(0, 4).map(formatMember).join("\n");
+  const p2 = paddedArray.slice(4, 8).map(formatMember).join("\n");
 
   const message = {
     content: "@everyone 파티 조율이 완료되었습니다!",
     embeds: [{
-      title: "⚔️ 파티 조율 완료 안내",
-      description: `**${date} ${time}** 레이드 파티 구성이 업데이트되었습니다.\n인게임 접속 전 파티를 확인해 주세요!`,
-      color: 4445183, // 그림자 레기온의 시그니처 Cyan 블루 색상
+      title: "⚔️ 레이드 파티 조율 완료 안내",
+      description: `**${date} ${time}** 그림자 레기온의 승리를 위해 파티 구성을 업데이트했습니다.\n인게임 접속 전 본인의 파티를 반드시 확인해 주세요!`,
+      color: 3447003, // 세련된 사이언 블루 (하이테크 느낌)
       fields: [
         { name: "🔹 1파티", value: p1, inline: true },
         { name: "🔹 2파티", value: p2, inline: true }
       ],
-      footer: { text: "그림자 · LEGION MANAGER" }
+      footer: { 
+        text: "SHADOW LEGION · SYSTEM MANAGER",
+        icon_url: "https://cdn-icons-png.flaticon.com/512/843/843220.png" // 💡 추후 레기온 로고 이미지 URL로 교체 가능
+      },
+      timestamp: new Date().toISOString() // 💡 발송 시간 타임스탬프 추가 (공식 문서 느낌)
     }]
   };
 
