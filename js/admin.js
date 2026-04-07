@@ -577,7 +577,7 @@ async function openUserCharacterManager(searchValue) {
     </div>
     <div style="margin-top: 12px; display: flex; gap: 8px;">
       ${roleButtonHtml}
-      <button class="mini-btn danger" onclick="resetUserPassword('${targetAccountId}')">비밀번호 초기화</button>
+      <button class="mini-btn danger" onclick="resetUserPassword('${targetAccountId}', '${escapeHtml(targetMainName)}')">비밀번호 초기화</button>
     </div>
   `;
 
@@ -692,8 +692,8 @@ async function toggleUserAdmin(targetAccountId, searchValue) {
 }
 
 // 유저 비밀번호 강제 초기화
-async function resetUserPassword(targetAccountId) {
-  if(!(await uiConfirm(`[${targetAccountId}] 유저의 비밀번호를 '0000'으로 초기화하시겠습니까?`))) return;
+async function resetUserPassword(targetAccountId, targetMainName) {
+  if(!(await uiConfirm(`[${targetMainName}] 유저의 비밀번호를 '0000'으로 초기화하시겠습니까?`))) return;
   const res = await callApi({ action: "resetUserPasswordByAdmin", adminCode: getAdminCode(), targetAccountId });
   if (res.success) await uiAlert(res.message);
 }

@@ -652,4 +652,12 @@ if (adminSecretBtn) {
   });
 }
 
+window.addEventListener('pageshow', (e) => {
+  // 💡 [UX] 아이폰 Safari 등에서 '뒤로 가기(스와이프)'로 돌아왔을 때, 
+  // 이전 화면의 낡은 캐시가 그대로 노출되는 현상(BFCache)을 방지하고 최신 데이터로 조용히 갱신합니다.
+  if (e.persisted) {
+    syncMainData();
+  }
+});
+
 loadMain();
