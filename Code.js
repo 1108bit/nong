@@ -133,8 +133,18 @@ function fetchAionToolData(characterName) {
       });
       const searchData = JSON.parse(searchRes.getContentText());
       
+      // 💡 [버그 수정] API 응답 구조가 배열이 아니라 객체({ data: [...] })일 경우를 대비한 방어 로직
+      let charArray = [];
+      if (Array.isArray(searchData)) {
+        charArray = searchData;
+      } else if (searchData && Array.isArray(searchData.data)) {
+        charArray = searchData.data;
+      } else if (searchData && Array.isArray(searchData.results)) {
+        charArray = searchData.results;
+      }
+
       // 서버 일치 캐릭터 찾기
-      const targetChar = searchData.find(c => c.serverId == serverId || c.serverName === '젠카카');
+      const targetChar = charArray.find(c => c.serverId == serverId || c.serverName === '젠카카');
       if (targetChar && targetChar.characterId) {
         ncCharacterId = targetChar.characterId;
       }
