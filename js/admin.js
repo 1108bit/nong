@@ -895,7 +895,7 @@ function renderPartyEditor(date, time) {
         ${slotsHtml}
       </div>
     </div>
-    <div class="admin-action-row" style="margin-top: 16px; align-items: center; flex-wrap: wrap;">
+    <div class="admin-action-row" style="margin-top: 16px; display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
       <button class="btn btn-secondary" id="autoHealerBtn" style="flex: 1; min-width: 100px; padding: 0 8px; font-size: 13px;">💖 치유 분배</button>
       <button class="btn btn-primary" id="savePartyBtn" style="flex: 1.5; min-width: 100px;">조용히 저장</button>
       <button class="btn" id="sendDiscordBtn" style="flex: 1.5; min-width: 100px; background: #5865F2; color: #fff; border: 1px solid #4752C4; box-shadow: 0 8px 20px rgba(88, 101, 242, 0.3); display: flex; align-items: center; justify-content: center; gap: 6px;">

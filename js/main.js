@@ -22,6 +22,7 @@ async function loadMain() {
     try { updateMainUI(JSON.parse(cachedData)); } catch(e){}
   } else {
     getEl("characterList").innerHTML = `<div class="skeleton-block skeleton-card" style="margin-bottom:10px;"></div>`;
+    getEl("myScheduleList").innerHTML = `<div class="skeleton-block skeleton-card" style="margin-bottom:10px;"></div>`;
   }
   
   if (cachedNotice !== null) {
@@ -135,6 +136,7 @@ function updateMainUI(data) {
 
   characters = data.characters || [];
   renderCharacters(characters);
+  renderMySchedules(data.summary);
   applyTouchPop();
 }
 
@@ -182,6 +184,59 @@ function renderCharacters(items) {
   // 애니메이션 효과 적용
   applyTouchPop();
 }
+
+// 내 레이드 일정 그리기
+function renderMySchedules(summary) {
+  const list = getEl("myScheduleList");
+  if (!list) return;
+
+  const myItems = (summary || []).filter(s => String(s.account_id).trim() === getAccountId());
+
+  if (myItems.length === 0) {
+    list.innerHTML = `<div class="character-empty">📭 신청한 레이드 일정이 없습니다.<br><span style="font-size:12px; opacity:0.7;">하단 [레이드 신청] 탭에서 일정을 선택해주세요.</span></div>`;
+    return;
+  }
+
+  // 날짜순, 시간순 정렬
+  myItems.sort((a, b) => {
+    if (a.date !== b.date) return a.date.localeCompare(b.date);
+    return a.time_slot.localeCompare(b.time_slot);
+  });
+
+  let html = "";
+  myItems.forEach(i => {
+    const shortDate = i.date && i.date.length >= 10 ? i.date.substring(5).replace('-', '.') : i.date;
+    const totalParticipants = summary.filter(s => s.date === i.date && s.time_slot === i.time_slot).length;
+
+    html += `
+      <div class="character-card touch-pop" style="cursor: pointer; padding: 16px 14px;" onclick="goToParty('${escapeHtml(i.day)}', '${escapeHtml(i.time_slot)}')">
+        <div class="character-left">
+          <div style="display:flex; flex-direction:column; gap:6px;">
+            <div style="font-size:15px; font-weight:800; color:var(--text-main); letter-spacing:-0.02em;">
+              📅 ${shortDate} (${escapeHtml(i.day)}) <span style="color:var(--cyan-2); margin-left:4px; font-variant-numeric:tabular-nums;">${escapeHtml(i.time_slot)}</span>
+            </div>
+            <div style="font-size:12px; color:var(--text-sub); font-weight:600;">
+              참여 캐릭터: <span style="color:var(--text-main); font-weight:700;">${escapeHtml(i.character_name)}</span>
+            </div>
+          </div>
+        </div>
+        <div class="character-right">
+          <div style="text-align:right;">
+            <div style="font-size:11px; color:var(--text-muted); margin-bottom:4px; font-weight:600;">현재 파티 현황</div>
+            <div style="font-size:14px; font-weight:800; color:${totalParticipants >= 8 ? 'var(--green-1)' : 'var(--cyan-1)'};">${totalParticipants}명 대기중 <span style="font-size:10px;">➔</span></div>
+          </div>
+        </div>
+      </div>
+    `;
+  });
+  list.innerHTML = html;
+}
+
+window.goToParty = function(day, time) {
+  sessionStorage.setItem('autoOpenPartyDay', day);
+  sessionStorage.setItem('autoOpenPartyTime', time);
+  movePage('party.html');
+};
 
 // Action Sheet 열기/닫기
 window.openCharacterActionSheet = function(charName, isMainChar) {
