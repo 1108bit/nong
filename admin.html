@@ -10,10 +10,10 @@
   <link rel="manifest" href="./manifest.json" />
   <title>그림자 레기온 - 일정 관리</title>
   <script src="https://cdn.jsdelivr.net/npm/sortablejs@latest/Sortable.min.js"></script>
-  <link rel="stylesheet" href="./css/variables.css?v=20260407164529" />
-  <link rel="stylesheet" href="./css/layout.css?v=20260407164529" />
-  <link rel="stylesheet" href="./css/components.css?v=20260407164529" />
-  <link rel="stylesheet" href="./css/pages.css?v=20260407164529" />
+  <link rel="stylesheet" href="./css/variables.css?v=20260407172553" />
+  <link rel="stylesheet" href="./css/layout.css?v=20260407172553" />
+  <link rel="stylesheet" href="./css/components.css?v=20260407172553" />
+  <link rel="stylesheet" href="./css/pages.css?v=20260407172553" />
 </head>
 <body>
   <div class="bg-logo"></div>
@@ -106,6 +106,15 @@
                     <button type="button" class="chip-btn" data-value="N" style="min-width: 80px;">비공개 (임시저장)</button>
                   </div>
                   <input type="hidden" id="openYnInput" value="Y" />
+                </div>
+                
+                <!-- 마스터 전용 테스트 도구 -->
+                <div style="margin-top: 24px; padding-top: 24px; border-top: 1px solid rgba(138, 188, 233, 0.1);">
+                  <label class="input-label">고유 ID 추출 테스트 (마스터 전용)</label>
+                  <div style="display: flex; gap: 8px; align-items: center;">
+                    <input type="text" id="testCharNameInput" class="main-input" autocomplete="off" placeholder="캐릭터명 입력" style="flex: 1; height: 52px;" autocapitalize="off" spellcheck="false" />
+                    <button class="btn btn-secondary" id="testCharIdBtn" style="flex-shrink: 0; width: 90px; height: 52px; min-height: 52px; padding: 0;">ID 추출</button>
+                  </div>
                 </div>
               </div>
             </article>
@@ -274,8 +283,8 @@
       <span style="font-size:18px; opacity:0.8;">←</span> 메인으로
     </button>
   </main>
-  <script src="./js/api.js?v=20260407164529"></script>
-  <script src="./js/common.js?v=20260407164529"></script>
-  <script src="./js/admin.js?v=20260407164529"></script>
+  <script src="./js/api.js?v=20260407172553"></script>
+  <script src="./js/common.js?v=20260407172553"></script>
+  <script src="./js/admin.js?v=20260407172553"></script>
 </body>
 </html>

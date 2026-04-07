@@ -735,6 +735,33 @@ if (changeAdminCodeBtn) {
 }
 
 // =========================
+// 💡 마스터 전용 디버깅 툴: 고유 ID 추출 테스트
+// =========================
+const testCharIdBtn = getEl("testCharIdBtn");
+if (testCharIdBtn) {
+  testCharIdBtn.onclick = async () => {
+    const name = getEl("testCharNameInput").value.trim();
+    if (!name) { await uiAlert("캐릭터명을 입력해주세요."); return; }
+
+    const originalText = testCharIdBtn.textContent;
+    testCharIdBtn.disabled = true;
+    testCharIdBtn.innerHTML = `<span class="spinner-icon"></span>`;
+
+    const res = await callApi({ action: "fetchAionToolData", characterName: name, showLoading: false });
+
+    testCharIdBtn.disabled = false;
+    testCharIdBtn.textContent = originalText;
+
+    if (res.success && res.data) {
+      const msg = `[ ${res.data.name} ] 님의 정보\n\n📌 고유 ID:\n${res.data.characterId}\n\n⚔️ 클래스: ${res.data.className}\n🔥 전투력: ${res.data.power}\n📈 레벨: ${res.data.level}`;
+      await uiAlert(msg);
+    } else {
+      await uiAlert(res.message || "캐릭터 정보를 불러오지 못했습니다.");
+    }
+  };
+}
+
+// =========================
 // 6. 칩 버튼 클릭 이벤트 위임 (단 한 번만 선언하여 중복 충돌 방지)
 document.querySelectorAll('.chip-select-group').forEach(group => {
   group.addEventListener('click', e => {

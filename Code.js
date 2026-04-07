@@ -112,9 +112,11 @@ function fetchAionToolData(characterName) {
 
     // 1. 시트 검색: 입력받은 'characterName'과 일치하는 행을 찾습니다.
     if (idCol > -1 && nameCol > -1) {
+      const cleanInputForSheet = characterName.replace(/\s+/g, "").toLowerCase();
       for (let i = 1; i < values.length; i++) {
-        // 공백 제거 및 대소문자 무시 비교
-        if (String(values[i][nameCol]).trim() === characterName.trim()) {
+        // 💡 [개선] 시트 검색 시에도 공백/대소문자 무시를 적용하여 매칭 확률 극대화
+        const cleanSheetName = String(values[i][nameCol]).replace(/\s+/g, "").toLowerCase();
+        if (cleanSheetName === cleanInputForSheet) {
           const existingId = values[i][idCol];
           // 진짜 UUID(chQW...)가 이미 있다면 그것을 사용
           if (existingId && !String(existingId).startsWith('CHAR_')) {
@@ -128,8 +130,8 @@ function fetchAionToolData(characterName) {
     
     // 2. ID 식별: 시트에 진짜 ID가 없다면 aions.kr에서 새로 찾아옵니다.
     if (!ncCharacterId) {
-      // 💡 여기서 '농'이 아니라 'characterName' 변수를 사용해야 합니다!
-      const searchUrl = `https://aions.kr/api/v1/characters/autocomplete?query=${encodeURIComponent(characterName)}&limit=10`;
+      // 💡 검색 범위를 넓히고(limit=20) 인코딩 전 공백을 제거하여 탐색 능력을 극대화합니다.
+      const searchUrl = `https://aions.kr/api/v1/characters/autocomplete?query=${encodeURIComponent(characterName.trim())}&limit=20`;
       const searchRes = UrlFetchApp.fetch(searchUrl, {
         headers: { "Accept": "application/json", "Referer": "https://aions.kr/" }
       });
@@ -158,8 +160,9 @@ function fetchAionToolData(characterName) {
       
       if (targetChar && targetChar.characterId) {
         ncCharacterId = targetChar.characterId;
-        // 새로 찾은 ID를 시트에 즉시 업데이트 (박제)
-        if (rowIndex !== -1) {
+        // 💡 [자동화의 핵심] 새로 찾은 ID를 시트에 즉시 업데이트 (박제)
+        // 매니저님이 일일이 복사/붙여넣기 할 필요 없이 엔진이 스스로 기록합니다.
+        if (rowIndex !== -1 && idCol > -1) {
           sheet.getRange(rowIndex, idCol + 1).setValue(ncCharacterId);
         }
       }
