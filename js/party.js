@@ -98,9 +98,9 @@ async function showComposition(day, time) {
         if (!warningContainer) {
             warningContainer = document.createElement("div");
             warningContainer.id = "partyWarningContainer";
-            warningContainer.style.marginBottom = "14px";
+            warningContainer.style.marginTop = "8px"; // 💡 2파티 카드와 경고창 사이의 간격 추가
             const party1Card = getEl("party1List").closest('.main-card');
-            party1Card.parentNode.insertBefore(warningContainer, party1Card);
+            party1Card.parentNode.appendChild(warningContainer); // 💡 1파티 위가 아닌, 전체 목록의 가장 마지막(아래)에 배치
         }
         const isError = res.data.warning.includes("없습니다");
         warningContainer.innerHTML = `

@@ -426,4 +426,3 @@ async function saveAllChanges() {
      await uiAlert("일부 데이터를 저장하는데 실패했습니다. 다시 시도해주세요.");
   }
 }
-}
