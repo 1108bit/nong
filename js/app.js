@@ -98,13 +98,6 @@ getEl("mainName").onkeydown = (e) => { if(e.key === "Enter") getEl("password").f
 const pwdEl = getEl("password");
 if (pwdEl) {
   pwdEl.onkeydown = (e) => { if(e.key === "Enter") login(); };
-  // 💡 [UX 향상] 비밀번호 4자리가 입력되면 버튼을 누르지 않아도 즉시 자동 로그인 시도
-  pwdEl.addEventListener("input", (e) => {
-    if (e.target.value.length === 4) {
-      e.target.blur(); // 모바일 가상 키보드 부드럽게 숨기기
-      login();
-    }
-  });
 }
 
 // =========================
