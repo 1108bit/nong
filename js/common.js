@@ -153,13 +153,14 @@ function setupAppleScroll(scrollBoxId, indicatorId) {
   }
 }
 
-// 💡 [캐시 강력 파괴] 악명 높은 PWA 서비스 워커 캐시를 강제로 해제하여 최신 코드를 즉각 반영
+// 💡 [PWA 활성화] 스마트폰 바탕화면 설치 및 앱 화면(독립 실행형) 구성을 위해 서비스 워커 등록
 if ('serviceWorker' in navigator) {
-  navigator.serviceWorker.getRegistrations().then(registrations => {
-    for(let registration of registrations) {
-      registration.unregister();
-      console.log('🗑️ [캐시 비우기] 서비스 워커 해제 완료');
-    }
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('./sw.js').then(reg => {
+      console.log('✅ PWA 서비스 워커 등록 완료');
+    }).catch(err => {
+      console.log('❌ PWA 서비스 워커 등록 실패:', err);
+    });
   });
 }
 

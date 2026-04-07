@@ -1,17 +1,20 @@
 {
-  "name": "NoStepBack Legion",
-  "short_name": "NoStepBack",
+  "name": "그림자 레기온",
+  "short_name": "LEGION MANAGER",
   "start_url": "./index.html",
   "display": "standalone",
   "background_color": "#06111d",
   "theme_color": "#06111d",
-  "orientation": "portrait",
   "icons": [
     {
-      "src": "images/logo_main1.png",
+      "src": "./images/logo_main1.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "./images/logo_main1.png",
       "sizes": "512x512",
-      "type": "image/png",
-      "purpose": "any maskable"
+      "type": "image/png"
     }
   ]
 }
