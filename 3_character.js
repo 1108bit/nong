@@ -51,6 +51,7 @@ function addCharacter(e) {
   const className = normalizeValue(e.parameter.className || e.parameter.class);
   const type = normalizeValue(e.parameter.type) || '부캐';
   const power = normalizeValue(e.parameter.power);
+  const reqCharId = normalizeValue(e.parameter.characterId); // 💡 [신규] 프론트엔드가 전달한 다이렉트 ID
 
   if (!accountId) return { ok: false, message: 'accountId가 없습니다.' };
   if (!name) return { ok: false, message: '캐릭터명이 없습니다.' };
@@ -68,7 +69,7 @@ function addCharacter(e) {
   }
 
   const row = new Array(headers.length).fill('');
-  if (headers.indexOf('character_id') > -1) row[headers.indexOf('character_id')] = 'CHAR_' + Utilities.getUuid().slice(0, 8).toUpperCase();
+  if (headers.indexOf('character_id') > -1) row[headers.indexOf('character_id')] = reqCharId ? reqCharId : 'CHAR_' + Utilities.getUuid().slice(0, 8).toUpperCase();
   if (headers.indexOf('account_id') > -1) row[headers.indexOf('account_id')] = accountId;
   if (headers.indexOf('name') > -1) row[headers.indexOf('name')] = name;
   if (headers.indexOf('class_name') > -1) row[headers.indexOf('class_name')] = className;
@@ -127,6 +128,7 @@ function updateCharacter(e) {
   const className = normalizeValue(e.parameter.className || e.parameter.class);
   const type = normalizeValue(e.parameter.type);
   const power = normalizeValue(e.parameter.power);
+  const reqCharId = normalizeValue(e.parameter.characterId); // 💡 [신규]
 
   const sheet = getSheet(SHEET_NAMES.CHARACTERS);
   const values = sheet.getDataRange().getValues();
@@ -141,6 +143,7 @@ function updateCharacter(e) {
       if (headers.indexOf('type') > -1) sheet.getRange(i + 1, headers.indexOf('type') + 1).setValue(type);
       if (headers.indexOf('power') > -1) sheet.getRange(i + 1, headers.indexOf('power') + 1).setValue(power);
       if (headers.indexOf('updated_at') > -1) sheet.getRange(i + 1, headers.indexOf('updated_at') + 1).setValue(nowText());
+      if (reqCharId && headers.indexOf('character_id') > -1) sheet.getRange(i + 1, headers.indexOf('character_id') + 1).setValue(reqCharId); // 💡 갱신 시 ID 박제
 
       if (type === '본캐') updateAccountMainName(accountId, name);
       SpreadsheetApp.flush();

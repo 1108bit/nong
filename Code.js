@@ -90,39 +90,88 @@ function doGet(e) {
 }
 
 // =========================
-// 외부 사이트(aion2tool.com) 데이터 스크래핑 로직
+// 외부 사이트 및 NC 다이렉트 하이브리드 동기화 엔진 (Clean Ver.)
 // =========================
+/**
+ * [그림자 레기온 전용 하이브리드 동기화 엔진]
+ * 1단계: 시트에 저장된 UUID 확인
+ * 2단계: 없으면 aions.kr에서 UUID 식별 (최초 1회)
+ * 3단계: 획득한 UUID로 NC 공식 API 다이렉트 호출
+ */
 function fetchAionToolData(characterName) {
   try {
-    const serverId = "2015";
-    const url = `https://aion2tool.com/char/serverid=${serverId}/${encodeURIComponent(characterName)}`;
+    const serverId = "2015"; // 젠카카
+    const sheet = getSheet(SHEET_NAMES.CHARACTERS);
+    const values = sheet.getDataRange().getValues();
+    const headers = values[0].map(v => String(v).trim());
+    const idCol = headers.indexOf('character_id');
+    const nameCol = headers.indexOf('name');
     
-    // 구글 서버에서 aion2tool 페이지의 HTML을 긁어옵니다.
-    const response = UrlFetchApp.fetch(url, { muteHttpExceptions: true });
-    if (response.getResponseCode() !== 200) {
-      return { ok: false, message: "툴 사이트 서버가 응답하지 않습니다." };
+    let ncCharacterId = null;
+    let rowIndex = -1;
+
+    // 1. 캐싱 확인: 이미 등록된 진짜 ID가 있는지 확인
+    if (idCol > -1 && nameCol > -1) {
+      for (let i = 1; i < values.length; i++) {
+        if (String(values[i][nameCol]).trim() === characterName.trim()) {
+          const existingId = values[i][idCol];
+          // CHAR_로 시작하는 임시 ID가 아닌 진짜 UUID인 경우만 채택
+          if (existingId && !String(existingId).startsWith('CHAR_')) {
+            ncCharacterId = existingId;
+            rowIndex = i + 1;
+          }
+          break;
+        }
+      }
     }
     
-    const html = response.getContentText();
-    
-    // 💡 [디버깅용] aion2tool의 구조가 변경되어 정규식이 깨졌을 경우를 대비해 로그 출력
-    console.log("Aion2Tool HTML 응답 샘플: ", html.substring(0, 300) + "...");
-
-    // 💡 [임시 정규식] aion2tool의 실제 HTML 구조에 맞게 추후 수정이 필요합니다.
-    const classMatch = html.match(/(검성|수호성|살성|궁성|마도성|정령성|치유성|호법성)/);
-    const powerMatch = html.match(/전투력.*?([\d,]+)/); 
-
-    if (!classMatch && !powerMatch) {
-        return { ok: false, message: "페이지에서 캐릭터 정보를 추출할 수 없습니다." };
+    // 2. 최초 등록: ID가 없다면 aions.kr 자동완성 API로 식별
+    if (!ncCharacterId) {
+      const searchUrl = `https://aions.kr/api/v1/characters/autocomplete?query=${encodeURIComponent(characterName)}&limit=10`;
+      const searchRes = UrlFetchApp.fetch(searchUrl, {
+        headers: { "Accept": "application/json", "Referer": "https://aions.kr/" }
+      });
+      const searchData = JSON.parse(searchRes.getContentText());
+      
+      // 서버 일치 캐릭터 찾기
+      const targetChar = searchData.find(c => c.serverId == serverId || c.serverName === '젠카카');
+      if (targetChar && targetChar.characterId) {
+        ncCharacterId = targetChar.characterId;
+      }
     }
+
+    if (!ncCharacterId) {
+      return { ok: false, message: "캐릭터 고유 ID를 식별할 수 없습니다. 공식 홈페이지 주소를 확인해주세요." };
+    }
+
+    // 3. 다이렉트 통신: NC 공식 JSON API 호출 (매니저님이 찾은 그 보물 주소!)
+    const infoUrl = `https://aion2.plaync.com/api/character/info?lang=ko&characterId=${ncCharacterId}&serverId=${serverId}`;
+    const infoRes = UrlFetchApp.fetch(infoUrl, {
+      headers: {
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
+        "Referer": "https://aion2.plaync.com/"
+      }
+    });
+    
+    const res = JSON.parse(infoRes.getContentText());
+    const p = res.profile;
+    const stats = res.stat ? res.stat.statList : [];
+    const itemLevelObj = stats.find(s => s.type === "ItemLevel");
 
     return { 
       ok: true, 
-      className: classMatch ? classMatch[1] : "", 
-      power: powerMatch ? powerMatch[1].replace(/,/g, '') : "" // 콤마 제거
+      characterId: ncCharacterId, // 나중에 시트에 박제할 ID
+      name: p.characterName,
+      level: p.characterLevel,
+      className: p.className,
+      power: p.combatPower,
+      img: p.profileImage,
+      itemLevel: itemLevelObj ? itemLevelObj.value : "0",
+      title: p.titleName || ""
     };
+
   } catch (e) {
-    return { ok: false, message: "동기화 중 서버 오류: " + e.message };
+    return { ok: false, message: "엔진 구동 실패: " + e.message };
   }
 }
 

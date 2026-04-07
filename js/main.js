@@ -366,6 +366,20 @@ if (syncBtn) {
         getEl("modalCharacterClass").value = res.data.className;
         document.querySelectorAll(`[data-target="modalCharacterClass"] .chip-btn`).forEach(b => b.classList.toggle("selected", b.dataset.value === res.data.className));
       }
+
+      // 💡 [신규] 프사 및 추가 레벨 메타데이터 연동
+      if (res.data.img) {
+        const imgEl = getEl("modalProfileImg");
+        const wrapEl = getEl("modalProfileWrap");
+        const metaEl = getEl("modalProfileMeta");
+        if(imgEl && wrapEl) {
+          imgEl.src = res.data.img;
+          wrapEl.style.display = "flex";
+          if(metaEl) metaEl.textContent = `Lv.${res.data.level || '?'} | 템렙 ${res.data.itemLevel || '?'}`;
+        }
+      }
+      
+      if (res.data.characterId) getEl("modalCharacterId").value = res.data.characterId;
       
       // 2. 푸른색 고스팅 애니메이션 효과 적용
       const modalForm = document.querySelector(".modal-form");
@@ -584,6 +598,12 @@ function closeModal() {
     getEl("characterModal").dataset.originalName = "";
     getEl("modalTitle").textContent = "캐릭터 추가";
     getEl("submitCharacterButton").textContent = "등록하기";
+    
+    // 💡 [신규] 닫을 때 프사 영역 숨김
+    const wrapEl = getEl("modalProfileWrap");
+    if (wrapEl) wrapEl.style.display = "none";
+    getEl("modalCharacterId").value = "";
+
     // 입력 필드 초기화
     getEl("modalCharacterName").value = "";
     getEl("modalCharacterType").value = "부캐";
