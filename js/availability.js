@@ -6,8 +6,10 @@ const State = {
   summaries: [],
   selectedDate: 'ALL', // 기본값을 '전체'로 변경
   selectedMap: new Set(),
+  originalSelectedMap: new Set(), // 💡 원본 데이터 비교용
   filterMode: 'all', // 필터 상태 (all / my)
-  isSaving: false // 💡 [레이스 컨디션 방어용] 저장 중 상태 플래그
+  isSaving: false, // 💡 [레이스 컨디션 방어용] 저장 중 상태 플래그
+  hasChanges: false // 💡 변경사항 존재 여부
 };
 
 
@@ -35,8 +37,10 @@ async function loadAvailabilityData() {
       State.schedules = parsed.schedules || [];
       State.summaries = parsed.summaries || [];
       State.selectedMap = new Set(parsed.selectedMap || []);
+      State.originalSelectedMap = new Set(parsed.selectedMap || []); // 캐시 불러올 때 원본도 동일하게 세팅
       updateDateChipsWithData();
       renderList();
+      updateSaveButtonVisibility(); // 버튼 숨김 처리
     } catch(e) {}
   } else {
     const target = getEl("availabilityList");
@@ -69,8 +73,12 @@ async function loadAvailabilityData() {
   State.summaries = summaryData.data.items || [];
   
   State.selectedMap.clear();
+  State.originalSelectedMap.clear(); // 원본 초기화
   const mySelections = State.summaries.filter(s => String(s.account_id).trim() === String(accountId).trim());
-  mySelections.forEach(s => State.selectedMap.add(`${s.date}__${s.time_slot}`));
+  mySelections.forEach(s => {
+    State.selectedMap.add(`${s.date}__${s.time_slot}`);
+    State.originalSelectedMap.add(`${s.date}__${s.time_slot}`);
+  });
 
   // 최신 데이터를 캐시에 저장
   sessionStorage.setItem(cacheKey, JSON.stringify({
@@ -81,6 +89,7 @@ async function loadAvailabilityData() {
 
   updateDateChipsWithData();
   renderList();
+  updateSaveButtonVisibility();
 }
 
 function initDateChips() {
@@ -154,7 +163,12 @@ function bindEvents() {
     });
   }
 
-  getEl("backButton").onclick = () => movePage("main.html");
+  getEl("backButton").onclick = async () => {
+    if (State.hasChanges) {
+      if (!(await uiConfirm("저장하지 않은 일정이 있습니다.\n변경사항을 버리고 나가시겠습니까?"))) return;
+    }
+    movePage("main.html");
+  };
 }
 
 function updateDateChipsWithData() {
@@ -308,16 +322,6 @@ async function toggleTime(date, time) {
     }
   }
 
-  // 현재 클릭한 일정과 '같은 주차(week_key)'에 속한 항목들만 안전하게 분리해서 모아줌
-  const slotsForThisWeek = [];
-  for (const selKey of State.selectedMap) {
-    const [d, t] = selKey.split("__");
-    const sItem = State.schedules.find(s => s.date === d && s.time_slot === t);
-    if (sItem && sItem.week_key === targetWeekKey) {
-      slotsForThisWeek.push({ day: sItem.day, time_slot: t });
-    }
-  }
-
   // 💡 [SWR 캐시 동기화] 변경된 상태를 즉시 캐시에 저장하여 나갔다 들어와도 깜빡임 없음
   sessionStorage.setItem(`cache_avail_${getAccountId()}`, JSON.stringify({
     schedules: State.schedules,
@@ -325,22 +329,101 @@ async function toggleTime(date, time) {
     selectedMap: Array.from(State.selectedMap)
   }));
 
-  // 2. 백그라운드에서 서버 동기화 (await 없이 백그라운드 실행)
-  callApi({
-    action: "saveAvailability",
-    accountId: getAccountId(),
-    mainName: getMainName(),
-    characterName: getMainName(),
-    type: "본캐",
-    weekKey: targetWeekKey,
-    slotList: JSON.stringify(slotsForThisWeek),
-    background: true // 💡 [UX] 낙관적 UI이므로 글로벌 로딩을 띄우지 않음
-  }).then(res => {
-    State.isSaving = false; // 저장 상태 OFF (백그라운드 동기화 허용)
-    
-    // 💡 1순위: 에러 알림은 api.js에서 띄워주므로, 여기서는 데이터 롤백만 수행하면 끝!
-    if (!res.success) {
-      loadAvailabilityData(); 
+  // 💡 [UX 개편] 자동 저장 대신, 변경사항이 생기면 '저장하기' 버튼을 띄우도록 처리
+  updateSaveButtonVisibility();
+}
+
+// =========================
+// 수동 저장(확정) 로직
+// =========================
+function updateSaveButtonVisibility() {
+  let diffFound = false;
+  if (State.selectedMap.size !== State.originalSelectedMap.size) {
+    diffFound = true;
+  } else {
+    for (let val of State.selectedMap) {
+      if (!State.originalSelectedMap.has(val)) {
+        diffFound = true;
+        break;
+      }
     }
-  });
+  }
+  State.hasChanges = diffFound;
+
+  let btn = document.getElementById("floatingSaveBtn");
+  if (diffFound) {
+    if (!btn) {
+      btn = document.createElement("button");
+      btn.id = "floatingSaveBtn";
+      btn.className = "btn btn-primary touch-pop";
+      btn.style.cssText = "position:fixed; bottom:32px; left:50%; transform:translateX(-50%); width:calc(100% - 32px); max-width:560px; z-index:9999; box-shadow:0 12px 30px rgba(0,0,0,0.8); font-size: 16px; font-weight: 800; min-height: 56px;";
+      btn.innerHTML = "💾 변경사항 저장하기";
+      btn.onclick = saveAllChanges;
+      document.body.appendChild(btn);
+    }
+    btn.style.display = "block";
+  } else {
+    if (btn) btn.style.display = "none";
+  }
+}
+
+async function saveAllChanges() {
+  if (State.isSaving) return;
+  State.isSaving = true;
+  
+  const btn = document.getElementById("floatingSaveBtn");
+  if (btn) btn.innerHTML = '<span class="spinner-icon"></span> 저장 중...';
+
+  // 변경사항이 발생한 모든 주차(week_key) 수집
+  const affectedWeekKeys = new Set();
+  const addWeeksFromMap = (map) => {
+    for (const key of map) {
+      const [d, t] = key.split("__");
+      const sItem = State.schedules.find(s => s.date === d && s.time_slot === t);
+      if (sItem && sItem.week_key) affectedWeekKeys.add(sItem.week_key);
+    }
+  };
+  
+  addWeeksFromMap(State.selectedMap);
+  addWeeksFromMap(State.originalSelectedMap);
+  
+  let hasError = false;
+  
+  // 영향을 받은 주차별로 묶어서 일괄 전송
+  for (const weekKey of affectedWeekKeys) {
+     const slotsForThisWeek = [];
+     for (const selKey of State.selectedMap) {
+       const [d, t] = selKey.split("__");
+       const sItem = State.schedules.find(s => s.date === d && s.time_slot === t);
+       if (sItem && sItem.week_key === weekKey) {
+         slotsForThisWeek.push({ day: sItem.day, time_slot: t });
+       }
+     }
+     
+     const res = await callApi({
+        action: "saveAvailability",
+        accountId: getAccountId(),
+        mainName: getMainName(),
+        characterName: getMainName(),
+        type: "본캐", 
+        weekKey: weekKey,
+        slotList: JSON.stringify(slotsForThisWeek),
+        showLoading: false // 플로팅 버튼 자체 스피너 사용
+     });
+     
+     if (!res.success) hasError = true;
+  }
+  
+  State.isSaving = false;
+  if (btn) btn.innerHTML = "💾 변경사항 저장하기";
+  
+  if (!hasError) {
+     await uiAlert("일정이 성공적으로 저장되었습니다.");
+     State.originalSelectedMap = new Set(State.selectedMap);
+     updateSaveButtonVisibility();
+     loadAvailabilityData(); // 서버의 최신 정보와 화면을 최종 동기화
+  } else {
+     await uiAlert("일부 데이터를 저장하는데 실패했습니다. 다시 시도해주세요.");
+  }
+}
 }
