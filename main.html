@@ -9,10 +9,10 @@
   <link rel="apple-touch-icon" href="./images/logo_main1.png" />
   <link rel="manifest" href="./manifest.json" />
   <title>그림자 레기온 - 메인</title>
-  <link rel="stylesheet" href="./css/variables.css?v=20260407145632" />
-  <link rel="stylesheet" href="./css/layout.css?v=20260407145632" />
-  <link rel="stylesheet" href="./css/components.css?v=20260407145632" />
-  <link rel="stylesheet" href="./css/pages.css?v=20260407145632" />
+  <link rel="stylesheet" href="./css/variables.css?v=20260407151922" />
+  <link rel="stylesheet" href="./css/layout.css?v=20260407151922" />
+  <link rel="stylesheet" href="./css/components.css?v=20260407151922" />
+  <link rel="stylesheet" href="./css/pages.css?v=20260407151922" />
 </head>
 <body>
   <div class="bg-logo"></div>
@@ -100,7 +100,10 @@
         <div class="modal-form">
           <div class="form-group">
             <label class="input-label">캐릭터명</label>
-            <input type="text" id="modalCharacterName" class="main-input" placeholder="캐릭터명 입력" autocomplete="off" autocapitalize="off" spellcheck="false" />
+            <div style="display: flex; gap: 8px; align-items: center;">
+              <input type="text" id="modalCharacterName" class="main-input" placeholder="캐릭터명 입력" style="flex: 1;" autocomplete="off" autocapitalize="off" spellcheck="false" />
+              <button type="button" class="btn btn-secondary touch-pop" id="syncAionToolBtn" style="flex-shrink: 0; padding: 0 14px; min-height: 52px; border-radius: 14px; font-size: 13px; background: rgba(10, 132, 255, 0.1); color: #0a84ff; border: 1px solid rgba(10, 132, 255, 0.3);">🔄 동기화</button>
+            </div>
           </div>
           <div class="form-group">
             <label class="input-label">클래스</label>
@@ -182,8 +185,8 @@
       </div>
     </div>
   </main>
-  <script src="./js/api.js?v=20260407145632"></script>
-  <script src="./js/common.js?v=20260407145632"></script>
-  <script src="./js/main.js?v=20260407145632"></script>
+  <script src="./js/api.js?v=20260407151922"></script>
+  <script src="./js/common.js?v=20260407151922"></script>
+  <script src="./js/main.js?v=20260407151922"></script>
 </body>
 </html>

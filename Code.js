@@ -67,6 +67,7 @@ function doGet(e) {
       case 'resetUserPasswordByAdmin': result = resetUserPasswordByAdmin(e.parameter.adminCode, e.parameter.targetAccountId); break;
       case 'getNotice': result = getNotice(); break;
       case 'saveNotice': result = saveNotice(e.parameter.adminCode, e.parameter.notice); break;
+      case 'fetchAionToolData': result = fetchAionToolData(e.parameter.characterName); break;
       default: return outputStandard(false, null, '잘못된 요청입니다.', 400);
     }
     
@@ -85,6 +86,43 @@ function doGet(e) {
   } finally {
     // 💡 락(Lock) 해제: 통신이 성공하든 실패하든 무조건 마지막에 락을 풀어주어 다음 유저가 쓸 수 있게 함
     if (lock) lock.releaseLock();
+  }
+}
+
+// =========================
+// 외부 사이트(aion2tool.com) 데이터 스크래핑 로직
+// =========================
+function fetchAionToolData(characterName) {
+  try {
+    const serverId = "2015";
+    const url = `https://aion2tool.com/char/serverid=${serverId}/${encodeURIComponent(characterName)}`;
+    
+    // 구글 서버에서 aion2tool 페이지의 HTML을 긁어옵니다.
+    const response = UrlFetchApp.fetch(url, { muteHttpExceptions: true });
+    if (response.getResponseCode() !== 200) {
+      return { ok: false, message: "툴 사이트 서버가 응답하지 않습니다." };
+    }
+    
+    const html = response.getContentText();
+    
+    // 💡 [디버깅용] aion2tool의 구조가 변경되어 정규식이 깨졌을 경우를 대비해 로그 출력
+    console.log("Aion2Tool HTML 응답 샘플: ", html.substring(0, 300) + "...");
+
+    // 💡 [임시 정규식] aion2tool의 실제 HTML 구조에 맞게 추후 수정이 필요합니다.
+    const classMatch = html.match(/(검성|수호성|살성|궁성|마도성|정령성|치유성|호법성)/);
+    const powerMatch = html.match(/전투력.*?([\d,]+)/); 
+
+    if (!classMatch && !powerMatch) {
+        return { ok: false, message: "페이지에서 캐릭터 정보를 추출할 수 없습니다." };
+    }
+
+    return { 
+      ok: true, 
+      className: classMatch ? classMatch[1] : "", 
+      power: powerMatch ? powerMatch[1].replace(/,/g, '') : "" // 콤마 제거
+    };
+  } catch (e) {
+    return { ok: false, message: "동기화 중 서버 오류: " + e.message };
   }
 }
 

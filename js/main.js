@@ -341,6 +341,58 @@ getEl("addCharacterButton").addEventListener("click", async () => {
 // 캐릭터 등록 실행
 getEl("submitCharacterButton").onclick = () => submitCharacter();
 
+// =========================
+// aion2tool.com 실시간 데이터 동기화
+// =========================
+const syncBtn = getEl("syncAionToolBtn");
+if (syncBtn) {
+  syncBtn.addEventListener("click", async () => {
+    const nameInput = getEl("modalCharacterName");
+    const name = nameInput.value.trim();
+    if (!name) { await uiAlert("캐릭터명을 먼저 입력해주세요."); return; }
+
+    const originalHtml = syncBtn.innerHTML;
+    syncBtn.disabled = true;
+    syncBtn.innerHTML = `<span class="spinner-icon" style="margin:0;"></span>`;
+
+    const res = await callApi({ action: "fetchAionToolData", characterName: name, showLoading: false });
+
+    syncBtn.disabled = false;
+    syncBtn.innerHTML = originalHtml;
+
+    if (res.success && res.data) {
+      // 1. 가져온 데이터로 폼 자동 선택
+      if (res.data.className) {
+        getEl("modalCharacterClass").value = res.data.className;
+        document.querySelectorAll(`[data-target="modalCharacterClass"] .chip-btn`).forEach(b => b.classList.toggle("selected", b.dataset.value === res.data.className));
+      }
+      
+      // 2. 푸른색 고스팅 애니메이션 효과 적용
+      const modalForm = document.querySelector(".modal-form");
+      modalForm.classList.remove("sync-success-glow");
+      void modalForm.offsetWidth; // Reflow 트리거
+      modalForm.classList.add("sync-success-glow");
+
+      // 3. 그림자 레기온 전용 시스템 사운드 재생 (Web Audio API 활용 - 외부 파일 불필요)
+      const AudioContext = window.AudioContext || window.webkitAudioContext;
+      if (AudioContext) {
+        const ctx = new AudioContext();
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(880, ctx.currentTime); // A5 음
+        osc.frequency.exponentialRampToValueAtTime(1760, ctx.currentTime + 0.1); // 삐릭! 하고 올라가는 첨단 효과음
+        gain.gain.setValueAtTime(0.1, ctx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.3);
+        osc.connect(gain); gain.connect(ctx.destination);
+        osc.start(); osc.stop(ctx.currentTime + 0.3);
+      }
+    } else {
+      await uiAlert(res.message || "정보를 불러오지 못했습니다.");
+    }
+  });
+}
+
 // 버튼 처리 중 상태 관리 (캐릭터 등록 시)
 async function submitCharacter() {
   const btn = getEl("submitCharacterButton");
