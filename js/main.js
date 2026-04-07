@@ -151,7 +151,7 @@ function openEditModal(characterName) {
 function renderCharacters(items) {
   const list = getEl("characterList");
   if (!items || items.length === 0) {
-    list.innerHTML = `<div class="character-empty">📭 등록된 캐릭터가 없습니다.<br><span style="font-size:12px; opacity:0.7;">우측 상단의 [추가] 버튼을 눌러보세요!</span></div>`;
+    list.innerHTML = `<div style="padding: 28px 16px; text-align: center; background: rgba(255,255,255,0.02); border: 1px dashed rgba(255,255,255,0.1); border-radius: 14px; margin-bottom: 8px;"><div style="font-size: 24px; margin-bottom: 8px; opacity: 0.8;">📭</div><div style="font-size: 14px; font-weight: 600; color: var(--text-main);">등록된 캐릭터가 없습니다.</div><div style="font-size: 12px; color: var(--text-muted); margin-top: 4px;">우측 상단의 [추가] 버튼을 눌러주세요.</div></div>`;
     return;
   }
 
@@ -175,6 +175,9 @@ function renderCharacters(items) {
         
         <div class="character-right">
           <button class="icon-btn" style="border:none; background:transparent; font-size:18px; color:var(--text-sub); pointer-events:none;" title="더보기">⋯</button>
+          <div style="color: rgba(255,255,255,0.2); display: flex; align-items: center; justify-content: center; pointer-events: none;">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg>
+          </div>
         </div>
 
       </div>
@@ -198,7 +201,7 @@ function renderMySchedules(summary) {
   const myItems = (summary || []).filter(s => String(s.account_id).trim() === getAccountId() && s.date >= todayStr);
 
   if (myItems.length === 0) {
-    list.innerHTML = `<div class="character-empty">📭 신청한 레이드 일정이 없습니다.<br><span style="font-size:12px; opacity:0.7;">하단 [레이드 신청] 탭에서 일정을 선택해주세요.</span></div>`;
+    list.innerHTML = `<div style="padding: 28px 16px; text-align: center; background: rgba(255,255,255,0.02); border: 1px dashed rgba(255,255,255,0.1); border-radius: 14px; margin-bottom: 8px;"><div style="font-size: 24px; margin-bottom: 8px; opacity: 0.8;">📅</div><div style="font-size: 14px; font-weight: 600; color: var(--text-main);">예정된 레이드 일정이 없습니다.</div><div style="font-size: 12px; color: var(--text-muted); margin-top: 4px;">우측 상단의 [일정 관리]를 눌러 신청해주세요.</div></div>`;
     return;
   }
 

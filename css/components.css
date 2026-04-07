@@ -602,3 +602,14 @@ body.modal-open { overflow: hidden; }
   }
   .waiting-list-title { top: -16px; }
 }
+
+/* ==========================================
+   Apple HIG 스타일 섹션 버튼 (Section Header Action)
+========================================== */
+.ios-section-btn {
+  background: rgba(10, 132, 255, 0.12); color: #0A84FF; border: none;
+  padding: 6px 14px; border-radius: 999px; font-size: 13px; font-weight: 600;
+  display: inline-flex; align-items: center; gap: 4px; cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+.ios-section-btn:active { background: rgba(10, 132, 255, 0.25); transform: scale(0.95); }

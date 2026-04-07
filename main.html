@@ -7,10 +7,10 @@
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
   <title>그림자 레기온 - 메인</title>
-  <link rel="stylesheet" href="./css/variables.css?v=20260407132857" />
-  <link rel="stylesheet" href="./css/layout.css?v=20260407132857" />
-  <link rel="stylesheet" href="./css/components.css?v=20260407132857" />
-  <link rel="stylesheet" href="./css/pages.css?v=20260407132857" />
+  <link rel="stylesheet" href="./css/variables.css?v=20260407133339" />
+  <link rel="stylesheet" href="./css/layout.css?v=20260407133339" />
+  <link rel="stylesheet" href="./css/components.css?v=20260407133339" />
+  <link rel="stylesheet" href="./css/pages.css?v=20260407133339" />
 </head>
 <body>
   <div class="bg-logo"></div>
@@ -59,7 +59,9 @@
         <article class="main-card" style="grid-column: 1 / -1;">
           <div class="card-head">
             <h2 class="section-title">내 캐릭터</h2>
-            <button type="button" class="mini-btn" id="addCharacterButton">추가</button>
+            <button type="button" class="ios-section-btn touch-pop" id="addCharacterButton">
+              <span style="font-size: 16px; font-weight: 400; line-height: 1; margin-top: -2px;">+</span> 추가
+            </button>
           </div>
           <div class="character-list" id="characterList">
             <div class="character-empty">불러오는 중...</div>
@@ -69,7 +71,9 @@
         <article class="main-card" style="grid-column: 1 / -1; margin-top: 14px;">
           <div class="card-head">
             <h2 class="section-title">내 레이드 일정</h2>
-            <button type="button" class="mini-btn" onclick="movePage('availability.html')">신청/수정</button>
+            <button type="button" class="ios-section-btn touch-pop" onclick="movePage('availability.html')">
+              일정 관리 <span style="font-size: 10px; opacity: 0.8; margin-top: 1px;">➔</span>
+            </button>
           </div>
           <div class="character-list" id="myScheduleList">
             <div class="character-empty">불러오는 중...</div>
@@ -191,8 +195,8 @@
       </div>
     </div>
   </main>
-  <script src="./js/api.js?v=20260407132857"></script>
-  <script src="./js/common.js?v=20260407132857"></script>
-  <script src="./js/main.js?v=20260407132857"></script>
+  <script src="./js/api.js?v=20260407133339"></script>
+  <script src="./js/common.js?v=20260407133339"></script>
+  <script src="./js/main.js?v=20260407133339"></script>
 </body>
 </html>
