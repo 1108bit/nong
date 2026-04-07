@@ -143,10 +143,20 @@ function fetchAionToolData(characterName) {
         charArray = searchData.results;
       }
 
-      // 서버 일치 캐릭터 찾기
-      const targetChar = charArray.find(c => c.serverId == serverId || c.serverName === '젠카카');
+      // 💡 [버그 수정] 서버명/서버ID 속성 이름이 다를 경우를 모두 포괄 (스네이크 케이스 등)
+      const targetChar = charArray.find(c => 
+        String(c.serverId) === String(serverId) || 
+        String(c.server_id) === String(serverId) || 
+        c.serverName === '젠카카' || 
+        c.server_name === '젠카카' || 
+        c.server === '젠카카'
+      );
+      
       if (targetChar && targetChar.characterId) {
         ncCharacterId = targetChar.characterId;
+      } else if (charArray.length > 0) {
+        // 💡 [안전망] 서버명 조건에 맞는 캐릭터를 찾지 못했더라도, 검색 결과가 있다면 일단 첫 번째 캐릭터 ID를 가져옵니다.
+        ncCharacterId = charArray[0].characterId || charArray[0].character_id;
       }
     }
 
