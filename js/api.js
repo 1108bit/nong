@@ -36,7 +36,7 @@ function hideGlobalLoading() {
   }
 }
 
-async function callApi(params) {
+async function callApi(params, retries = 3) {
   // 💡 [구조 개선] 하드코딩된 배열 대신, 액션명 패턴(save, update 등)으로 쓰기 작업을 자동 감지하여 로딩창 렌더링
   const isWriteAction = params.showLoading === true || /^(save|update|delete|add|toggle|reset|login)/i.test(params.action);
   const isBackground = params.background; // 명시적으로 백그라운드 요청인 경우 오버레이 제외
@@ -64,6 +64,14 @@ async function callApi(params) {
       json.success = json.ok;
       json.data = { ...json };
       console.log(`♻️ [데이터 호환성 패치 적용 완료]`);
+    }
+
+    // 💡 [구글 시트 한계 극복] LockService 타임아웃(HTTP 429) 발생 시 유저에게 에러를 띄우지 않고 자동 재시도 (최대 3회)
+    if (json.code === 429 && retries > 0) {
+      console.warn(`⏳ [동시 접근 병목] 서버 혼잡. ${retries}회 재시도 대기 중...`);
+      // 다수가 동시에 재시도하여 또 충돌하는 것을 막기 위해 1.5초 ~ 2.5초 사이의 랜덤한 시간 동안 대기(Jitter) 후 재요청
+      await new Promise(resolve => setTimeout(resolve, 1500 + Math.random() * 1000));
+      return callApi(params, retries - 1);
     }
 
     // 💡 [1순위] 통합 에러 핸들링: 실패 시 공통 알림창을 띄워 개별 화면의 중복 코드를 제거

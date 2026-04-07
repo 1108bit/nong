@@ -190,7 +190,12 @@ function renderMySchedules(summary) {
   const list = getEl("myScheduleList");
   if (!list) return;
 
-  const myItems = (summary || []).filter(s => String(s.account_id).trim() === getAccountId());
+  // 💡 오늘 날짜 기준(YYYY-MM-DD) 생성
+  const today = new Date();
+  const todayStr = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
+
+  // 💡 내 캐릭터이면서, 동시에 오늘 날짜(todayStr) 이후의 일정만 필터링 (과거 일정 숨김)
+  const myItems = (summary || []).filter(s => String(s.account_id).trim() === getAccountId() && s.date >= todayStr);
 
   if (myItems.length === 0) {
     list.innerHTML = `<div class="character-empty">📭 신청한 레이드 일정이 없습니다.<br><span style="font-size:12px; opacity:0.7;">하단 [레이드 신청] 탭에서 일정을 선택해주세요.</span></div>`;

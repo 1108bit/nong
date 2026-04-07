@@ -31,9 +31,9 @@ function doGet(e) {
     // 💡 [동시성 방어벽] 쓰기 작업 시 락을 걸어 구글 시트 데이터 덮어쓰기 및 행 밀림 대참사 완벽 방어
     if (WRITE_ACTIONS.includes(action)) {
       lock = LockService.getScriptLock();
-      // 최대 5초 대기 (5초 이상 다른 유저의 쓰기가 안 끝나면 에러 반환)
-      if (!lock.tryLock(5000)) {
-        return outputStandard(false, null, "현재 접속자가 많아 저장이 지연되고 있습니다. 잠시 후 다시 시도해주세요.", 429);
+      // 💡 [개선] 구글 시트 쓰기 지연을 고려해 대기 시간을 15초(15000ms)로 연장
+      if (!lock.tryLock(15000)) {
+        return outputStandard(false, null, "현재 접속자가 많아 서버가 혼잡합니다. 잠시 후 자동으로 다시 시도합니다.", 429);
       }
     }
 
