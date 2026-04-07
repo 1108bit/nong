@@ -100,7 +100,7 @@ function doGet(e) {
  */
 function fetchAionToolData(characterName) {
   try {
-    const serverId = "2015"; // 젠카카
+    const serverId = "2015"; // 젠카카 고정
     const sheet = getSheet(SHEET_NAMES.CHARACTERS);
     const values = sheet.getDataRange().getValues();
     const headers = values[0].map(v => String(v).trim());
@@ -110,12 +110,13 @@ function fetchAionToolData(characterName) {
     let ncCharacterId = null;
     let rowIndex = -1;
 
-    // 1. 캐싱 확인: 이미 등록된 진짜 ID가 있는지 확인
+    // 1. 시트 검색: 입력받은 'characterName'과 일치하는 행을 찾습니다.
     if (idCol > -1 && nameCol > -1) {
       for (let i = 1; i < values.length; i++) {
+        // 공백 제거 및 대소문자 무시 비교
         if (String(values[i][nameCol]).trim() === characterName.trim()) {
           const existingId = values[i][idCol];
-          // CHAR_로 시작하는 임시 ID가 아닌 진짜 UUID인 경우만 채택
+          // 진짜 UUID(chQW...)가 이미 있다면 그것을 사용
           if (existingId && !String(existingId).startsWith('CHAR_')) {
             ncCharacterId = existingId;
             rowIndex = i + 1;
@@ -125,50 +126,36 @@ function fetchAionToolData(characterName) {
       }
     }
     
-    // 2. 최초 등록: ID가 없다면 aions.kr 자동완성 API로 식별
+    // 2. ID 식별: 시트에 진짜 ID가 없다면 aions.kr에서 새로 찾아옵니다.
     if (!ncCharacterId) {
+      // 💡 여기서 '농'이 아니라 'characterName' 변수를 사용해야 합니다!
       const searchUrl = `https://aions.kr/api/v1/characters/autocomplete?query=${encodeURIComponent(characterName)}&limit=10`;
       const searchRes = UrlFetchApp.fetch(searchUrl, {
         headers: { "Accept": "application/json", "Referer": "https://aions.kr/" }
       });
       const searchData = JSON.parse(searchRes.getContentText());
       
-      // 💡 [버그 수정] API 응답 구조가 배열이 아니라 객체({ data: [...] })일 경우를 대비한 방어 로직
-      let charArray = [];
-      if (Array.isArray(searchData)) {
-        charArray = searchData;
-      } else if (searchData && Array.isArray(searchData.data)) {
-        charArray = searchData.data;
-      } else if (searchData && Array.isArray(searchData.results)) {
-        charArray = searchData.results;
-      }
-
-      // 💡 [버그 수정] 서버명/서버ID 속성 이름이 다를 경우를 모두 포괄 (스네이크 케이스 등)
-      const targetChar = charArray.find(c => 
-        String(c.serverId) === String(serverId) || 
-        String(c.server_id) === String(serverId) || 
-        c.serverName === '젠카카' || 
-        c.server_name === '젠카카' || 
-        c.server === '젠카카'
-      );
+      // 우리 서버(2015)이면서 이름이 정확히 일치하는 캐릭터 필터링
+      const targetChar = searchData.find(c => (c.serverId == serverId || c.serverName === '젠카카') && c.name === characterName.trim());
       
       if (targetChar && targetChar.characterId) {
         ncCharacterId = targetChar.characterId;
-      } else if (charArray.length > 0) {
-        // 💡 [안전망] 서버명 조건에 맞는 캐릭터를 찾지 못했더라도, 검색 결과가 있다면 일단 첫 번째 캐릭터 ID를 가져옵니다.
-        ncCharacterId = charArray[0].characterId || charArray[0].character_id;
+        // 새로 찾은 ID를 시트에 즉시 업데이트 (박제)
+        if (rowIndex !== -1) {
+          sheet.getRange(rowIndex, idCol + 1).setValue(ncCharacterId);
+        }
       }
     }
 
     if (!ncCharacterId) {
-      return { ok: false, message: "캐릭터 고유 ID를 식별할 수 없습니다. 공식 홈페이지 주소를 확인해주세요." };
+      return { ok: false, message: `'${characterName}' 캐릭터를 찾을 수 없습니다. 공식홈페이지 검색 결과와 일치해야 합니다.` };
     }
 
-    // 3. 다이렉트 통신: NC 공식 JSON API 호출 (매니저님이 찾은 그 보물 주소!)
+    // 3. 데이터 추출: 확정된 ID로 NC 공식 서버에 다이렉트 호출
     const infoUrl = `https://aion2.plaync.com/api/character/info?lang=ko&characterId=${ncCharacterId}&serverId=${serverId}`;
     const infoRes = UrlFetchApp.fetch(infoUrl, {
       headers: {
-        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64)",
         "Referer": "https://aion2.plaync.com/"
       }
     });
@@ -176,17 +163,17 @@ function fetchAionToolData(characterName) {
     const res = JSON.parse(infoRes.getContentText());
     const p = res.profile;
     const stats = res.stat ? res.stat.statList : [];
-    const itemLevelObj = stats.find(s => s.type === "ItemLevel");
+    const itemLevel = stats.find(s => s.type === "ItemLevel")?.value || "0";
 
     return { 
       ok: true, 
-      characterId: ncCharacterId, // 나중에 시트에 박제할 ID
+      characterId: ncCharacterId,
       name: p.characterName,
       level: p.characterLevel,
       className: p.className,
       power: p.combatPower,
       img: p.profileImage,
-      itemLevel: itemLevelObj ? itemLevelObj.value : "0",
+      itemLevel: itemLevel,
       title: p.titleName || ""
     };
 
