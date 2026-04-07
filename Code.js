@@ -135,8 +135,21 @@ function fetchAionToolData(characterName) {
       });
       const searchData = JSON.parse(searchRes.getContentText());
       
-      // 우리 서버(2015)이면서 이름이 정확히 일치하는 캐릭터 필터링
-      const targetChar = searchData.find(c => (c.serverId == serverId || c.serverName === '젠카카') && c.name === characterName.trim());
+      // 💡 [핵심 방어] 데이터가 배열인지 확인하고, 아니면 배열로 감싸거나 내부 리스트를 추출합니다.
+      let charList = [];
+      if (Array.isArray(searchData)) {
+        charList = searchData;
+      } else if (searchData && Array.isArray(searchData.data)) {
+        charList = searchData.data; // 만약 { data: [...] } 구조라면
+      } else if (searchData && typeof searchData === 'object') {
+        charList = [searchData]; // 단일 객체라면 배열로 변환
+      }
+
+      // 이제 charList는 무조건 배열이므로 .find를 안전하게 쓸 수 있습니다.
+      const targetChar = charList.find(c => 
+        (c.serverId == serverId || c.serverName === '젠카카') && 
+        String(c.name || c.characterName).trim() === characterName.trim()
+      );
       
       if (targetChar && targetChar.characterId) {
         ncCharacterId = targetChar.characterId;
@@ -295,7 +308,7 @@ function sendDiscordNotification(date, time, partyArray) {
       ],
       footer: { 
         text: "SHADOW LEGION · SYSTEM MANAGER",
-        icon_url: "https://cdn-icons-png.flaticon.com/512/843/843220.png" // 💡 추후 레기온 로고 이미지 URL로 교체 가능
+        icon_url: "https://i.postimg.cc/C5RSrYvD/logo-main2.png" // 💡 그림자 레기온 전용 로고 적용 완료
       },
       timestamp: new Date().toISOString() // 💡 발송 시간 타임스탬프 추가 (공식 문서 느낌)
     }]
