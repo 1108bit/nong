@@ -198,63 +198,40 @@
 }
 
 .checkbox-label { display: inline-flex; align-items: center; gap: 6px; cursor: pointer; }
-.checkbox-label input[type="checkbox"] { width: 15px; height: 15px; margin: 0; accent-color: var(--cyan-1); cursor: pointer; }
+.checkbox-label input[type="checkbox"]:not(.ios-toggle) { width: 15px; height: 15px; margin: 0; accent-color: var(--cyan-1); cursor: pointer; }
 .checkbox-text { font-size: 12px; color: var(--text-sub); user-select: none; }
 
+/* 💡 Apple iOS 순정 토글 스위치 (Toggle Switch) */
+.ios-toggle {
+  appearance: none; -webkit-appearance: none; margin: 0;
+  width: 46px; height: 26px; border-radius: 26px;
+  background: rgba(255, 255, 255, 0.15); outline: none; cursor: pointer; position: relative;
+  transition: background 0.3s cubic-bezier(0.2, 0.8, 0.2, 1); box-shadow: inset 0 1px 3px rgba(0,0,0,0.2);
+}
+.ios-toggle::after {
+  content: ""; position: absolute; top: 2px; left: 2px;
+  width: 22px; height: 22px; border-radius: 50%;
+  background: #fff; box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+  transition: transform 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+.ios-toggle:checked { background: #34C759; }
+.ios-toggle:checked::after { transform: translateX(20px); }
+
 /* -------------------------
-   플로팅 네비게이션 바 (Floating Action Bar)
+   플로팅 뒤로가기 버튼 (Floating Back Button)
 ------------------------- */
-.bottom-action-bar {
-  position: fixed; left: 16px; right: 16px; bottom: 24px; z-index: 50; /* 💡 하단 여백을 24px로 띄워 터치 안전성 및 심미성 확보 */
-  display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 2px; /* 💡 4칸으로 변경 */
-  padding: 8px 6px; border-radius: 999px; 
-  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6);
-  backdrop-filter: blur(12px) saturate(180%); -webkit-backdrop-filter: blur(12px) saturate(180%); /* 💡 은은하고 몽환적인 유리 질감 블러 */
-  padding-bottom: calc(8px + env(safe-area-inset-bottom, 0px));
-  overflow: hidden; /* 💡 회전하는 빛 마스킹 */
+.floating-back-btn {
+  position: fixed; left: max(20px, env(safe-area-inset-left, 20px)); bottom: max(32px, env(safe-area-inset-bottom, 32px));
+  z-index: 50; padding: 0 20px; min-height: 48px; border-radius: 999px;
+  background: rgba(28, 28, 30, 0.65); border: 1px solid rgba(255, 255, 255, 0.15);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4), inset 0 1px 1px rgba(255, 255, 255, 0.2);
+  backdrop-filter: blur(30px) saturate(200%); -webkit-backdrop-filter: blur(30px) saturate(200%);
+  color: #fff; font-size: 15px; font-weight: 600; letter-spacing: -0.01em;
+  display: flex; align-items: center; justify-content: center; gap: 6px;
+  cursor: pointer; transition: all 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
 }
-
-/* 💡 숨쉬는 파란색 테두리 (빛 레이어) */
-.bottom-action-bar::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  background: var(--blue-1); /* 파란색 배경 */
-  box-shadow: 0 0 15px var(--cyan-1); /* 몽환적인 빛 번짐 */
-  animation: border-breathe 2s ease-in-out infinite alternate;
-  z-index: -2;
-}
-
-/* 💡 중앙 영역을 파내어 1.5px 테두리만 남기는 커버 레이어 */
-.bottom-action-bar::after {
-  content: ""; position: absolute; inset: 1.5px; border-radius: 999px;
-  background: rgba(14, 26, 40, 0.92); /* 배경 역할을 대신 수행하여 중앙으로 빛이 새는 것을 방지 */
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.15); /* 기존 엣지 하이라이트 복구 */
-  z-index: -1;
-}
-
-.bottom-action-btn {
-  min-height: 54px; border: none; border-radius: 999px; padding: 8px 4px; cursor: pointer;
-  background: transparent !important; color: var(--text-sub); /* 💡 모든 버튼 투명 배경 고정 */
-  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px;
-  transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275); /* 💡 전체 투명도 제거, 이모지 원색 100% 복구 */
-  z-index: 1; /* 빛 효과 위로 버튼 클릭 영역 확보 */
-}
-.bottom-action-btn .action-icon { font-size: 20px; line-height: 1; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.4)); transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275), filter 0.2s ease; }
-.bottom-action-btn .action-text { font-size: 11px; font-weight: 600; letter-spacing: -0.02em; color: var(--text-sub); transition: color 0.2s ease; }
-.bottom-action-btn:hover .action-text, .bottom-action-btn.active .action-text { color: var(--text-main); } /* 💡 호버 시에만 텍스트 밝게 */
-.bottom-action-btn:hover .action-icon, .bottom-action-btn.active .action-icon { transform: scale(1.15) translateY(-2px); }
-/* 💡 배경색 변경 완전 제거, 오직 이모지 형광 글로우(Drop-shadow)만 적용 */
-.bottom-action-btn.primary:hover .action-icon, .bottom-action-btn.primary.active .action-icon { filter: drop-shadow(0 0 12px rgba(67, 217, 255, 0.9)); }
-.bottom-action-btn.accent:hover .action-icon, .bottom-action-btn.accent.active .action-icon { filter: drop-shadow(0 0 12px rgba(52, 211, 153, 0.9)); }
-.bottom-action-btn.gold:hover .action-icon, .bottom-action-btn.gold.active .action-icon { filter: drop-shadow(0 0 12px rgba(246, 211, 122, 0.9)); }
-.bottom-action-btn.purple:hover, .bottom-action-btn.purple.active { background: rgba(191, 90, 242, 0.12); color: var(--purple-1); border: 1px solid rgba(191, 90, 242, 0.15); }
-.bottom-action-btn.purple:hover .action-icon, .bottom-action-btn.purple.active .action-icon { filter: drop-shadow(0 0 12px rgba(191, 90, 242, 0.9)); }
-.bottom-action-btn.gray:hover .action-icon, .bottom-action-btn.gray.active .action-icon { filter: drop-shadow(0 0 12px rgba(148, 163, 184, 0.9)); }
-
-@keyframes border-breathe {
-  0% { opacity: 0.15; }
-  100% { opacity: 0.95; }
+.floating-back-btn:hover { background: rgba(44, 44, 46, 0.85); transform: translateY(-2px) scale(1.02); }
+.floating-back-btn:active { transform: scale(0.92) !important; transition: transform 0.1s ease !important; }
 
 
 /* -------------------------
