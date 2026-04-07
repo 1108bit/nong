@@ -599,12 +599,6 @@ if (changePwdBtn) {
   };
 }
 
-// 하단 액션 바 버튼 연결
-const bottomAddBtn = getEl("bottomAddBtn");
-if (bottomAddBtn) {
-    bottomAddBtn.onclick = () => getEl("addCharacterButton").click();
-}
-
 // =========================
 // 관리자 권한 버튼 노출 로직
 // =========================

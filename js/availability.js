@@ -358,10 +358,10 @@ function updateSaveButtonVisibility() {
       btn.className = "touch-pop";
       // 💡 [Apple HIG 스타일] 투명한 유리 질감(Glassmorphism)과 둥근 알약(Pill) 디자인 적용
       btn.style.cssText = `
-        position: fixed; bottom: max(32px, env(safe-area-inset-bottom, 32px)); left: 50%;
-        transform: translateX(-50%) translateY(40px) scale(0.9); opacity: 0;
-        width: max-content; min-width: 220px; padding: 0 32px; min-height: 54px;
-        z-index: 9999; font-size: 16px; font-weight: 600; letter-spacing: -0.01em;
+        position: fixed; bottom: max(32px, env(safe-area-inset-bottom, 32px)); right: 20px;
+        transform: translateY(40px) scale(0.9); opacity: 0;
+        width: max-content; padding: 0 20px; min-height: 52px;
+        z-index: 50; font-size: 16px; font-weight: 600; letter-spacing: -0.01em; /* 💡 팝업창 위로 올라오는 현상 방지 */
         border-radius: 999px; background: rgba(10, 132, 255, 0.85); border: none;
         backdrop-filter: blur(24px) saturate(150%); -webkit-backdrop-filter: blur(24px) saturate(150%);
         box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.2), 0 16px 32px rgba(0, 0, 0, 0.4);
@@ -375,11 +375,11 @@ function updateSaveButtonVisibility() {
     btn.style.display = "flex";
     void btn.offsetWidth; // 💡 애니메이션 트리거를 위한 Reflow 강제 발생
     btn.style.opacity = "1";
-    btn.style.transform = "translateX(-50%) translateY(0) scale(1)";
+    btn.style.transform = "translateY(0) scale(1)";
   } else {
     if (btn) {
       btn.style.opacity = "0";
-      btn.style.transform = "translateX(-50%) translateY(40px) scale(0.9)";
+      btn.style.transform = "translateY(40px) scale(0.9)";
       // 💡 애니메이션이 끝난 후 화면에서 부드럽게 숨김 처리
       setTimeout(() => { if (!State.hasChanges) btn.style.display = "none"; }, 400);
     }

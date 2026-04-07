@@ -7,10 +7,10 @@
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
   <title>그림자 레기온 - 메인</title>
-  <link rel="stylesheet" href="./css/variables.css?v=20260407133339" />
-  <link rel="stylesheet" href="./css/layout.css?v=20260407133339" />
-  <link rel="stylesheet" href="./css/components.css?v=20260407133339" />
-  <link rel="stylesheet" href="./css/pages.css?v=20260407133339" />
+  <link rel="stylesheet" href="./css/variables.css?v=20260407133626" />
+  <link rel="stylesheet" href="./css/layout.css?v=20260407133626" />
+  <link rel="stylesheet" href="./css/components.css?v=20260407133626" />
+  <link rel="stylesheet" href="./css/pages.css?v=20260407133626" />
 </head>
 <body>
   <div class="bg-logo"></div>
@@ -24,6 +24,10 @@
             <div class="main-eyebrow">AION2</div>
             <h1 class="main-page-title">그림자 · SHADOW</h1>
             <p class="main-page-desc">레기온 일정과 캐릭터를 관리합니다.</p>
+          </div>
+          <div style="display: flex; gap: 8px;">
+            <button class="icon-btn touch-pop" onclick="movePage('all-characters.html')" title="레기온 멤버" style="width: 40px; height: 40px; font-size: 18px; border-radius: 12px; background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.08);">👥</button>
+            <button class="icon-btn touch-pop" id="openSettingsBtn" title="설정" style="width: 40px; height: 40px; font-size: 18px; border-radius: 12px; background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.08);">⚙️</button>
           </div>
         </div>
         
@@ -83,25 +87,6 @@
 
       <!-- 관리자 진입용 숨겨진 버튼 (이스터에그) -->
       <div class="copyright-text" id="adminSecretBtn" style="text-align: center; margin-top: 32px; margin-bottom: 20px; cursor: pointer; user-select: none; -webkit-user-select: none;">© 농[젠카]. All Rights Reserved.</div>
-    </div>
-
-    <div class="bottom-action-bar">
-      <button class="bottom-action-btn primary" onclick="movePage('availability.html')">
-        <span class="action-icon">📅</span>
-        <span class="action-text">레이드 신청</span>
-      </button>
-      <button class="bottom-action-btn purple" onclick="movePage('all-characters.html')">
-        <span class="action-icon">👥</span>
-        <span class="action-text">레기온 멤버</span>
-      </button>
-      <button class="bottom-action-btn accent" id="bottomAddBtn">
-        <span class="action-icon">➕</span>
-        <span class="action-text">캐릭터 추가</span>
-      </button>
-      <button class="bottom-action-btn gray" id="openSettingsBtn">
-        <span class="action-icon">⚙️</span>
-        <span class="action-text">설정</span>
-      </button>
     </div>
 
     <div class="modal-overlay" id="characterModal">
@@ -195,8 +180,8 @@
       </div>
     </div>
   </main>
-  <script src="./js/api.js?v=20260407133339"></script>
-  <script src="./js/common.js?v=20260407133339"></script>
-  <script src="./js/main.js?v=20260407133339"></script>
+  <script src="./js/api.js?v=20260407133626"></script>
+  <script src="./js/common.js?v=20260407133626"></script>
+  <script src="./js/main.js?v=20260407133626"></script>
 </body>
 </html>
