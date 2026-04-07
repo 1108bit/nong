@@ -2,7 +2,7 @@
 window.addEventListener("DOMContentLoaded", () => {
   // 💡 로그인 화면 접속 시 무조건 스플래시 스크린 재생 (F5 새로고침 테스트 가능)
   const splash = document.getElementById('splashScreen');
-  const splashDelay = 3600; // 스플래시 대기 시간 고정
+  const splashDelay = 1500; // 💡 [UX 향상] 애플 HIG 권장 사항에 따라 지루한 인트로를 1.5초로 대폭 단축
 
   if (splash) {
     splash.style.display = 'flex';
@@ -16,7 +16,7 @@ window.addEventListener("DOMContentLoaded", () => {
   const autoMainName = localStorage.getItem("autoMainName");
   
   if (autoAccountId && autoMainName) {
-    // 💡 자동 로그인 시, 스플래시가 재생 중이면 끝날 때까지 기다렸다가 우아하게 메인으로 이동
+    // 💡 [초고속 진입] 자동 로그인 유저는 1.5초를 다 기다리지 않고, 0.4초 만에 스킵하여 즉시 메인으로 하이패스!
     setTimeout(() => {
       const isAdmin = localStorage.getItem("autoIsAdmin") === "true";
       if (isAdmin) {
@@ -29,7 +29,7 @@ window.addEventListener("DOMContentLoaded", () => {
       } else {
         location.href = `./main.html?mainName=${encodeURIComponent(autoMainName)}&accountId=${autoAccountId}`;
       }
-    }, splashDelay);
+    }, 400);
   }
 });
 
@@ -96,7 +96,16 @@ async function login() {
 getEl("loginButton").onclick = login;
 getEl("mainName").onkeydown = (e) => { if(e.key === "Enter") getEl("password").focus(); };
 const pwdEl = getEl("password");
-if (pwdEl) pwdEl.onkeydown = (e) => { if(e.key === "Enter") login(); };
+if (pwdEl) {
+  pwdEl.onkeydown = (e) => { if(e.key === "Enter") login(); };
+  // 💡 [UX 향상] 비밀번호 4자리가 입력되면 버튼을 누르지 않아도 즉시 자동 로그인 시도
+  pwdEl.addEventListener("input", (e) => {
+    if (e.target.value.length === 4) {
+      e.target.blur(); // 모바일 가상 키보드 부드럽게 숨기기
+      login();
+    }
+  });
+}
 
 // =========================
 // 관리자 이스터에그 (3번 연속 터치)
@@ -131,13 +140,8 @@ if (adminSecretBtn) {
 // 비밀번호 찾기 모달 로직
 // =========================
 const forgotBtn = getEl("forgotPasswordBtn");
-const helpModal = getEl("helpModal");
 
-function closeHelpModal() {
-  helpModal.classList.remove("show");
-  document.body.classList.remove("modal-open");
-}
-
-if (forgotBtn) forgotBtn.onclick = () => { helpModal.classList.add("show"); document.body.classList.add("modal-open"); };
-if (getEl("closeHelpModalBtn")) getEl("closeHelpModalBtn").onclick = closeHelpModal;
-if (getEl("confirmHelpModalBtn")) getEl("confirmHelpModalBtn").onclick = closeHelpModal;
+// 💡 무거운 커스텀 HTML 모달 대신, 세련된 애플 시스템 알럿(uiAlert)으로 교체하여 일관성 확보
+if (forgotBtn) forgotBtn.onclick = async () => { 
+  await uiAlert("비밀번호가 기억나지 않으신가요?\n\n운영진에게 문의하여 '비밀번호 초기화'를 요청해 주세요.\n\n초기화 완료 후 임시 비밀번호는 [0000]이 됩니다."); 
+};

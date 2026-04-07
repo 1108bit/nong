@@ -575,7 +575,7 @@ body.modal-open { overflow: hidden; }
 .applicant-meta { display: flex; flex-direction: column; align-items: flex-end; justify-content: center; gap: 4px; flex-shrink: 0; }
 .draggable-char { cursor: grab; margin-bottom: 8px; }
 .draggable-char:active { cursor: grabbing; }
-.already-placed { opacity: 0.4; filter: grayscale(0.8); pointer-events: none; } /* 중복 배치 상호작용 차단 */
+.already-placed { opacity: 0.4; filter: grayscale(0.8); } /* 💡 드래그 방지는 JS가 담당하므로, 더블클릭 스왑을 위해 pointer-events 제한 해제 */
 
 /* 슬롯 안에 들어갔을 때 카드 하이라이트 효과 */
 .party-slot .applicant-card { margin-bottom: 0 !important; border: 1px solid rgba(67, 217, 255, 0.2); background: rgba(67, 217, 255, 0.05); box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2); }

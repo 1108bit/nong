@@ -158,7 +158,7 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  animation: splashFadeInOut 3.5s ease-in-out forwards;
+  animation: splashFadeInOut 1.5s ease-in-out forwards; /* 💡 3.5s -> 1.5s로 속도감 향상 */
 }
 
 .splash-logo {
@@ -178,9 +178,9 @@
 
 @keyframes splashFadeInOut {
   0% { opacity: 0; transform: scale(0.95); }
-  15% { opacity: 1; transform: scale(1); }
-  85% { opacity: 1; transform: scale(1); }
-  100% { opacity: 0; transform: scale(1.05); }
+  20% { opacity: 1; transform: scale(1); }
+  80% { opacity: 1; transform: scale(1); }
+  100% { opacity: 0; transform: scale(1.02); }
 }
 
 /* -------------------------

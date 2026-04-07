@@ -45,7 +45,10 @@ function escapeHtml(v) {
 
 // 터치 피드백 애니메이션 적용
 function applyTouchPop() {
-  document.querySelectorAll(".btn, .main-button, .character-card, .availability-item, .bottom-action-btn").forEach(el => {
+  // 💡 앱 내의 모든 최신 버튼과 칩, 카드에 터치 피드백이 들어가도록 선택자 대폭 확장
+  document.querySelectorAll(".btn, .main-button, .mini-btn, .icon-btn, .ios-section-btn, .floating-back-btn, .character-card, .availability-item, .chip-btn").forEach(el => {
+    if (el.dataset.popBound) return; // 💡 이벤트 중복 바인딩 메모리 누수 방지
+    el.dataset.popBound = "true";
     el.addEventListener("click", () => {
       el.classList.remove("touch-pop");
       void el.offsetWidth;

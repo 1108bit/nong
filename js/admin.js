@@ -218,6 +218,24 @@ async function loadAdminSchedule() {
   renderScheduleList(State.selectedDashboardDate);
 }
 
+// 💡 [UX 개선] 화면 깜빡임 없이 데이터를 백그라운드에서 조용히 갱신 (SWR 패턴)
+async function syncAdminData() {
+  const adminCode = getAdminCode();
+  const [scheduleData, summaryData] = await Promise.all([
+    callApi({ action: "getRaidScheduleAdmin", adminCode, hideAlert: true, background: true }),
+    callApi({ action: "getAvailabilitySummary", hideAlert: true, background: true })
+  ]);
+
+  if (scheduleData.success) State.schedules = scheduleData.data.items || [];
+  if (summaryData.success) State.summaries = summaryData.data.items || [];
+
+  // 현재 보고 있는 화면을 유지한 채 부드럽게 덧씌우기
+  if (State.selectedDashboardDate) {
+    renderCalendar();
+    renderScheduleList(State.selectedDashboardDate);
+  }
+}
+
 function renderCalendar() {
   const calEl = getEl("miniCalendar");
   if (!calEl) return;
@@ -276,29 +294,11 @@ function renderCalendar() {
   
   calEl.innerHTML = html;
   
-  // 최초 로드 시 상단 파란색 인디케이터 게이지 채우기
   const progress = getEl("dashboardProgress");
   if (progress) {
     const percent = (selectedIndex / 13) * 100;
     progress.style.width = `${percent}%`;
   }
-  
-  calEl.querySelectorAll('.cal-day-cell').forEach(cell => {
-    cell.addEventListener('click', () => {
-      calEl.querySelectorAll('.cal-day-cell').forEach(c => c.classList.remove('active'));
-      cell.classList.add('active');
-      State.selectedDashboardDate = cell.dataset.date;
-      
-      // 클릭 시 인디케이터 부드럽게 이동
-      if (progress) {
-        const idx = parseInt(cell.dataset.index, 10);
-        const percent = (idx / 13) * 100;
-        progress.style.width = `${percent}%`;
-      }
-      
-      renderScheduleList(State.selectedDashboardDate);
-    });
-  });
 }
 
 function renderScheduleList(dateStr) {
@@ -391,17 +391,16 @@ async function saveSchedule() {
   btn.disabled = false;
   btn.textContent = originalText;
 
-  if(res.success) { await uiAlert("저장되었습니다."); loadAdminSchedule(); }
   if(res.success) { 
       await uiAlert("저장되었습니다."); 
-      setTimeout(loadAdminSchedule, 500); // 💡 구글 시트 동기화 딜레이 방어
+      getEl("noteInput").value = ""; // 💡 다음 일정 등록을 위해 메모 입력창 비우기
+      setTimeout(syncAdminData, 500); // 💡 스피너 깜빡임 없이 부드러운 백그라운드 갱신
   }
 }
 
 async function deleteSchedule(date, day, time) {
   if(!(await uiConfirm("정말 삭제하시겠습니까?"))) return;
   const res = await callApi({ action: "deleteRaidSchedule", adminCode: getAdminCode(), date, day, timeSlot: time });
-  if(res.success) loadAdminSchedule();
   
   if(res.success) {
     // 💡 [낙관적 UI] 구글 시트 동기화 지연으로 인해 삭제 직후 데이터를 다시 불러올 때 
@@ -412,7 +411,7 @@ async function deleteSchedule(date, day, time) {
     renderScheduleList(State.selectedDashboardDate);
     
     await uiAlert("일정이 삭제되었습니다.");
-    setTimeout(loadAdminSchedule, 500); // 안전하게 0.5초 뒤 동기화
+    setTimeout(syncAdminData, 500); // 💡 스피너 없이 안전하게 백그라운드 동기화
   }
 }
 
@@ -516,8 +515,7 @@ if(getEl("submitScheduleModalBtn")) {
     if (res.success) {
        await uiAlert("일정이 성공적으로 수정되었습니다.");
        closeScheduleModal();
-       loadAdminSchedule();
-       setTimeout(loadAdminSchedule, 500); // 💡 구글 시트 동기화 딜레이 방어
+       setTimeout(syncAdminData, 500); // 💡 부드러운 갱신
     }
   }; 
 }
@@ -759,8 +757,18 @@ async function openPartyDetail(date, day, time) {
   if (modal) modal.classList.add("show");
   document.body.classList.add("modal-open");
 
-  // 약간의 딜레이 후 렌더링 (자연스러운 모달 팝업 연출)
-  setTimeout(() => {
+  // 💡 [데이터 무결성 확보] 파티 창을 열 때 무조건 서버에서 최신 신청자 목록을 백그라운드로 가져옴
+  // (관리자가 창을 켜둔 사이 다른 유저가 새로 신청/취소한 내역을 실시간 반영하기 위함)
+  setTimeout(async () => {
+    const [scheduleData, summaryData] = await Promise.all([
+      callApi({ action: "getRaidScheduleAdmin", adminCode: getAdminCode(), hideAlert: true, background: true }),
+      callApi({ action: "getAvailabilitySummary", hideAlert: true, background: true })
+    ]);
+
+    if (scheduleData.success) State.schedules = scheduleData.data.items || [];
+    if (summaryData.success) State.summaries = summaryData.data.items || [];
+
+    // 최신 데이터로 파티 에디터 렌더링
     renderPartyEditor(date, time);
   }, 50);
 }
@@ -1071,8 +1079,7 @@ function renderPartyEditor(date, time) {
       const finalMsg = res.message && res.message.includes("실패") ? res.message : (isDiscordSend ? "파티 저장 및 디스코드 전송이 완료되었습니다!" : "디스코드 발송 없이 조용히 저장되었습니다.");
       await uiAlert(finalMsg);
       closePartyDetailModal();
-      loadAdminSchedule(); // 💡 저장 직후 관리자 화면 데이터를 갱신하여 빈 슬롯 현상 방지
-      setTimeout(loadAdminSchedule, 500); // 💡 구글 시트 동기화 딜레이 방어
+      setTimeout(syncAdminData, 500); // 💡 화면 깜빡임 없이 부드러운 갱신
     }
   };
 
@@ -1085,6 +1092,27 @@ function renderPartyEditor(date, time) {
 
 // 💡 [2순위: 패턴 일관성] 관리자 페이지의 모든 이벤트 리스너를 한 곳에서 관리
 function bindEvents() {
+  // 💡 [메모리 최적화] 미니 달력 클릭 이벤트를 렌더링마다 걸지 않고, 컨테이너에 단 한 번만 위임(Delegation)
+  const calEl = getEl("miniCalendar");
+  if (calEl && !calEl.dataset.bound) {
+    calEl.dataset.bound = "true";
+    calEl.addEventListener('click', (e) => {
+      const cell = e.target.closest('.cal-day-cell');
+      if (!cell) return;
+      
+      calEl.querySelectorAll('.cal-day-cell').forEach(c => c.classList.remove('active'));
+      cell.classList.add('active');
+      State.selectedDashboardDate = cell.dataset.date;
+      
+      const progress = getEl("dashboardProgress");
+      if (progress) {
+        const idx = parseInt(cell.dataset.index, 10);
+        progress.style.width = `${(idx / 13) * 100}%`;
+      }
+      renderScheduleList(State.selectedDashboardDate);
+    });
+  }
+
   if(getEl("saveButton")) getEl("saveButton").onclick = saveSchedule; 
   
   if(getEl("checkSchemaButton")) getEl("checkSchemaButton").onclick = async () => {
@@ -1208,8 +1236,13 @@ window.executeSwapCharacter = function(name, className, type, power) {
     currentSwapTargetCard.dataset.power = power;
     currentSwapTargetCard.id = `char_${currentSwapTargetCard.dataset.acc}_${name}`;
 
-    // 💡 [핵심] 다른 부캐로 교체했으므로 '이번 주 완료' 제약 상태를 즉시 해제하여 드래그 가능하게 만듦
+    // 💡 [상태 전이 검증] 일단 제약 상태를 해제한 뒤,
     currentSwapTargetCard.classList.remove('already-placed');
+    
+    // 새로 교체한 캐릭터마저도 이번 주 다른 일정에 이미 참여 중이라면 다시 제약을 걸어버림 (무결성 유지)
+    if (State.currentPartyInfo.alreadyPlacedNames && State.currentPartyInfo.alreadyPlacedNames.has(name)) {
+        currentSwapTargetCard.classList.add('already-placed');
+    }
 
     const nameEl = currentSwapTargetCard.querySelector('.applicant-name');
     if(nameEl) nameEl.textContent = name;

@@ -39,23 +39,32 @@ async function loadMain() {
   }
 
   // 백그라운드에서 서버의 최신 데이터(메인 정보 + 공지사항)를 동시에 가져옴
+  const isSuccess = await syncMainData();
+
+  if (!isSuccess && !cachedData) {
+    // 💡 [에러 핸들링] 네트워크 오류 시 영원히 스켈레톤이 도는 버그 방지
+    getEl("characterList").innerHTML = `<div class="character-empty" style="text-align:center; padding: 20px;">데이터를 불러오지 못했습니다.<br><button onclick="loadMain()" class="mini-btn" style="margin-top:12px;">🔄 다시 시도</button></div>`;
+    getEl("myScheduleList").innerHTML = `<div class="character-empty">데이터를 불러오지 못했습니다.</div>`;
+  }
+}
+
+// 💡 [UX 개선] 화면의 깜빡임(스켈레톤 플래시) 없이 데이터를 백그라운드에서 조용히 갱신
+async function syncMainData() {
+  const accountId = getAccountId();
   const [data, noticeRes] = await Promise.all([
     callApi({ action: "getMainData", accountId, hideAlert: true, background: true }),
     callApi({ action: "getNotice", hideAlert: true, background: true })
   ]);
 
-  if (!data.success && !cachedData) {
-    return;
-  }
-
   if (data.success) {
-    sessionStorage.setItem(cacheKey, JSON.stringify(data.data));
+    sessionStorage.setItem(`cache_main_${accountId}`, JSON.stringify(data.data));
     updateMainUI(data.data);
   }
   if (noticeRes.success) {
     sessionStorage.setItem('cache_notice', noticeRes.data.notice);
     renderNotice(noticeRes.data.notice);
   }
+  return data.success;
 }
 
 let currentNoticeText = ""; // 💡 수정 중 취소할 때를 대비한 백업 변수
@@ -386,9 +395,8 @@ async function submitCharacter() {
   btn.style.opacity = "1";
 
   if(res.success) {
-    sessionStorage.removeItem(`cache_main_${getAccountId()}`); // 💡 캐시 날리기
     closeModal(); // 모달 닫기 및 입력창 완전 초기화
-    setTimeout(loadMain, 400); // 구글 시트 저장 대기 후 리스트 새로고침
+    await syncMainData(); // 💡 캐시 삭제(스켈레톤 렌더링) 없이 부드러운 화면 갱신
   } else {
     await uiAlert(res.message || "처리에 실패했습니다.");
   }
@@ -421,8 +429,7 @@ async function confirmDelete(characterName) {
     });
 
     if (res.success) {
-      sessionStorage.removeItem(`cache_main_${getAccountId()}`); // 💡 캐시 날리기
-      setTimeout(loadMain, 300); // 삭제 처리 후 대기 및 새로고침
+      await syncMainData(); // 💡 캐시 삭제(스켈레톤 렌더링) 없이 부드러운 화면 갱신
     } else {
       await uiAlert(res.message || "캐릭터 삭제에 실패했습니다.");
       if (targetCard) targetCard.classList.remove("removing"); // 실패 시 복구
@@ -505,8 +512,7 @@ async function toggleCharacterType(characterName) {
             if (localStorage.getItem("autoMainName")) localStorage.setItem("autoMainName", characterName);
         }
         await uiAlert(`'${characterName}' 캐릭터 설정이 변경되었습니다.`);
-        sessionStorage.removeItem(`cache_main_${getAccountId()}`); // 💡 캐시 날리기
-        setTimeout(loadMain, 300); // 타입 변경 후 대기 및 새로고침
+        await syncMainData(); // 💡 캐시 삭제(스켈레톤 렌더링) 없이 부드러운 화면 갱신
     } else {
         await uiAlert(res.message || "타입 변경에 실패했습니다.");
     }

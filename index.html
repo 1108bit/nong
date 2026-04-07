@@ -10,10 +10,10 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;800;900&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="./css/variables.css?v=20260407133626" />
-  <link rel="stylesheet" href="./css/layout.css?v=20260407133626" />
-  <link rel="stylesheet" href="./css/components.css?v=20260407133626" />
-  <link rel="stylesheet" href="./css/pages.css?v=20260407133626" />
+  <link rel="stylesheet" href="./css/variables.css?v=20260407134927" />
+  <link rel="stylesheet" href="./css/layout.css?v=20260407134927" />
+  <link rel="stylesheet" href="./css/components.css?v=20260407134927" />
+  <link rel="stylesheet" href="./css/pages.css?v=20260407134927" />
 </head>
 <body>
   <!-- 스플래시 스크린 (인트로) -->
@@ -40,7 +40,8 @@
         </div>
         <div class="form-group">
           <label class="input-label" for="password">비밀번호</label>
-          <input type="password" id="password" class="main-input" placeholder="숫자 4자리" maxlength="4" autocomplete="off" />
+          <!-- 💡 [UX 향상] 아이폰/안드로이드에서 터치 시 즉시 커다란 숫자 키패드가 올라오도록 호환성 추가 -->
+          <input type="password" id="password" class="main-input" placeholder="숫자 4자리" maxlength="4" autocomplete="off" inputmode="numeric" pattern="[0-9]*" />
         </div>
         <div class="login-options-row">
           <label class="checkbox-label">
@@ -55,26 +56,9 @@
       <p class="copyright-text" id="adminSecretBtn" style="cursor: pointer; user-select: none; -webkit-user-select: none;">© 농[젠카]. All Rights Reserved.</p>
     </div>
 
-    <!-- 비밀번호 찾기 모달 -->
-    <div class="modal-overlay" id="helpModal">
-      <div class="modal-sheet">
-        <div class="modal-head">
-          <h3 class="modal-title">비밀번호 찾기 안내</h3>
-          <button class="modal-close-btn" id="closeHelpModalBtn">닫기</button>
-        </div>
-        <div class="modal-form">
-          <div style="padding: 10px 0 24px; line-height: 1.6; color: var(--text-sub); font-size: 14px; text-align: left;">
-            비밀번호가 기억나지 않으신가요?<br><br>
-            레기온 군단장 마스터님이나 운영진에게 문의하여 <strong>비밀번호 초기화</strong>를 요청해 주세요.<br>
-            초기화가 완료되면 비밀번호는 <strong style="color: var(--cyan-2); font-size: 16px; letter-spacing: 2px;">0000</strong>으로 임시 설정되며, 로그인 후 메인 화면에서 다시 변경하실 수 있습니다.
-          </div>
-          <button type="button" class="main-button" id="confirmHelpModalBtn">확인</button>
-        </div>
-      </div>
-    </div>
   </main>
-  <script src="./js/api.js?v=20260407133626"></script>
-  <script src="./js/common.js?v=20260407133626"></script>
-  <script src="./js/app.js?v=20260407133626"></script>
+  <script src="./js/api.js?v=20260407134927"></script>
+  <script src="./js/common.js?v=20260407134927"></script>
+  <script src="./js/app.js?v=20260407134927"></script>
 </body>
 </html>
