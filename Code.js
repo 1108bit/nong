@@ -143,20 +143,36 @@ function fetchAionToolData(characterName) {
         charList = searchData;
       } else if (searchData && Array.isArray(searchData.data)) {
         charList = searchData.data; // 만약 { data: [...] } 구조라면
+      } else if (searchData && Array.isArray(searchData.results)) {
+        charList = searchData.results;
       } else if (searchData && typeof searchData === 'object') {
         charList = [searchData]; // 단일 객체라면 배열로 변환
       }
 
       // 💡 [개선된 검색 로직] 공백 제거 및 대소문자 무시 비교 강화
-      const targetChar = charList.find(c => {
+      let targetChar = charList.find(c => {
         const inputName = characterName.replace(/\s+/g, "").toLowerCase(); // 입력값 공백제거
         const apiName = String(c.name || c.characterName || "").replace(/\s+/g, "").toLowerCase(); // API값 공백제거
         
-        const isSameServer = (c.serverId == serverId || c.serverName === '젠카카');
-        const isSameName = (apiName === inputName);
+        const apiServer = String(c.serverId || c.server_id || "");
+        const apiServerName = String(c.serverName || c.server_name || c.server || "");
         
-        return isSameServer && isSameName;
+        const isSameServer = (apiServer === String(serverId) || apiServerName.includes('젠카카'));
+        return isSameServer && (apiName === inputName);
       });
+
+      // 💡 [안전망] 정확히 일치하는 이름이 없다면, 해당 서버에서 이름이 '포함된(부분 일치)' 캐릭터를 차선책으로 선택합니다.
+      if (!targetChar) {
+        targetChar = charList.find(c => {
+          const inputName = characterName.replace(/\s+/g, "").toLowerCase();
+          const apiName = String(c.name || c.characterName || "").replace(/\s+/g, "").toLowerCase();
+          const apiServer = String(c.serverId || c.server_id || "");
+          const apiServerName = String(c.serverName || c.server_name || c.server || "");
+          
+          const isSameServer = (apiServer === String(serverId) || apiServerName.includes('젠카카'));
+          return isSameServer && apiName.includes(inputName);
+        });
+      }
       
       if (targetChar && targetChar.characterId) {
         ncCharacterId = targetChar.characterId;
