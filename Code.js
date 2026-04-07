@@ -291,3 +291,11 @@ function sendDiscordNotification(date, time, partyArray) {
     return e.message;
   }
 }
+
+// =========================
+// 💡 [보안 권한 강제 활성화] 구글 앱스 스크립트 권한 팝업 호출용 미끼 함수
+// 에디터 상단에서 이 함수(forceAuth)를 선택하고 [▶️ 실행]을 누르세요.
+// =========================
+function forceAuth() {
+  UrlFetchApp.fetch("https://google.com");
+}
