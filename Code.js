@@ -173,7 +173,7 @@ function savePartyComposition(adminCode, targetDate, targetTime, partyListJson, 
 // 디스코드 웹훅 알림 발송 로직
 // =========================
 function sendDiscordNotification(date, time, partyArray) {
-  if (!DISCORD_WEBHOOK_URL) return; // URL이 없으면 작동하지 않음
+  if (!DISCORD_WEBHOOK_URL) return "GAS 스크립트 속성에 DISCORD_WEBHOOK_URL이 설정되지 않았습니다.";
 
   // 💡 [에러 원천 차단] 데이터가 깨지거나 배열이 아닐 경우 빈 배열로 덮어씌우고 무조건 8칸을 강제 확보합니다.
   const safeArray = Array.isArray(partyArray) ? partyArray : [];
