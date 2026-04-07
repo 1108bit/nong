@@ -1153,7 +1153,7 @@ function bindEvents() {
   const backBtn = getEl("backButton");
   if (backBtn) {
     if (getAccountId() === "MASTER_ADMIN") {
-      backBtn.textContent = "로그아웃";
+      backBtn.innerHTML = '<span style="font-size:18px; opacity:0.8;">🚪</span> 로그아웃';
       backBtn.onclick = () => {
         sessionStorage.clear();
         localStorage.removeItem("autoAccountId"); localStorage.removeItem("autoMainName");

@@ -80,9 +80,9 @@ function sortData(column) {
   applySort();
 }
 
-window.goToUserManage = function(accountId) {
+window.goToUserManage = function(mainName) {
   if (sessionStorage.getItem("isAdmin") === "true") {
-    sessionStorage.setItem("autoSearchUser", accountId);
+    sessionStorage.setItem("autoSearchUser", mainName);
     movePage("admin.html");
   }
 };
@@ -139,7 +139,7 @@ function renderTable() {
     const classNameEscaped = escapeHtml(c.className);
     const isMainChar = c.type === '본캐';
     const mainIcon = isMainChar ? '<span style="color:var(--gold-1); margin-right:4px; font-size:14px; text-shadow: 0 0 8px rgba(246,211,122,0.4);">⭐️</span>' : '';
-    const rowClick = isAdmin ? `onclick="goToUserManage('${escapeHtml(c.accountId)}')" style="cursor: pointer;" title="클릭하여 유저 정보 수정"` : '';
+    const rowClick = isAdmin ? `onclick="goToUserManage('${escapeHtml(c.mainName)}')" style="cursor: pointer;" title="클릭하여 유저 정보 수정"` : '';
 
     return `
       <tr ${rowClick}>
