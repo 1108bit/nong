@@ -445,6 +445,8 @@ async function saveAllChanges() {
   if (!hasError) {
      await uiAlert("일정이 성공적으로 저장되었습니다.");
      State.originalSelectedMap = new Set(State.selectedMap);
+     // 💡 [캐시 무효화] 메인 화면으로 돌아갔을 때 '내 레이드 일정'이 즉시 최신화되도록 기존 메인 캐시 삭제
+     sessionStorage.removeItem(`cache_main_${getAccountId()}`);
      updateSaveButtonVisibility();
      loadAvailabilityData(); // 서버의 최신 정보와 화면을 최종 동기화
   } else {
