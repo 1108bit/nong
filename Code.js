@@ -145,11 +145,16 @@ function fetchAionToolData(characterName) {
         charList = [searchData]; // 단일 객체라면 배열로 변환
       }
 
-      // 이제 charList는 무조건 배열이므로 .find를 안전하게 쓸 수 있습니다.
-      const targetChar = charList.find(c => 
-        (c.serverId == serverId || c.serverName === '젠카카') && 
-        String(c.name || c.characterName).trim() === characterName.trim()
-      );
+      // 💡 [개선된 검색 로직] 공백 제거 및 대소문자 무시 비교 강화
+      const targetChar = charList.find(c => {
+        const inputName = characterName.replace(/\s+/g, "").toLowerCase(); // 입력값 공백제거
+        const apiName = String(c.name || c.characterName || "").replace(/\s+/g, "").toLowerCase(); // API값 공백제거
+        
+        const isSameServer = (c.serverId == serverId || c.serverName === '젠카카');
+        const isSameName = (apiName === inputName);
+        
+        return isSameServer && isSameName;
+      });
       
       if (targetChar && targetChar.characterId) {
         ncCharacterId = targetChar.characterId;
